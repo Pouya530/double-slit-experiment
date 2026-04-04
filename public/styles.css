@@ -86,6 +86,17 @@ body.nav-mobile-open {
   color: white;
   text-decoration: none;
   line-height: 1.15;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+}
+
+.logo-mark {
+  height: 1em;
+  width: auto;
+  flex-shrink: 0;
+  object-fit: contain;
+  display: block;
 }
 
 .nav-burger {
