@@ -16,6 +16,11 @@
   ],
   "redirects": [
     {
+      "source": "/demo",
+      "destination": "/demo/",
+      "permanent": true
+    },
+    {
       "source": "/demo.css",
       "destination": "/demo/demo.css",
       "permanent": true
@@ -60,7 +65,6 @@
       "destination": "/demo/physics-interpretations.js",
       "permanent": true
     },
-    { "source": "/demo", "destination": "/demo/", "permanent": true },
     {
       "source": "/demo/advanced",
       "destination": "/demo/",
