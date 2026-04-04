@@ -90,7 +90,7 @@ body {
 }
 .demo-header .logo {
   font-size: clamp(16px, 3.2vw, 22px);
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text);
   text-decoration: none;
   line-height: 1.2;
@@ -99,7 +99,7 @@ body {
   gap: 0.35em;
 }
 .demo-header .logo-mark {
-  height: 1em;
+  height: 2em;
   width: auto;
   flex-shrink: 0;
   object-fit: contain;

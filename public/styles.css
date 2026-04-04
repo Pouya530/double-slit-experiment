@@ -92,7 +92,7 @@ body.nav-mobile-open {
 }
 
 .logo-mark {
-  height: 1em;
+  height: 2em;
   width: auto;
   flex-shrink: 0;
   object-fit: contain;
