@@ -46,8 +46,10 @@ body {
 
 .demo-layout {
   position: relative;
-  width: 100vw;
+  width: 100%;
+  max-width: 100vw;
   height: 100vh;
+  height: 100dvh;
 }
 
 #canvas {
@@ -414,12 +416,24 @@ body {
     display: block;
   }
 
+  .demo-layout {
+    /* Small viewport height: keeps bottom UI above mobile browser chrome (Safari tab bar) */
+    height: 100svh;
+    min-height: 100svh;
+  }
+
+  .demo-ui {
+    padding: 18px 16px;
+    /* Safe home-indicator + typical Safari bottom bar (~48px) so timeline isn’t covered */
+    padding-bottom: max(28px, calc(env(safe-area-inset-bottom, 0px) + 52px));
+  }
+
   .tour-overlay {
     left: 12px;
     right: 12px;
     transform: none;
     max-width: none;
-    bottom: 100px;
+    bottom: calc(120px + env(safe-area-inset-bottom, 0px));
   }
 }
 
