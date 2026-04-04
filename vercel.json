@@ -1,9 +1,76 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "headers": [
+    {
+      "source": "/demo",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }]
+    },
+    {
+      "source": "/demo/",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }]
+    },
+    {
+      "source": "/demo/index.html",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }]
+    }
+  ],
   "redirects": [
+    {
+      "source": "/demo.css",
+      "destination": "/demo/demo.css",
+      "permanent": true
+    },
+    {
+      "source": "/help-modal.js",
+      "destination": "/demo/help-modal.js",
+      "permanent": true
+    },
+    {
+      "source": "/advanced-main.js",
+      "destination": "/demo/advanced-main.js",
+      "permanent": true
+    },
+    {
+      "source": "/main.js",
+      "destination": "/demo/main.js",
+      "permanent": true
+    },
+    {
+      "source": "/simulation.js",
+      "destination": "/demo/simulation.js",
+      "permanent": true
+    },
+    {
+      "source": "/physics.js",
+      "destination": "/demo/physics.js",
+      "permanent": true
+    },
+    {
+      "source": "/interpretations.js",
+      "destination": "/demo/interpretations.js",
+      "permanent": true
+    },
+    {
+      "source": "/interpretations-advanced.js",
+      "destination": "/demo/interpretations-advanced.js",
+      "permanent": true
+    },
+    {
+      "source": "/physics-interpretations.js",
+      "destination": "/demo/physics-interpretations.js",
+      "permanent": true
+    },
     { "source": "/demo", "destination": "/demo/", "permanent": true },
-    { "source": "/demo/advanced", "destination": "/demo/", "permanent": false },
-    { "source": "/demo/advanced/", "destination": "/demo/", "permanent": false }
+    {
+      "source": "/demo/advanced",
+      "destination": "/demo/",
+      "permanent": false
+    },
+    {
+      "source": "/demo/advanced/",
+      "destination": "/demo/",
+      "permanent": false
+    }
   ],
   "rewrites": [
     { "source": "/preview/what", "destination": "/preview/what.html" },
