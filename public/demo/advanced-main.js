@@ -14,6 +14,15 @@ import {
   effectiveWavelength,
 } from './physics-interpretations.js';
 
+/** Map interpretation UI accent (#RRGGBB) to Three.js hex for overlays. */
+function hexFromInterpBrand(def) {
+  const c = def?.color;
+  if (typeof c !== 'string' || !c.startsWith('#')) return null;
+  const h = c.slice(1);
+  if (h.length === 6 && /^[0-9a-fA-F]+$/.test(h)) return parseInt(h, 16);
+  return null;
+}
+
 function syncInterpretationUI() {
   document.querySelectorAll('.interp-tab').forEach((b) => b.classList.toggle('active', b.dataset.interp === activeInterpretation));
   if (showInfoPanel) renderInfoPanel(activeInterpretation);
@@ -565,6 +574,7 @@ function addInterpretationOverlays() {
   waveOverlay.rotation.y = -Math.PI / 2;
   waveOverlay.position.set(1, 0, 0);
   waveOverlay.visible = false;
+  waveOverlay.renderOrder = 10;
   scene.add(waveOverlay);
 
   const envGeo = new THREE.SphereGeometry(0.015, 4, 4);
@@ -596,8 +606,9 @@ function addInterpretationOverlays() {
   });
   qbismOverlay = new THREE.Mesh(qbismGeo, qbismMat);
   qbismOverlay.rotation.y = -Math.PI / 2;
-  qbismOverlay.position.set(0.8, 0, 0);
+  qbismOverlay.position.set(0.95, 0, 0);
   qbismOverlay.visible = false;
+  qbismOverlay.renderOrder = 10;
   scene.add(qbismOverlay);
 }
 
@@ -614,15 +625,27 @@ function updateInterpretationOverlays() {
 
   if (waveOverlay) {
     waveOverlay.visible = showWave;
-    if (interp?.waveColor) waveOverlay.material.color.setHex(interp.waveColor);
-    waveOverlay.material.opacity = 0.06 + 0.04 * Math.sin(currentTime * 2) ** 2;
+    if (showWave) {
+      const waveHex =
+        interp?.waveColor ?? hexFromInterpBrand(interp) ?? 0x4fc3f7;
+      waveOverlay.material.color.setHex(waveHex);
+    }
+    waveOverlay.material.opacity = 0.08 + 0.06 * Math.sin(currentTime * 2) ** 2;
   }
   if (envParticles) envParticles.visible = showEnv;
 
   if (qbismOverlay) {
     qbismOverlay.visible = showQbism;
     if (showQbism) {
-      qbismOverlay.material.opacity = physicsBlend > 0.5 ? 0.04 : 0.12 + 0.03 * Math.sin(currentTime * 1.5) ** 2;
+      const cloudHex =
+        interp?.cloudColor ?? hexFromInterpBrand(interp) ?? 0xba68c8;
+      qbismOverlay.material.color.setHex(cloudHex);
+      const classical = physicsBlend > 0.45;
+      const pulse =
+        0.14 + 0.08 * Math.sin(currentTime * 1.5) ** 2;
+      const classicalPulse =
+        0.1 + 0.06 * Math.sin(currentTime * 1.2) ** 2;
+      qbismOverlay.material.opacity = classical ? classicalPulse : pulse;
     }
   }
 }

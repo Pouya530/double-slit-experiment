@@ -48,6 +48,7 @@ export const INTERPRETATIONS = {
     quote: '"The universe is constantly splitting into a stupendous number of branches."',
     quoteAuthor: 'Bryce DeWitt',
     level: 'A-Level+',
+    waveColor: 0x66bb6a,
     branchColor: 0x66bb6a,
     showBranches: true,
   },

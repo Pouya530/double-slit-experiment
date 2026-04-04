@@ -37,7 +37,7 @@ export const INTERPRETATIONS_ADV = {
     quote: '"There is no quantum world. There is only an abstract quantum physical description."',
     quoteAuthor: 'Niels Bohr (attributed)',
     level: 'A-level+',
-    waveColor: 0x4fc3f7,
+    waveColor: 0x2f5496,
     collapseFlash: true,
     observerHint:
       'Here “observing” means which-path / macroscopic recording — not consciousness (in most modern readings).',
@@ -82,7 +82,7 @@ export const INTERPRETATIONS_ADV = {
     quote: '"The universe is constantly splitting into a stupendous number of branches."',
     quoteAuthor: 'Bryce DeWitt',
     level: 'A-level+',
-    waveColor: 0x66bb6a,
+    waveColor: 0x8e44ad,
     branchColor: 0x66bb6a,
     showBranches: true,
     observerHint:
@@ -128,7 +128,7 @@ export const INTERPRETATIONS_ADV = {
     quote: '"Is it not clear from the scintillation that we have to do with a particle? And from the interference, that its motion is directed by a wave?"',
     quoteAuthor: 'John Bell',
     level: 'A-level+',
-    waveColor: 0xffb74d,
+    waveColor: 0x2980b9,
     trajectoryColor: 0xffffff,
     showTrajectories: true,
     observerHint: 'Which-path detection disturbs the guiding wave — same statistics as standard QM.',
