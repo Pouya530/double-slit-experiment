@@ -1,4 +1,14 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "rewrites": [{ "source": "/(.*)", "destination": "/api" }]
+  "redirects": [
+    { "source": "/demo", "destination": "/demo/", "permanent": true },
+    { "source": "/demo/advanced", "destination": "/demo/", "permanent": false },
+    { "source": "/demo/advanced/", "destination": "/demo/", "permanent": false }
+  ],
+  "rewrites": [
+    { "source": "/preview/what", "destination": "/preview/what.html" },
+    { "source": "/preview/who", "destination": "/preview/who.html" },
+    { "source": "/preview/benefits", "destination": "/preview/benefits.html" },
+    { "source": "/preview/features", "destination": "/preview/features.html" }
+  ]
 }

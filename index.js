@@ -13,6 +13,23 @@ const PORT = Number(process.env.PORT) || 3000;
 const demoPath = path.join(__dirname, 'public', 'demo', 'index.html');
 const publicPath = path.join(__dirname, 'public');
 
+// When the doc URL is /demo (no slash), relative URLs like demo.css resolve to /demo.css at the host root.
+// Catch those on any host (incl. Vercel CDN miss → Express fallback) and send to /demo/.
+const DEMO_ASSET_ALIASES = [
+  '/demo.css',
+  '/help-modal.js',
+  '/main.js',
+  '/advanced-main.js',
+  '/simulation.js',
+  '/physics.js',
+  '/interpretations.js',
+  '/interpretations-advanced.js',
+  '/physics-interpretations.js',
+];
+for (const from of DEMO_ASSET_ALIASES) {
+  app.get(from, (_req, res) => res.redirect(308, `/demo${from}`));
+}
+
 /** Avoid stale marketing HTML/JS in dev: static’s default index + ETag cache can skip showing loads in Network */
 function noStoreHtmlJs(res, filePath) {
   if (/\.(html?|js|mjs)$/i.test(filePath)) {
