@@ -263,7 +263,8 @@ body {
     display: flex;
     flex-direction: column;
     position: absolute;
-    top: 58px;
+    /* Below wrapped header (logo + nav); safe-area for notched iPhones */
+    top: calc(env(safe-area-inset-top, 0px) + 84px);
     left: 12px;
     right: 12px;
     z-index: 100;
@@ -298,10 +299,17 @@ body {
   }
   .demo-header {
     padding: 12px 16px;
+    padding-top: max(12px, env(safe-area-inset-top, 0px));
     flex-wrap: wrap;
     gap: 8px;
+    row-gap: 6px;
   }
-  .demo-header .logo { font-size: clamp(14px, 4vw, 18px); }
+  /* Smaller title on phones so nav stays on fewer rows (was crowding toolbar at top: 58px) */
+  .demo-header .logo {
+    font-size: clamp(11px, 3.15vw, 14px);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
   .header-right {
     flex-wrap: wrap;
     gap: 8px;
@@ -640,7 +648,7 @@ body {
     display: flex;
     flex-direction: column;
     position: absolute;
-    top: 58px;
+    top: calc(env(safe-area-inset-top, 0px) + 84px);
     left: 12px;
     right: 12px;
     z-index: 100;
