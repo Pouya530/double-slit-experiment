@@ -1,10 +1,10 @@
-# Double Slit
+# Double Slit Experiment
 
 > Interactive 3D web visualiser of the quantum double-slit experiment for physics education: timeline scrubbing of particle accumulation, observer toggle (wave–particle illustration), orbital 360° camera, and adjustable parameters.
 
 ## About
 
-Double Slit lets students and teachers explore wave–particle duality by firing photons or electrons at two slits and watching an interference pattern build on a detection screen. It is designed for clear classroom use with accessible controls and semantic, crawlable content on marketing and info pages. Built by Nocturnal Cloud.
+Double Slit Experiment lets students and teachers explore wave–particle duality by firing photons or electrons at two slits and watching an interference pattern build on a detection screen. It is designed for clear classroom use with accessible controls and semantic, crawlable content on marketing and info pages. Built by Nocturnal Cloud.
 
 ## Key Pages
 
@@ -22,4 +22,4 @@ Double Slit lets students and teachers explore wave–particle duality by firing
 
 ## Optional reference
 
-Educators also use established simulations such as [PhET Wave Interference](https://phet.colorado.edu/en/simulations/wave-interference) for comparison; Double Slit emphasises combined 3D presentation, timeline scrubbing, and observer juxtaposition.
+Educators also use established simulations such as [PhET Wave Interference](https://phet.colorado.edu/en/simulations/wave-interference) for comparison; Double Slit Experiment emphasises combined 3D presentation, timeline scrubbing, and observer juxtaposition.

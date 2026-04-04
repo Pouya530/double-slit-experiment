@@ -86,7 +86,7 @@ body {
 [data-theme="light"] .demo-header {
   background: linear-gradient(180deg, var(--bg-overlay-top) 0%, transparent);
 }
-.demo-header .logo { font-size: 24px; font-weight: 600; color: var(--text); text-decoration: none; }
+.demo-header .logo { font-size: clamp(16px, 3.2vw, 22px); font-weight: 600; color: var(--text); text-decoration: none; line-height: 1.2; }
 .header-right { display: flex; align-items: center; gap: 16px; }
 .demo-header .back { font-size: 14px; color: var(--text-muted); text-decoration: none; }
 .demo-header .back:hover { color: var(--text); }
@@ -301,7 +301,7 @@ body {
     flex-wrap: wrap;
     gap: 8px;
   }
-  .demo-header .logo { font-size: 20px; }
+  .demo-header .logo { font-size: clamp(14px, 4vw, 18px); }
   .header-right {
     flex-wrap: wrap;
     gap: 8px;
