@@ -52,6 +52,87 @@ let envCoupling = 0;
 let perspective = 'external';
 let physicsBlend = 0;
 
+/** Per-interpretation persisted knobs (slit λ / geometry stay global on the form). */
+const DEFAULT_ELECTRON_AMU = 0.00055;
+/** @type {Record<string, { particleMassAmu: number; envCoupling: number; perspective: string; isObserving: boolean }>} */
+let interpParamSnapshots = {};
+
+function createDefaultInterpParams() {
+  return {
+    particleMassAmu: DEFAULT_ELECTRON_AMU,
+    envCoupling: 0,
+    perspective: 'external',
+    isObserving: false,
+  };
+}
+
+function cloneInterpParams(p) {
+  return {
+    particleMassAmu: p.particleMassAmu,
+    envCoupling: p.envCoupling,
+    perspective: p.perspective,
+    isObserving: p.isObserving,
+  };
+}
+
+function captureParamsFromGlobals() {
+  return cloneInterpParams({
+    particleMassAmu,
+    envCoupling,
+    perspective,
+    isObserving,
+  });
+}
+
+function initInterpParamSnapshots() {
+  interpParamSnapshots = {};
+  for (const id of INTERPRETATION_IDS_ADV) {
+    interpParamSnapshots[id] = createDefaultInterpParams();
+  }
+}
+
+function syncAdvancedControlsFromGlobals() {
+  const massEl = document.getElementById('adv-mass');
+  if (massEl) {
+    massEl.value = String(Math.round(amuToMassSlider(particleMassAmu) * 1000));
+  }
+  const envEl = document.getElementById('adv-env');
+  if (envEl) {
+    envEl.value = String(Math.round(envCoupling * 100));
+  }
+  document.querySelectorAll('input[name="perspective"]').forEach((radio) => {
+    radio.checked = radio.value === perspective;
+  });
+}
+
+/** Snap blend/observers so switching tabs does not leave seconds of “wrong” interpolation. */
+function snapPhysicsStateImmediate() {
+  observerTarget = isObserving ? 1 : 0;
+  observerTransition = observerTarget;
+  physicsBlend = computePhysicsBlendTarget();
+}
+
+/**
+ * Save current globals into the tab we are leaving, load the tab we are entering, rebuild particles.
+ */
+function switchInterpretation(nextId) {
+  if (nextId === activeInterpretation) return;
+  interpParamSnapshots[activeInterpretation] = captureParamsFromGlobals();
+  activeInterpretation = nextId;
+  const snap = interpParamSnapshots[activeInterpretation] || createDefaultInterpParams();
+  particleMassAmu = snap.particleMassAmu;
+  envCoupling = snap.envCoupling;
+  perspective = snap.perspective;
+  isObserving = snap.isObserving;
+  syncAdvancedControlsFromGlobals();
+  updateObserveAndAdvancedControls();
+  snapPhysicsStateImmediate();
+  rebuildParticleBuffer(Date.now());
+  currentTime = 0;
+  const timelineEl = document.getElementById('timeline');
+  if (timelineEl) timelineEl.value = 0;
+}
+
 const THEMES = {
   dark: {
     bg: 0x050510,
@@ -185,6 +266,8 @@ function init() {
   const savedTheme = localStorage.getItem('doubleSlitTheme');
   isDarkMode = savedTheme === 'dark';
   document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
+
+  initInterpParamSnapshots();
 
   scene = new THREE.Scene();
 
@@ -625,7 +708,7 @@ function setupInterpretationUI() {
     const color = INTERPRETATIONS_ADV[btn.dataset.interp]?.color;
     btn.style.setProperty('--interp-accent', color || '#129079');
     btn.addEventListener('click', () => {
-      activeInterpretation = btn.dataset.interp;
+      switchInterpretation(btn.dataset.interp);
       document.querySelectorAll('.interp-tab').forEach(b => b.classList.toggle('active', b.dataset.interp === activeInterpretation));
       const interpMobile = document.getElementById('interp-select-mobile');
       if (interpMobile) interpMobile.value = activeInterpretation;
@@ -636,7 +719,7 @@ function setupInterpretationUI() {
   });
   document.querySelector('.interp-tab[data-interp="copenhagen"]')?.classList.add('active');
   document.getElementById('interp-select-mobile')?.addEventListener('change', (e) => {
-    activeInterpretation = e.target.value;
+    switchInterpretation(e.target.value);
     document.querySelectorAll('.interp-tab').forEach((b) => b.classList.toggle('active', b.dataset.interp === activeInterpretation));
     syncInterpretationUI();
     renderInfoPanel(activeInterpretation);
