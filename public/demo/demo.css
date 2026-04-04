@@ -263,8 +263,8 @@ body {
     display: flex;
     flex-direction: column;
     position: absolute;
-    /* Below wrapped header (logo + nav); safe-area for notched iPhones */
-    top: calc(env(safe-area-inset-top, 0px) + 84px);
+    /* Below single-row header: safe-area + vertical padding + 44px controls */
+    top: calc(env(safe-area-inset-top, 0px) + 68px);
     left: 12px;
     right: 12px;
     z-index: 100;
@@ -298,24 +298,60 @@ body {
     flex-wrap: nowrap;
   }
   .demo-header {
-    padding: 12px 16px;
-    padding-top: max(12px, env(safe-area-inset-top, 0px));
-    flex-wrap: wrap;
-    gap: 8px;
-    row-gap: 6px;
+    padding: 10px 10px;
+    padding-top: max(10px, env(safe-area-inset-top, 0px));
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 6px;
   }
-  /* Smaller title on phones so nav stays on fewer rows (was crowding toolbar at top: 58px) */
+  /* Logo + nav on one line: logo shrinks with ellipsis if needed */
   .demo-header .logo {
-    font-size: clamp(11px, 3.15vw, 14px);
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: clamp(10px, 2.9vw, 12px);
     line-height: 1.2;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.03em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .header-right {
-    flex-wrap: wrap;
-    gap: 8px;
+    display: flex;
+    flex-wrap: nowrap;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 4px;
+  }
+  .demo-header .theme-label {
+    display: none;
+  }
+  .demo-header .theme-btn {
+    padding: 6px 10px;
+    min-width: 44px;
+    min-height: 44px;
+    justify-content: center;
+    gap: 0;
+    font-size: 12px;
+  }
+  .demo-header .theme-icon {
+    font-size: 16px;
+    line-height: 1;
+  }
+  .demo-header .help-features-btn {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 0 8px;
+    min-height: 44px;
+    line-height: 1.2;
   }
   .demo-header .back {
-    font-size: 13px;
+    font-size: 11px;
+    white-space: nowrap;
+    padding: 0 4px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
   }
 
   .params-toggle-mobile {
@@ -648,7 +684,7 @@ body {
     display: flex;
     flex-direction: column;
     position: absolute;
-    top: calc(env(safe-area-inset-top, 0px) + 84px);
+    top: calc(env(safe-area-inset-top, 0px) + 68px);
     left: 12px;
     right: 12px;
     z-index: 100;
@@ -865,9 +901,3 @@ body {
   border: 1px solid var(--panel-border);
 }
 
-@media (max-width: 768px) {
-  .help-features-btn {
-    font-size: 13px;
-    padding: 8px 10px;
-  }
-}
