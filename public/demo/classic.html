@@ -1,8 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <base href="/demo/">
   <meta charset="UTF-8">
+  <script>
+  (function () {
+    var p = location.pathname;
+    if (p === '/demo') {
+      location.replace(location.origin + '/demo/' + location.search + location.hash);
+      return;
+    }
+    if (p === '/demo/' || (p.length >= 6 && p.indexOf('/demo/') === 0)) {
+      var bases = document.getElementsByTagName('base');
+      var i;
+      for (i = bases.length - 1; i >= 0; i--) {
+        bases[i].parentNode.removeChild(bases[i]);
+      }
+      var b = document.createElement('base');
+      b.href = location.origin + '/demo/';
+      var charset = document.querySelector('meta[charset]');
+      if (charset) {
+        charset.insertAdjacentElement('afterend', b);
+      } else {
+        document.head.insertBefore(b, document.head.firstChild);
+      }
+    }
+  })();
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Double Slit classic guided demo: step-through tour of the 3D double-slit experiment, wave interference, and observer effects.">
   <meta name="keywords" content="double slit, guided tour, quantum physics demo, A-level physics">
@@ -24,7 +47,7 @@
   <title>Double Slit — Classic demo (guided tour)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/demo/demo.css">
+  <link rel="stylesheet" href="/demo/demo.css?v=4">
   <script type="application/ld+json">
   {"@context":"https://schema.org","@graph":[{"@type":"WebPage","@id":"https://doubleslitexperiment.app/demo/classic.html#webpage","name":"Double Slit — Classic demo (guided tour)","description":"Double Slit classic guided demo: step-through tour of the 3D double-slit experiment, wave interference, and observer effects.","url":"https://doubleslitexperiment.app/demo/classic.html","isPartOf":{"@type":"WebSite","name":"Double Slit","url":"https://doubleslitexperiment.app/"},"breadcrumb":{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://doubleslitexperiment.app/"},{"@type":"ListItem","position":2,"name":"Demo","item":"https://doubleslitexperiment.app/demo/"},{"@type":"ListItem","position":3,"name":"Classic guided demo","item":"https://doubleslitexperiment.app/demo/classic.html"}]}}]}
   </script>
@@ -153,7 +176,7 @@
     </div>
   </div>
 
-  <script src="/demo/help-modal.js" defer></script>
-  <script type="module" src="/demo/main.js"></script>
+  <script src="/demo/help-modal.js?v=4" defer></script>
+  <script type="module" src="/demo/main.js?v=4"></script>
 </body>
 </html>

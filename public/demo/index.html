@@ -1,9 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <base href="/demo/">
-  <!-- static: v2026-04-04 correct asset URLs for CDN + /demo trailing slash -->
   <meta charset="UTF-8">
+  <script>
+  (function () {
+    var p = location.pathname;
+    if (p === '/demo') {
+      location.replace(location.origin + '/demo/' + location.search + location.hash);
+      return;
+    }
+    if (p === '/demo/' || (p.length >= 6 && p.indexOf('/demo/') === 0)) {
+      var bases = document.getElementsByTagName('base');
+      var i;
+      for (i = bases.length - 1; i >= 0; i--) {
+        bases[i].parentNode.removeChild(bases[i]);
+      }
+      var b = document.createElement('base');
+      b.href = location.origin + '/demo/';
+      var charset = document.querySelector('meta[charset]');
+      if (charset) {
+        charset.insertAdjacentElement('afterend', b);
+      } else {
+        document.head.insertBefore(b, document.head.firstChild);
+      }
+    }
+  })();
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Run the Double Slit 3D demo: double-slit interference, observer toggle, quantum interpretations, and live parameters in your browser.">
   <meta name="keywords" content="double slit demo, quantum simulation, interactive physics, WebGL, wave interference">
@@ -25,7 +47,7 @@
   <title>Double Slit — Interactive Demo</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/demo/demo.css">
+  <link rel="stylesheet" href="/demo/demo.css?v=4">
   <script type="application/ld+json">
   {"@context":"https://schema.org","@graph":[{"@type":"WebPage","@id":"https://doubleslitexperiment.app/demo/#webpage","name":"Double Slit — Interactive Demo","description":"Run the Double Slit 3D demo: double-slit interference, observer toggle, quantum interpretations, and live parameters in your browser.","url":"https://doubleslitexperiment.app/demo/","isPartOf":{"@type":"WebSite","name":"Double Slit","url":"https://doubleslitexperiment.app/"},"breadcrumb":{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://doubleslitexperiment.app/"},{"@type":"ListItem","position":2,"name":"Demo","item":"https://doubleslitexperiment.app/demo/"}]}},{"@type":"SoftwareApplication","name":"Double Slit","applicationCategory":"EducationalApplication","operatingSystem":"Web","url":"https://doubleslitexperiment.app/demo/","description":"Interactive 3D double-slit experiment with timeline scrubber, observer toggle, interpretations, and adjustable experimental parameters.","author":{"@type":"Organization","name":"Nocturnal Cloud","url":"https://nocturnal.cloud"},"offers":{"@type":"Offer","price":"0","priceCurrency":"GBP","availability":"https://schema.org/InStock"}}]}
   </script>
@@ -144,7 +166,7 @@
     </div>
   </div>
 
-  <script src="/demo/help-modal.js" defer></script>
-  <script type="module" src="/demo/advanced-main.js"></script>
+  <script src="/demo/help-modal.js?v=4" defer></script>
+  <script type="module" src="/demo/advanced-main.js?v=4"></script>
 </body>
 </html>
