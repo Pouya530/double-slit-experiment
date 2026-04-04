@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Run the Double Slit 3D demo: double-slit interference, observer toggle, quantum interpretations, and live parameters in your browser.">
+  <meta name="keywords" content="double slit demo, quantum simulation, interactive physics, WebGL, wave interference">
+  <meta name="author" content="Nocturnal Cloud">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+  <link rel="canonical" href="https://doubleslitexperiment.app/demo/">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="en_GB">
+  <meta property="og:url" content="https://doubleslitexperiment.app/demo/">
+  <meta property="og:site_name" content="Double Slit">
+  <meta property="og:title" content="Double Slit — Interactive 3D Demo">
+  <meta property="og:description" content="3D quantum double-slit demo: scrub the timeline, toggle the observer, switch interpretations, adjust slits and wavelength.">
+  <meta property="og:image" content="https://doubleslitexperiment.app/img/double-slit-demo-image.png">
+  <meta property="og:image:alt" content="Double Slit interactive 3D demo">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Double Slit — Interactive 3D Demo">
+  <meta name="twitter:description" content="3D quantum double-slit demo in the browser — timeline, observer, interpretations, parameters.">
+  <meta name="twitter:image" content="https://doubleslitexperiment.app/img/double-slit-demo-image.png">
+  <title>Double Slit — Interactive Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="demo.css">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@graph":[{"@type":"WebPage","@id":"https://doubleslitexperiment.app/demo/#webpage","name":"Double Slit — Interactive Demo","description":"Run the Double Slit 3D demo: double-slit interference, observer toggle, quantum interpretations, and live parameters in your browser.","url":"https://doubleslitexperiment.app/demo/","isPartOf":{"@type":"WebSite","name":"Double Slit","url":"https://doubleslitexperiment.app/"},"breadcrumb":{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://doubleslitexperiment.app/"},{"@type":"ListItem","position":2,"name":"Demo","item":"https://doubleslitexperiment.app/demo/"}]}},{"@type":"SoftwareApplication","name":"Double Slit","applicationCategory":"EducationalApplication","operatingSystem":"Web","url":"https://doubleslitexperiment.app/demo/","description":"Interactive 3D double-slit experiment with timeline scrubber, observer toggle, interpretations, and adjustable experimental parameters.","author":{"@type":"Organization","name":"Nocturnal Cloud","url":"https://nocturnal.cloud"},"offers":{"@type":"Offer","price":"0","priceCurrency":"GBP","availability":"https://schema.org/InStock"}}]}
+  </script>
+</head>
+<body>
+  <div class="demo-layout demo-layout-advanced">
+    <div class="demo-header">
+      <a href="/" class="logo">Double Slit</a>
+      <div class="header-right">
+        <button type="button" class="help-features-btn" id="features-help-open" aria-haspopup="dialog" aria-controls="features-help-modal" aria-expanded="false">
+          How it works
+        </button>
+        <button class="theme-btn" id="theme-toggle" aria-label="Toggle light/dark mode" title="Toggle theme">
+          <span class="theme-icon">☀</span>
+          <span class="theme-label">Light</span>
+        </button>
+        <a href="/" class="back">← Home</a>
+      </div>
+    </div>
+
+    <div class="demo-toolbar-cluster" id="demo-toolbar-cluster">
+      <div class="interpretation-tabs interpretation-tabs-many" id="interpretation-tabs">
+        <label class="interp-mobile-label" for="interp-select-mobile">Interpretation</label>
+        <select id="interp-select-mobile" class="interp-select-mobile" aria-label="Quantum interpretation"></select>
+        <div class="interp-tabs-pills interp-tabs-pills-advanced"></div>
+        <div class="interp-toolbar-actions">
+          <button type="button" class="info-toggle" id="info-toggle" aria-label="Toggle info panel">ℹ</button>
+        </div>
+      </div>
+      <button type="button" class="params-toggle-mobile" id="params-toggle" aria-expanded="false" aria-controls="params-panel">
+        <span class="params-toggle-icon" aria-hidden="true">⚙</span>
+        <span>Parameters</span>
+        <span class="params-toggle-chevron" aria-hidden="true">▾</span>
+      </button>
+      <div class="params-panel params-panel-advanced" id="params-panel">
+        <h4>Extended parameters</h4>
+        <div class="param-row" id="adv-mass-row">
+          <label for="adv-mass">Particle mass (slider → amu)</label>
+          <input type="range" id="adv-mass" min="0" max="1000" value="0" aria-valuetext="electron scale">
+          <span class="param-readout" id="adv-mass-readout"></span>
+        </div>
+        <div class="param-row" id="adv-env-row" hidden>
+          <label for="adv-env">Environment coupling</label>
+          <input type="range" id="adv-env" min="0" max="100" value="0" aria-valuetext="0%">
+        </div>
+        <fieldset class="param-fieldset" id="adv-perspective-row" hidden>
+          <legend>RQM perspective</legend>
+          <label class="radio-label"><input type="radio" name="perspective" value="external" checked> External</label>
+          <label class="radio-label"><input type="radio" name="perspective" value="detector"> Detector</label>
+          <label class="radio-label"><input type="radio" name="perspective" value="particle"> Particle</label>
+        </fieldset>
+        <h4>Experiment</h4>
+        <div class="param-row">
+          <label for="slit-width">Slit width (nm)</label>
+          <input type="number" id="slit-width" value="100" min="10" max="500">
+        </div>
+        <div class="param-row">
+          <label for="slit-sep">Slit separation (nm)</label>
+          <input type="number" id="slit-sep" value="500" min="100" max="2000">
+        </div>
+        <div class="param-row">
+          <label for="wavelength">Wavelength (nm)</label>
+          <input type="number" id="wavelength" value="550" min="380" max="700">
+        </div>
+        <button class="recompute-btn" id="recompute">Recompute</button>
+      </div>
+    </div>
+
+    <div id="canvas"></div>
+
+    <div class="info-panel" id="info-panel">
+      <button class="info-close" id="info-close" aria-label="Close">×</button>
+      <div class="info-content" id="info-content"></div>
+    </div>
+
+    <div class="demo-ui">
+      <div class="timeline-row">
+        <label>Timeline</label>
+        <input type="range" id="timeline" class="timeline-slider" aria-label="Timeline" aria-valuetext="0%">
+        <button class="play-btn" id="play" aria-label="Play / Pause">❚❚</button>
+        <span class="particle-count" id="particle-count">0 / 2000 particles</span>
+      </div>
+      <div class="controls-row">
+        <button class="observe-btn" id="observe" aria-pressed="false">
+          <span>📷</span>
+          <span>Not observing</span>
+        </button>
+        <button class="observe-btn reset-btn" id="reset">
+          ↺ Reset
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="demo-modal-overlay"
+    id="features-help-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="features-help-title"
+    hidden
+  >
+    <div class="demo-modal-dialog">
+      <button type="button" class="demo-modal-close" id="features-help-close" aria-label="Close how it works">×</button>
+      <h2 id="features-help-title" class="demo-modal-title">How this demo works</h2>
+      <p class="demo-modal-lead">These controls mirror the main product: timeline, observer, camera, and experiment parameters.</p>
+      <ul class="demo-modal-list">
+        <li><strong>Timeline</strong> — Drag the slider to scrub through time, or use Play to watch hits accumulate on the detection screen. Reset jumps back to the start.</li>
+        <li><strong>Which-path / observer</strong> — Turn on to model knowing which slit the particle went through; the pattern moves toward two bands. Turn off to bring back interference.</li>
+        <li><strong>Camera</strong> — Drag to orbit, scroll or pinch to zoom, right-drag (or trackpad two-finger) to pan—full 3D around the bench.</li>
+        <li><strong>Parameters &amp; Recompute</strong> — Slit width, separation, and wavelength (colour). After edits, <strong>Recompute</strong> regenerates the particle set. Extended options in this build add mass-related behaviour for some interpretations.</li>
+        <li><strong>Interpretations &amp; ℹ</strong> — Tabs switch the story and overlays (Copenhagen, pilot-wave, etc.). The <strong>ℹ</strong> panel explains the active view without changing the underlying simulation.</li>
+        <li><strong>Theme</strong> — Use the sun/moon control in the header for light or dark UI.</li>
+      </ul>
+      <p id="features-help-tour-note" class="demo-modal-note" hidden><strong>Tour</strong> — On the classic demo, use ▶ Tour next to ℹ for a guided walkthrough.</p>
+    </div>
+  </div>
+
+  <script src="help-modal.js" defer></script>
+  <script type="module" src="advanced-main.js"></script>
+</body>
+</html>

@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Double Slit — Interactive 3D quantum experiment visualiser for A-level physics. Watch wave-particle duality in real time.">
+  <meta name="keywords" content="double slit experiment, quantum physics, A-level physics, wave-particle duality, interactive simulation, 3D visualisation, physics education">
+  <meta name="author" content="Nocturnal Cloud">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+  <link rel="canonical" href="https://doubleslitexperiment.app/">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="en_GB">
+  <meta property="og:url" content="https://doubleslitexperiment.app/">
+  <meta property="og:site_name" content="Double Slit">
+  <meta property="og:title" content="Double Slit — Interactive 3D Quantum Experiment">
+  <meta property="og:description" content="Interactive 3D quantum experiment visualiser for A-level physics. Timeline scrubber, observer toggle, 360° camera — try the demo.">
+  <meta property="og:image" content="https://doubleslitexperiment.app/img/double-slit-demo-image.png">
+  <meta property="og:image:alt" content="Double Slit 3D quantum double-slit experiment visualiser">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Double Slit — Interactive 3D Quantum Experiment">
+  <meta name="twitter:description" content="Interactive 3D quantum experiment visualiser for A-level physics. Watch wave-particle duality in real time.">
+  <meta name="twitter:image" content="https://doubleslitexperiment.app/img/double-slit-demo-image.png">
+  <title>Double Slit — Interactive 3D Quantum Experiment</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://nocturnal.cloud/#org","name":"Nocturnal Cloud","url":"https://nocturnal.cloud"},{"@type":"WebSite","@id":"https://doubleslitexperiment.app/#website","name":"Double Slit","url":"https://doubleslitexperiment.app/","description":"Interactive 3D quantum double-slit experiment visualiser for physics education.","publisher":{"@id":"https://nocturnal.cloud/#org"}},{"@type":"WebPage","@id":"https://doubleslitexperiment.app/#webpage","name":"Double Slit — Interactive 3D Quantum Experiment","description":"Interactive 3D quantum experiment visualiser for A-level physics. Watch wave-particle duality in real time.","url":"https://doubleslitexperiment.app/","isPartOf":{"@id":"https://doubleslitexperiment.app/#website"},"about":{"@type":"Thing","name":"Double-slit experiment"}},{"@type":"SoftwareApplication","name":"Double Slit","applicationCategory":"EducationalApplication","operatingSystem":"Web","description":"Interactive 3D web visualiser of the quantum double-slit experiment with timeline scrubber, observer toggle, orbital camera, and adjustable parameters.","url":"https://doubleslitexperiment.app/demo/","author":{"@id":"https://nocturnal.cloud/#org"},"offers":{"@type":"Offer","price":"0","priceCurrency":"GBP","availability":"https://schema.org/InStock"}}]}
+  </script>
+</head>
+<body>
+  <header class="site-header" id="site-header">
+    <a href="/" class="logo">Double Slit</a>
+    <button
+      type="button"
+      class="nav-burger"
+      id="nav-burger"
+      aria-expanded="false"
+      aria-controls="nav-mobile-overlay"
+      aria-label="Open menu"
+    >
+      <span class="nav-burger-icon" aria-hidden="true">
+        <span class="nav-burger-line"></span>
+        <span class="nav-burger-line"></span>
+      </span>
+      <span class="nav-burger-label nav-burger-label--open">Menu</span>
+      <span class="nav-burger-label nav-burger-label--close">Close</span>
+    </button>
+    <nav class="nav nav--desktop" aria-label="Primary">
+      <a href="/demo?how=1">How it works</a>
+      <a href="#about">About</a>
+    </nav>
+  </header>
+
+  <div
+    class="nav-mobile-overlay"
+    id="nav-mobile-overlay"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="nav-mobile-title"
+    hidden
+  >
+    <h2 id="nav-mobile-title" class="visually-hidden">Menu</h2>
+    <nav class="nav-mobile" aria-label="Site sections">
+      <ul class="nav-mobile-main">
+        <li><a href="/demo?how=1">How it works</a></li>
+        <li><a href="#about">About</a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <main>
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-media" aria-hidden="true">
+        <div class="hero-collage">
+          <img class="hero-img hero-img--a" src="/img/1.png" alt="" width="800" height="600" decoding="async" />
+          <img class="hero-img hero-img--b" src="/img/2.png" alt="" width="600" height="450" decoding="async" />
+          <img class="hero-img hero-img--c" src="/img/3.png" alt="" width="600" height="450" decoding="async" />
+          <img class="hero-img hero-img--d" src="/img/4.png" alt="" width="600" height="450" decoding="async" />
+          <img class="hero-img hero-img--e" src="/img/5.png" alt="" width="600" height="450" decoding="async" />
+        </div>
+      </div>
+      <div class="hero-shade"></div>
+      <div class="hero-content innerspacer">
+        <h1 class="hero-title">Interactive 3D Quantum Experiment</h1>
+        <p class="hero-tagline">Watch photons and electrons reveal wave-particle duality. Drag the timeline, toggle the observer, explore in 360°.</p>
+        <a href="/demo" class="mainbutton">Try the demo</a>
+        <a href="#about" class="mainbutton" style="margin-left: 24px;">Explore</a>
+      </div>
+    </section>
+
+    <!-- About -->
+    <section id="about" class="section section-light">
+      <div class="innerspacer">
+        <h2 class="section-title">About</h2>
+        <div class="grid-sidebyside">
+          <div class="content-block">
+            <p class="lead">An interactive 3D web application that visualises the quantum double-slit experiment.</p>
+            <p>Users fire photons or electrons at a barrier with two slits and watch an interference pattern build on a detection screen. Four features combine to create a unique educational tool that no competitor offers together.</p>
+            <div class="scene-diagram">
+              <code>[Particle Source] —→ [Barrier with 2 Slits] —→ [Detection Screen]</code>
+            </div>
+          </div>
+          <div class="preview-card">
+            <a href="/demo" class="preview-placeholder">
+              <img
+                class="preview-placeholder__media"
+                src="/img/double-slit-demo-image.png"
+                alt=""
+                width="1600"
+                height="1200"
+                loading="lazy"
+                decoding="async"
+              />
+              <div class="preview-placeholder__overlay">
+                <span class="preview-placeholder__label">▶ Try the interactive demo</span>
+                <small>Timeline • Observer • 360° camera</small>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Who it's for (hidden for now) -->
+    <section id="who" class="section section-dark" hidden aria-hidden="true">
+      <div class="innerspacer">
+        <h2 class="section-title">Who it's for</h2>
+        <div class="audience-grid">
+          <article class="audience-card">
+            <h3>A-level physics students</h3>
+            <p>Ages 16–18. The double-slit experiment is a core required practical across AQA, OCR, Edexcel, and WJEC exam boards.</p>
+          </article>
+          <article class="audience-card">
+            <h3>Teachers</h3>
+            <p>25% of English state schools have no specialist physics teacher. Double Slit scaffolds understanding for non-specialists.</p>
+          </article>
+          <article class="audience-card">
+            <h3>KS3 / KS4 students</h3>
+            <p>Ages 11–16. Scaffolded introductory modes introduce basic wave behaviour and the photon model.</p>
+          </article>
+          <article class="audience-card">
+            <h3>Science museums</h3>
+            <p>Self-contained 2–4 minute interaction cycles for walk-up visitors. Museum mode with large touch targets.</p>
+          </article>
+        </div>
+        <div class="stats">
+          <span><strong>44,947</strong> A-level physics entries in 2025</span>
+          <span><strong>5,877</strong> secondary schools in England</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Benefits (hidden for now) -->
+    <section id="benefits" class="section section-light benefits-section" hidden aria-hidden="true">
+      <div class="benefits-bg" aria-hidden="true">
+        <canvas id="benefits-canvas"></canvas>
+      </div>
+      <div class="innerspacer benefits-inner">
+        <h2 class="section-title">Benefits</h2>
+        <div class="benefits-grid">
+          <article class="benefit-item">
+            <div class="benefit-item__media">
+              <img src="/img/benifits/Built_for_UK_schools.png" alt="UK schools and classroom devices" width="1536" height="1024" loading="lazy" decoding="async" />
+            </div>
+            <div class="benefit-item__body">
+              <h3>Built for UK schools</h3>
+              <p>Runs on school Chromebooks (Intel Celeron N4500, 4GB RAM). Adaptive quality keeps 30fps on low-end hardware.</p>
+            </div>
+          </article>
+          <article class="benefit-item">
+            <div class="benefit-item__media">
+              <img src="/img/benifits/Beyond-PhET.png" alt="Advanced 3D simulation compared with flat lab visuals" width="1536" height="1024" loading="lazy" decoding="async" />
+            </div>
+            <div class="benefit-item__body">
+              <h3>Beyond PhET</h3>
+              <p>PhET dominates with 1.7B runs but is entirely 2D. Double Slit adds timeline scrubber, observer toggle, and full 3D rendering.</p>
+            </div>
+          </article>
+          <article class="benefit-item">
+            <div class="benefit-item__media">
+              <img src="/img/benifits/Compliant-accessible.png" alt="Inclusive, standards-aligned digital learning" width="1536" height="1024" loading="lazy" decoding="async" />
+            </div>
+            <div class="benefit-item__body">
+              <h3>Compliant & accessible</h3>
+              <p>ICO Children's Code, WCAG 2.2 AA, cookieless analytics. No engagement loops or gamification.</p>
+            </div>
+          </article>
+          <article class="benefit-item">
+            <div class="benefit-item__media">
+              <img src="/img/benifits/Shareable-states.png" alt="Teachers sharing experiment links" width="1536" height="1024" loading="lazy" decoding="async" />
+            </div>
+            <div class="benefit-item__body">
+              <h3>Shareable states</h3>
+              <p>Teachers share experiment URLs with exact parameters. Deep links for classroom distribution.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features (4 USPs) — scroll-driven Three.js timeline (hidden for now) -->
+    <section id="features" class="section section-dark features-timeline-section" aria-labelledby="features-heading" hidden aria-hidden="true">
+      <div class="features-timeline-track" data-features-timeline-track>
+        <div class="features-timeline-sticky">
+          <div class="features-timeline-stage">
+          <div class="features-timeline-visual" aria-hidden="true">
+            <canvas id="features-timeline-canvas"></canvas>
+          </div>
+          <div class="features-timeline-copy">
+            <p class="features-timeline-kicker">Scroll — trace connects each feature</p>
+            <h2 id="features-heading" class="section-title features-timeline-title">Features</h2>
+            <div class="features-list" role="list">
+              <article class="feature-card" data-feature-index="0" role="listitem">
+                <div class="feature-number">01</div>
+                <div>
+                  <h3>Timeline Scrubber</h3>
+                  <p>Drag through time to watch particles accumulate dot by dot, or rewind to see fewer. All trajectories pre-computed; the timeline controls visibility.</p>
+                </div>
+              </article>
+              <article class="feature-card" data-feature-index="1" role="listitem">
+                <div class="feature-number">02</div>
+                <div>
+                  <h3>Observer Toggle</h3>
+                  <p>When "observing," the interference pattern collapses to two classical bands. Toggle off and the wave pattern returns. The "wow" moment — students see wave function collapse in real time.</p>
+                </div>
+              </article>
+              <article class="feature-card" data-feature-index="2" role="listitem">
+                <div class="feature-number">03</div>
+                <div>
+                  <h3>360° Orbital Camera</h3>
+                  <p>Full OrbitControls: rotate, zoom, pan around the experiment like a physics bench. Keyboard alternatives for every mouse action.</p>
+                </div>
+              </article>
+              <article class="feature-card" data-feature-index="3" role="listitem">
+                <div class="feature-number">04</div>
+                <div>
+                  <h3>Adjustable Parameters</h3>
+                  <p>Slit width, slit separation, wavelength (changes particle colour), emission rate, distance to screen. Real-time tweaking.</p>
+                </div>
+              </article>
+            </div>
+            <div class="features-timeline-cta" data-features-path-frame>
+              <a href="/demo" class="mainbutton">Try demo</a>
+            </div>
+          </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA / Footer -->
+    <footer class="site-footer">
+      <div class="innerspacer">
+        <div class="footer-grid">
+          <div class="footer-brand">
+            <h3 class="logo">Double Slit</h3>
+            <p>Interactive 3D Quantum Experiment Visualiser</p>
+          </div>
+          <div class="footer-links">
+            <h4>Pages</h4>
+            <a href="/preview/what">About</a>
+          </div>
+          <div class="footer-credits">
+            <h4>References</h4>
+            <a href="https://phet.colorado.edu/en/simulations/wave-interference" target="_blank" rel="noopener">PhET Wave Interference</a>
+          </div>
+        </div>
+        <div class="credits-bar">
+          <span>© Double Slit</span>
+          <span class="credits-bar__by">
+            Built by
+            <a href="https://nocturnal.cloud" target="_blank" rel="noopener noreferrer">Nocturnal Cloud</a>
+          </span>
+        </div>
+      </div>
+    </footer>
+  </main>
+  <script type="module" src="/nav-mobile.js"></script>
+</body>
+</html>

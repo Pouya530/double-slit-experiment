@@ -1,0 +1,16 @@
+{
+  "name": "double-slit-homepage",
+  "version": "1.0.0",
+  "description": "One-page homepage for Double Slit — Interactive 3D Quantum Experiment Visualiser",
+  "main": "index.js",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "preview": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.21.0"
+  }
+}
