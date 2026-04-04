@@ -33,8 +33,15 @@ app.use(
   }),
 );
 
-// Demo — interactive simulation (with and without trailing slash)
-app.get(['/demo', '/demo/'], (req, res) => {
+// /demo without trailing slash makes relative asset URLs (e.g. help-modal.js) resolve to /
+app.get('/demo', (req, res) => {
+  const i = req.url.indexOf('?');
+  const qs = i >= 0 ? req.url.slice(i) : '';
+  res.redirect(308, `/demo/${qs}`);
+});
+
+// Demo — interactive simulation (trailing slash only)
+app.get('/demo/', (req, res) => {
   res.sendFile(demoPath);
 });
 
