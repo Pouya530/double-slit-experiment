@@ -23,6 +23,79 @@ function hexFromInterpBrand(def) {
   return null;
 }
 
+/**
+ * Safari / WebKit Canvas2D degrades badly with thousands of createRadialGradient calls per frame.
+ * Chrome handles it; Safari becomes janky once many hits accumulate (visibleCount > ~1000).
+ */
+let safariDetectionFastPath = false;
+
+function initSafariDetectionFastPathFlag() {
+  if (typeof navigator === 'undefined') return;
+  const ua = navigator.userAgent;
+  if (/Chrome|Chromium|Edg|OPR|CriOS|FxiOS/.test(ua)) {
+    safariDetectionFastPath = false;
+    return;
+  }
+  safariDetectionFastPath = /Safari/i.test(ua);
+}
+
+/** Lighter-weight hit splats: solid arcs + optional additive blend (dark theme). */
+function drawDetectionScreenWebKitFast(ctx, w, h, theme, positionBlend, collapseFlashActive) {
+  ctx.fillStyle = theme.screenBg;
+  ctx.fillRect(0, 0, w, h);
+  const { birthTimes, interferencePositions, classicalPositions, wavelengths } = particleBuffer;
+  const isDark = isDarkMode;
+  ctx.globalCompositeOperation = isDark ? 'lighter' : 'source-over';
+
+  for (let i = 0; i < particleBuffer.count; i++) {
+    if (singleParticleMode && i > 0) continue;
+    if (birthTimes[i] > currentTime) continue;
+    const age = currentTime - birthTimes[i];
+    if (age < FLIGHT_TIME) continue;
+
+    const ageSinceHit = age - FLIGHT_TIME;
+    const isNewHit = collapseFlashActive && ageSinceHit < 0.2;
+
+    const iz = interferencePositions[i * 3 + 2];
+    const cz = classicalPositions[i * 3 + 2];
+    const iy = interferencePositions[i * 3 + 1];
+    const cy = classicalPositions[i * 3 + 1];
+    const z = iz * (1 - positionBlend) + cz * positionBlend;
+    const y = iy * (1 - positionBlend) + cy * positionBlend;
+
+    const u = (z + SCREEN_WIDTH / 2) / SCREEN_WIDTH;
+    const v = (y + SCREEN_HEIGHT / 2) / SCREEN_HEIGHT;
+    const px = Math.max(0, Math.min(w - 1, u * w));
+    const py = Math.max(0, Math.min(h - 1, (1 - v) * h));
+    const [r, g, b] = wavelengthToRGB(wavelengths[i]);
+    const br = theme.hitBrightness;
+    const R = Math.min(255, r * 255 * br);
+    const G = Math.min(255, g * 255 * br);
+    const B = Math.min(255, b * 255 * br);
+
+    if (isNewHit) {
+      const flashDecay = 1 - ageSinceHit / 0.2;
+      ctx.fillStyle = isDark
+        ? `rgba(255,255,255,${0.42 * flashDecay})`
+        : `rgba(255,255,255,${0.5 * flashDecay})`;
+      ctx.beginPath();
+      ctx.arc(px, py, 5 + 10 * (1 - flashDecay), 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    ctx.fillStyle = `rgba(${R},${G},${B},${isDark ? 0.38 : 0.42})`;
+    ctx.beginPath();
+    ctx.arc(px, py, 5, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = `rgba(${R},${G},${B},${isDark ? 0.55 : 0.62})`;
+    ctx.beginPath();
+    ctx.arc(px, py, 2.5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.globalCompositeOperation = 'source-over';
+}
+
 function syncInterpretationUI() {
   document.querySelectorAll('.interp-tab').forEach((b) => b.classList.toggle('active', b.dataset.interp === activeInterpretation));
   if (showInfoPanel) renderInfoPanel(activeInterpretation);
@@ -272,6 +345,8 @@ function updateObserveAndAdvancedControls() {
 }
 
 function init() {
+  initSafariDetectionFastPathFlag();
+
   const savedTheme = localStorage.getItem('doubleSlitTheme');
   isDarkMode = savedTheme === 'dark';
   document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
@@ -284,7 +359,7 @@ function init() {
 
   renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
   renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.setPixelRatio(Math.min(2, window.devicePixelRatio));
+  renderer.setPixelRatio(Math.min(safariDetectionFastPath ? 1.5 : 2, window.devicePixelRatio));
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.2;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -463,8 +538,9 @@ function addBarrier() {
 
 function addDetectionScreen() {
   detectionCanvas = document.createElement('canvas');
-  detectionCanvas.width = 1024;
-  detectionCanvas.height = Math.round(1024 * (SCREEN_HEIGHT / SCREEN_WIDTH));
+  const detW = safariDetectionFastPath ? 768 : 1024;
+  detectionCanvas.width = detW;
+  detectionCanvas.height = Math.round(detW * (SCREEN_HEIGHT / SCREEN_WIDTH));
   const t = THEMES[isDarkMode ? 'dark' : 'light'];
   const ctx = detectionCanvas.getContext('2d');
   ctx.fillStyle = t.screenBg;
@@ -769,13 +845,18 @@ function drawDetectionScreen() {
   const h = detectionCanvas.height;
   const theme = THEMES[isDarkMode ? 'dark' : 'light'];
   const blend = physicsBlend;
+  const collapseFlashActive = activeInterpretation === 'copenhagen' && blend < 0.25;
+
+  if (safariDetectionFastPath) {
+    drawDetectionScreenWebKitFast(ctx, w, h, theme, blend, collapseFlashActive);
+    detectionTexture.needsUpdate = true;
+    return;
+  }
 
   ctx.fillStyle = theme.screenBg;
   ctx.fillRect(0, 0, w, h);
 
   const { birthTimes, interferencePositions, classicalPositions, wavelengths } = particleBuffer;
-
-  const collapseFlashActive = activeInterpretation === 'copenhagen' && blend < 0.25;
 
   for (let i = 0; i < particleBuffer.count; i++) {
     if (singleParticleMode && i > 0) continue;
