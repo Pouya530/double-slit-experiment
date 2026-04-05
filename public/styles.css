@@ -94,9 +94,9 @@ body.nav-mobile-open {
     -webkit-backdrop-filter: blur(8px);
   }
 
-  /* ~40% smaller logo wordmark + icon (em scales with font-size) */
+  /* Homepage logo scale (icon follows 2em) */
   .site-header--home .logo {
-    font-size: clamp(10.8px, 1.56vw, 19.2px);
+    font-size: clamp(13.5px, 1.95vw, 24px);
   }
 }
 
