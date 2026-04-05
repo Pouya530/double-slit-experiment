@@ -351,6 +351,13 @@ body.nav-mobile-open {
   }
 }
 
+/* Homepage only: desktop pull-out main links 100% larger than default overlay size */
+@media (min-width: 800px) {
+  .page-home .nav-mobile-main a {
+    font-size: clamp(80px, 20vw, 176px);
+  }
+}
+
 .nav-mobile-secondary {
   display: flex;
   flex-wrap: wrap;
