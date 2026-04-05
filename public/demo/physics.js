@@ -131,7 +131,8 @@ function sampleDecoherencePosition(random, screenHalfWidth, L, dNorm, aNorm, lam
 function sampleClassicalPosition(random, slitSeparation, slitWidth) {
   const slit0 = -slitSeparation / 2;
   const slit1 = slitSeparation / 2;
-  const sigma = slitWidth * 0.8;
+  /** ~fills slit opening without σ ≫ width (keeps two resolved stripes on screen). */
+  const sigma = slitWidth * 0.38;
   const which = random() < 0.5 ? 0 : 1;
   const mu = which === 0 ? slit0 : slit1;
   return mu + sigma * gaussian(random);

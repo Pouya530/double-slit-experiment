@@ -5,15 +5,15 @@
 
 import * as THREE from 'https://esm.sh/three@0.160.0';
 import { OrbitControls } from 'https://esm.sh/three@0.160.0/examples/jsm/controls/OrbitControls.js';
-import { createParticleBuffer } from './simulation.js?v=15';
-import { wavelengthToRGB, fringeVisibility, getComplementarity } from './physics.js';
+import { createParticleBuffer } from './simulation.js?v=16';
+import { wavelengthToRGB, fringeVisibility, getComplementarity } from './physics.js?v=16';
 import { INTERPRETATIONS_ADV, INTERPRETATION_IDS_ADV } from './interpretations-advanced.js';
 import { MEASUREMENT_CONFIGS, narrativeForGamma } from './measurement-configs.js';
 import {
   collapseSuppressionFactor,
   decoherenceVisibility,
   effectiveWavelength,
-} from './physics-interpretations.js';
+} from './physics-interpretations.js?v=16';
 
 /** Map interpretation UI accent (#RRGGBB) to Three.js hex for overlays. */
 function hexFromInterpBrand(def) {
@@ -41,12 +41,14 @@ function initSafariDetectionFastPathFlag() {
 }
 
 /** Lighter-weight hit splats: solid arcs + optional additive blend (dark theme). */
-function drawDetectionScreenWebKitFast(ctx, w, h, theme, _positionBlend, collapseFlashActive) {
+function drawDetectionScreenWebKitFast(ctx, w, h, theme, _positionBlend, collapseFlashActive, thinStripHits) {
   ctx.fillStyle = theme.screenBg;
   ctx.fillRect(0, 0, w, h);
   const { birthTimes, interferencePositions, wavelengths } = particleBuffer;
   const isDark = isDarkMode;
   ctx.globalCompositeOperation = isDark ? 'lighter' : 'source-over';
+  const r0 = thinStripHits ? 3 : 5;
+  const r1 = thinStripHits ? 1.6 : 2.5;
 
   for (let i = 0; i < particleBuffer.count; i++) {
     if (singleParticleMode && i > 0) continue;
@@ -78,18 +80,18 @@ function drawDetectionScreenWebKitFast(ctx, w, h, theme, _positionBlend, collaps
         ? `rgba(255,255,255,${0.42 * flashDecay})`
         : `rgba(255,255,255,${0.5 * flashDecay})`;
       ctx.beginPath();
-      ctx.arc(px, py, 5 + 10 * (1 - flashDecay), 0, Math.PI * 2);
+      ctx.arc(px, py, r0 + (thinStripHits ? 6 : 10) * (1 - flashDecay), 0, Math.PI * 2);
       ctx.fill();
     }
 
     ctx.fillStyle = `rgba(${R},${G},${B},${isDark ? 0.38 : 0.42})`;
     ctx.beginPath();
-    ctx.arc(px, py, 5, 0, Math.PI * 2);
+    ctx.arc(px, py, r0, 0, Math.PI * 2);
     ctx.fill();
 
     ctx.fillStyle = `rgba(${R},${G},${B},${isDark ? 0.55 : 0.62})`;
     ctx.beginPath();
-    ctx.arc(px, py, 2.5, 0, Math.PI * 2);
+    ctx.arc(px, py, r1, 0, Math.PI * 2);
     ctx.fill();
   }
   ctx.globalCompositeOperation = 'source-over';
@@ -1009,9 +1011,10 @@ function drawDetectionScreen() {
   const theme = THEMES[isDarkMode ? 'dark' : 'light'];
   const collapseFlashActive =
     activeInterpretation === 'copenhagen' && computeMeasurementGamma() < 0.25;
+  const thinStripHits = computeMeasurementGamma() >= 0.92;
 
   if (safariDetectionFastPath) {
-    drawDetectionScreenWebKitFast(ctx, w, h, theme, 0, collapseFlashActive);
+    drawDetectionScreenWebKitFast(ctx, w, h, theme, 0, collapseFlashActive, thinStripHits);
     detectionTexture.needsUpdate = true;
     return;
   }
@@ -1049,7 +1052,7 @@ function drawDetectionScreen() {
 
     if (isNewHit) {
       const flashDecay = 1 - ageSinceHit / 0.2;
-      const flashRadius = 8 + 16 * (1 - flashDecay);
+      const flashRadius = thinStripHits ? 5 + 9 * (1 - flashDecay) : 8 + 16 * (1 - flashDecay);
       const flashAlpha = 0.6 * flashDecay;
       const flashGrad = ctx.createRadialGradient(px, py, 0, px, py, flashRadius);
       flashGrad.addColorStop(0, `rgba(255,255,255,${flashAlpha})`);
@@ -1061,18 +1064,19 @@ function drawDetectionScreen() {
       ctx.fill();
     }
 
-    const grad = ctx.createRadialGradient(px, py, 0, px, py, 12);
+    const glowR = thinStripHits ? 7 : 12;
+    const grad = ctx.createRadialGradient(px, py, 0, px, py, glowR);
     grad.addColorStop(0, `rgba(${R},${G},${B},${alpha})`);
     grad.addColorStop(0.4, `rgba(${R},${G},${B},${alphaOuter})`);
     grad.addColorStop(1, 'transparent');
     ctx.fillStyle = grad;
     ctx.beginPath();
-    ctx.arc(px, py, 12, 0, Math.PI * 2);
+    ctx.arc(px, py, glowR, 0, Math.PI * 2);
     ctx.fill();
 
     ctx.fillStyle = `rgba(${R},${G},${B},${isDarkMode ? 0.8 : 0.9})`;
     ctx.beginPath();
-    ctx.arc(px, py, 3, 0, Math.PI * 2);
+    ctx.arc(px, py, thinStripHits ? 2 : 3, 0, Math.PI * 2);
     ctx.fill();
   }
   detectionTexture.needsUpdate = true;

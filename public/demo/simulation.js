@@ -8,7 +8,7 @@ import {
   gaussian,
   sampleDecoherencePosition,
   sampleClassicalPosition,
-} from './physics.js';
+} from './physics.js?v=16';
 
 /** Smooth hermite edge blend (0 outside [e0,e1]). */
 function smoothstep(edge0, edge1, x) {
@@ -71,7 +71,8 @@ export function createParticleBuffer(params, maxParticles, seed) {
     slitZ[i] = cz;
     slitY[i] = Math.max(-slitHalfHeight, Math.min(slitHalfHeight, gaussian(random) * (slitHalfHeight * 0.55)));
 
-    const iy = (random() * 2 - 1) * screenHalfHeight * 0.3;
+    /** Wave-like buildup: loose vertical spread on screen. */
+    const iyQ = (random() * 2 - 1) * screenHalfHeight * 0.3;
 
     const zQ = sampleDecoherencePosition(
       random,
@@ -83,11 +84,26 @@ export function createParticleBuffer(params, maxParticles, seed) {
       measurementGamma,
       visibilityModel
     );
-    /** Which-path / classical limit: two lumps from geometric projection of each slit (γ → 1). */
-    const sigmaZ = Math.max(0.024, slitWidthScene * zScale * 0.72 + (lambdaNm / 550) * 0.012);
-    const zClass = cz * zScale + gaussian(random) * sigmaZ;
+    /**
+     * Which-path limit: point source at sourceX → slit (cz, slitY) → screen.
+     * Same magnification for transverse y and z so vertical slits image as tall, narrow stripes (narrow in z).
+     * Width in z is already set by sampleClassicalPosition (Gaussian in slit plane); avoid large extra σ_z — it was smearing blobs.
+     */
+    const zGeom = cz * zScale;
+    const yGeom = slitY * zScale;
+    const slitImageHalfW = (slitWidthScene * 0.5) * zScale;
+    const slitImageHalfH = slitHalfHeight * zScale;
+    const lambdaRatio = (params.slitWidth || 1e-7) > 0 ? 5.5e-7 / (params.slitWidth || 1e-7) : 1;
+    const diffractionZ = Math.min(
+      slitImageHalfW * 0.22,
+      0.004 + 0.0025 * lambdaRatio * (lambdaNm / 550)
+    );
+    const diffractionY = Math.min(slitImageHalfH * 0.12, diffractionZ * 1.8);
+    const zClass = zGeom + gaussian(random) * diffractionZ;
+    const iyClass = yGeom + gaussian(random) * diffractionY;
     const classicalMix = smoothstep(0.9, 1, measurementGamma);
     const iz = zQ * (1 - classicalMix) + zClass * classicalMix;
+    const iy = iyQ * (1 - classicalMix) + iyClass * classicalMix;
 
     interferencePositions[i * 3] = screenDistance;
     interferencePositions[i * 3 + 1] = iy;

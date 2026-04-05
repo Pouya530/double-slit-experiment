@@ -2,7 +2,7 @@
  * Interpretation-engine physics helpers — SPEC-INTERPRETATIONS.md §3
  */
 
-import { fringeVisibility } from './physics.js';
+import { fringeVisibility } from './physics.js?v=16';
 
 /**
  * CSL-style spontaneous collapse suppression vs mass (simplified).
