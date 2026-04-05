@@ -1087,6 +1087,119 @@ body.page-home .nav-mobile-overlay--open .nav-mobile-credits {
   color: rgba(255, 255, 255, 0.85);
 }
 
+/* FAQ — design.md: dark section, DM Sans, menu-divider separators, accessible disclosure */
+.faq-section .section-title {
+  margin-bottom: 20px;
+}
+
+.faq-intro {
+  max-width: 52rem;
+  margin-bottom: 36px !important;
+}
+
+.faq-list {
+  max-width: 52rem;
+  border-top: 1px solid var(--menudivider);
+}
+
+.faq-item {
+  border-bottom: 1px solid var(--menudivider);
+}
+
+.faq-question {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  cursor: pointer;
+  list-style: none;
+  font-size: clamp(17px, 2.2vw, 22px);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  color: #fff;
+  padding: 20px 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.faq-question::-webkit-details-marker {
+  display: none;
+}
+
+.faq-question::after {
+  content: '';
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid rgba(255, 255, 255, 0.45);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.45);
+  transform: rotate(45deg);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+  margin-top: -6px;
+}
+
+.faq-item[open] .faq-question::after {
+  transform: rotate(-135deg);
+  margin-top: 4px;
+  border-color: rgba(255, 255, 255, 0.75);
+}
+
+.faq-question:hover::after,
+.faq-question:focus-visible::after {
+  border-color: rgba(255, 255, 255, 0.85);
+}
+
+.faq-question:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.85);
+  outline-offset: 4px;
+}
+
+.faq-answer {
+  padding: 0 0 24px 0;
+}
+
+.faq-answer p {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.82);
+  margin: 0 0 14px 0;
+}
+
+.faq-answer p:last-child {
+  margin-bottom: 0;
+}
+
+.faq-answer strong {
+  color: #fff;
+  font-weight: 600;
+}
+
+.faq-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.9em;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.12em 0.45em;
+  border-radius: 4px;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.faq-subcta {
+  margin-top: 44px;
+  margin-bottom: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px 36px;
+  align-items: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .faq-question::after {
+    transition: none;
+  }
+}
+
 .section-title {
   font-size: clamp(40px, 5vw, 64px);
   font-weight: 600;

@@ -33,9 +33,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=home-header-no-demo-nav-1">
+  <link rel="stylesheet" href="styles.css?v=faq-section-1">
   <script type="application/ld+json">
-  {"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://nocturnal.cloud/#org","name":"Nocturnal Cloud","url":"https://nocturnal.cloud"},{"@type":"WebSite","@id":"https://doubleslitexperiment.app/#website","name":"Double Slit Experiment","url":"https://doubleslitexperiment.app/","description":"Interactive 3D quantum double-slit experiment visualiser for physics education.","publisher":{"@id":"https://nocturnal.cloud/#org"}},{"@type":"WebPage","@id":"https://doubleslitexperiment.app/#webpage","name":"Double Slit Experiment — Interactive 3D Quantum Experiment","description":"Interactive 3D quantum experiment visualiser for A-level physics. Watch wave-particle duality in real time.","url":"https://doubleslitexperiment.app/","isPartOf":{"@id":"https://doubleslitexperiment.app/#website"},"about":{"@type":"Thing","name":"Double-slit experiment"}},{"@type":"SoftwareApplication","name":"Double Slit Experiment","applicationCategory":"EducationalApplication","operatingSystem":"Web","description":"Interactive 3D web visualiser of the quantum double-slit experiment with timeline scrubber, observer toggle, orbital camera, and adjustable parameters.","url":"https://doubleslitexperiment.app/demo/","author":{"@id":"https://nocturnal.cloud/#org"},"offers":{"@type":"Offer","price":"0","priceCurrency":"GBP","availability":"https://schema.org/InStock"}}]}
+  {"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://nocturnal.cloud/#org","name":"Nocturnal Cloud","url":"https://nocturnal.cloud"},{"@type":"WebSite","@id":"https://doubleslitexperiment.app/#website","name":"Double Slit Experiment","url":"https://doubleslitexperiment.app/","description":"Interactive 3D quantum double-slit experiment visualiser for physics education.","publisher":{"@id":"https://nocturnal.cloud/#org"}},{"@type":"WebPage","@id":"https://doubleslitexperiment.app/#webpage","name":"Double Slit Experiment — Interactive 3D Quantum Experiment","description":"Interactive 3D quantum experiment visualiser for A-level physics. Watch wave-particle duality in real time.","url":"https://doubleslitexperiment.app/","isPartOf":{"@id":"https://doubleslitexperiment.app/#website"},"about":{"@type":"Thing","name":"Double-slit experiment"}},{"@type":"SoftwareApplication","name":"Double Slit Experiment","applicationCategory":"EducationalApplication","operatingSystem":"Web","description":"Interactive 3D web visualiser of the quantum double-slit experiment with timeline scrubber, observer toggle, orbital camera, and adjustable parameters.","url":"https://doubleslitexperiment.app/demo/","author":{"@id":"https://nocturnal.cloud/#org"},"offers":{"@type":"Offer","price":"0","priceCurrency":"GBP","availability":"https://schema.org/InStock"}},{"@type":"FAQPage","@id":"https://doubleslitexperiment.app/#faq","mainEntity":[{"@type":"Question","name":"What is the double-slit experiment?","acceptedAnswer":{"@type":"Answer","text":"Quantum particles are sent through two narrow slits toward a detection screen. Without which-path measurement, interference produces bright and dark bands. The app visualises that setup in 3D with an adjustable bench, detection screen, and timeline."}},{"@type":"Question","name":"What is wave–particle duality?","acceptedAnswer":{"@type":"Answer","text":"The same physical entity can show wave-like behaviour (interference) or particle-like behaviour (localised hits), depending on how the experiment is set up. The double-slit experiment is the classic demonstration."}},{"@type":"Question","name":"What does the observer toggle do?","acceptedAnswer":{"@type":"Answer","text":"When “observing,” the simulation moves toward two classical bands behind each slit—like knowing which slit the particle used. Turning observation off restores the interference-style pattern, illustrating complementarity in a teaching-oriented way."}},{"@type":"Question","name":"How does the timeline scrubber work?","acceptedAnswer":{"@type":"Answer","text":"Particle impacts are pre-computed. The timeline only controls which particles are visible based on emission time—scrub backward to hide hits, forward to reveal them—without recomputing the whole run until you change parameters."}},{"@type":"Question","name":"Which parameters can I change?","acceptedAnswer":{"@type":"Answer","text":"Typical controls include slit width, slit separation, wavelength (often linked to colour), emission rate, and distance to the screen—so students can relate geometry and wavelength to fringe spacing."}},{"@type":"Question","name":"Is the simulation scientifically grounded?","acceptedAnswer":{"@type":"Answer","text":"The teaching build uses standard double-slit intensity models—interference modulated by a single-slit diffraction envelope—and a classical mixture model when observation is emphasised. It is a visualiser for education, not a full quantum mechanical treatment of measurement."}},{"@type":"Question","name":"Who is the app for?","acceptedAnswer":{"@type":"Answer","text":"Primary audience is A-level physics (16–18) and teachers; the double-slit experiment is a required practical across major UK exam boards. It also supports GCSE scaffolding, museums, and non-specialist teachers who need clear visuals."}},{"@type":"Question","name":"Will it run on school Chromebooks?","acceptedAnswer":{"@type":"Answer","text":"Performance is designed around common UK classroom hardware—for example low tiers target smooth use on Intel Celeron–class Chromebooks with integrated graphics, with adaptive quality reducing particles and effects when needed."}},{"@type":"Question","name":"How does this compare to PhET?","acceptedAnswer":{"@type":"Answer","text":"PhET’s wave simulations are widely used and 2D. This project adds a 3D bench, timeline scrubber, observer-style toggle, and orbital camera so learners can relate the abstract pattern to a spatial experiment layout."}},{"@type":"Question","name":"Is it free? Do you track personal data?","acceptedAnswer":{"@type":"Answer","text":"The product is free to use in the browser. Analytics aim to be privacy-conscious—for example cookieless, aggregated telemetry rather than individual profiling for children’s products."}},{"@type":"Question","name":"What about accessibility?","acceptedAnswer":{"@type":"Answer","text":"The roadmap targets WCAG 2.2 AA: keyboard alternatives for 3D controls, readable overlays, and alternatives such as data tables where a canvas alone is not enough. Prefer reduced motion is respected on marketing pages where applicable."}}]}]}
   </script>
 </head>
 <body class="page-home">
@@ -169,6 +169,98 @@
             </a>
           </div>
         </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq" class="section section-dark faq-section" aria-labelledby="faq-heading">
+      <div class="innerspacer">
+        <h2 id="faq-heading" class="section-title">FAQ</h2>
+        <p class="faq-intro lead">Answers for students, teachers, and anyone new to the simulation—drawn from how the experiment, demo, and classroom constraints are defined for this project.</p>
+        <div class="faq-list">
+          <details class="faq-item">
+            <summary class="faq-question">What is the double-slit experiment?</summary>
+            <div class="faq-answer">
+              <p>Quantum particles (e.g. photons or electrons) are directed at a barrier with two narrow openings and detected on a screen behind it. When paths are not resolved at the slits, a statistical pattern of hits can show <strong>interference</strong>—bright and dark regions—consistent with wave behaviour. The app places you at a 3D bench with source, slits, and screen so that layout is obvious.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary class="faq-question">What is wave–particle duality?</summary>
+            <div class="faq-answer">
+              <p>The same physical description can exhibit <strong>particle-like</strong> detection (discrete hits) and <strong>wave-like</strong> statistics (interference), depending on the experimental arrangement—including whether which-path information is available. The double-slit setup is the standard introduction to that idea at A-level.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary class="faq-question">What does the observer toggle do in the demo?</summary>
+            <div class="faq-answer">
+              <p>With observation emphasised, the pattern moves toward <strong>two lumped bands</strong> behind the slits—an intuitive stand-in for classical which-path behaviour. With observation off, the distribution returns toward an <strong>interference-like</strong> pattern. It is a teaching visualisation, not a full quantum measurement model.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary class="faq-question">How does the timeline scrubber work?</summary>
+            <div class="faq-answer">
+              <p>Impacts are <strong>pre-computed</strong> into a buffer. The timeline changes <code class="faq-code">current time</code>: only particles whose emission time is on or before that instant are shown. Scrubbing left “rewinds” the pattern; scrubbing right builds it up again—without recomputing everything until you change physical parameters.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary class="faq-question">Which parameters can I usually change?</summary>
+            <div class="faq-answer">
+              <p>Typical controls include <strong>slit width</strong>, <strong>slit separation</strong>, <strong>wavelength</strong> (often tied to colour), <strong>emission rate</strong>, and <strong>distance to the screen</strong>. Together they link geometry and λ to fringe spacing—exactly what many exam specs ask students to reason about.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary class="faq-question">Is the physics in the demo “exact”?</summary>
+            <div class="faq-answer">
+              <p>The teaching model uses the standard <strong>double-slit intensity</strong> form: an interference term multiplied by a <strong>single-slit diffraction</strong> (sinc²) envelope. With observation on, a <strong>classical mixture</strong> (e.g. Gaussians behind each slit) replaces fringe structure. That matches how interference and diffraction are introduced in school—not a complete quantum measurement or decoherence simulation.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary class="faq-question">Who is this for?</summary>
+            <div class="faq-answer">
+              <p><strong>A-level physics</strong> (16–18) is the core audience—the practical appears across AQA, OCR, Edexcel, and WJEC. It also supports <strong>GCSE</strong> scaffolding, <strong>museums</strong> (short interaction loops), and <strong>non-specialist teachers</strong>—about a quarter of English state secondaries lack a specialist physics teacher, so clear visuals matter.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary class="faq-question">Will it run on classroom Chromebooks?</summary>
+            <div class="faq-answer">
+              <p>UK schools often use modest Chromebooks (e.g. Intel Celeron class, 4&nbsp;GB RAM, integrated graphics). The product roadmap includes <strong>adaptive quality</strong>: fewer particles, simpler materials, and no heavy post-processing on low tiers so the demo stays usable at ~30&nbsp;fps on that class of hardware.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary class="faq-question">How is this different from PhET or other sims?</summary>
+            <div class="faq-answer">
+              <p><strong>PhET</strong> has huge reach and excellent 2D wave labs. This project adds a <strong>3D bench</strong>, <strong>timeline scrubber</strong>, <strong>observer-style toggle</strong>, and <strong>orbital camera</strong> so the experiment reads as a spatial apparatus—not only a flat interference plot.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary class="faq-question">WebGPU vs WebGL—what should I expect?</summary>
+            <div class="faq-answer">
+              <p>Where supported, <strong>WebGPU</strong> enables higher particle counts and compute-oriented paths; otherwise the app falls back to <strong>WebGL 2</strong> with lower caps. You do not choose manually—the runtime picks a safe path for the device.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary class="faq-question">Is it free? What about privacy and analytics?</summary>
+            <div class="faq-answer">
+              <p>The experience is <strong>free in the browser</strong>. Analytics are intended to be <strong>cookieless and aggregated</strong>, aligned with ICO expectations for young users—no engagement gimmicks, streaks, or personal profiling in the product principles for this build.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary class="faq-question">What accessibility features are targeted?</summary>
+            <div class="faq-answer">
+              <p>The specification aims for <strong>WCAG&nbsp;2.2 AA</strong>: keyboard routes for 3D controls, visible focus, live announcements for important simulation changes, and non-canvas alternatives (e.g. tabular summaries) where helpful. Marketing pages honour <strong>prefers-reduced-motion</strong> where motion is decorative.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary class="faq-question">Can teachers share one exact setup?</summary>
+            <div class="faq-answer">
+              <p>Yes—state can be encoded in the URL so you can pass a link with specific parameters (slits, wavelength, etc.) to a class, aligned with “shareable experiment state” in the product plan.</p>
+            </div>
+          </details>
+        </div>
+        <p class="faq-subcta">
+          <a href="/demo/" class="mainbutton">Try the demo</a>
+          <a href="/demo/?how=1" class="mainbutton">Open with &ldquo;How it works&rdquo;</a>
+        </p>
       </div>
     </section>
 
@@ -313,6 +405,7 @@
           <div class="footer-links">
             <h4>Pages</h4>
             <a href="/demo/">Demo</a>
+            <a href="#faq">FAQ</a>
             <a href="/preview/about">About</a>
             <a href="/preview/who">Who it&rsquo;s for</a>
             <a href="/preview/features">Features</a>
