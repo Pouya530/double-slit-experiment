@@ -336,7 +336,11 @@ body.nav-mobile-open {
   flex-direction: column;
   justify-content: flex-end;
   align-items: flex-start;
-  padding: 20px 20px max(32px, env(safe-area-inset-bottom, 0px));
+  /* Insets: match .site-header horizontal padding (20px mobile, 60px desktop for home/marketing) */
+  padding-top: max(20px, env(safe-area-inset-top, 0px));
+  padding-bottom: max(32px, env(safe-area-inset-bottom, 0px));
+  padding-left: max(20px, env(safe-area-inset-left, 0px));
+  padding-right: max(20px, env(safe-area-inset-right, 0px));
   background-color: var(--maintext);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
@@ -363,6 +367,13 @@ body:is(.page-home, .page-marketing) .nav-mobile-overlay:not(.nav-mobile-overlay
 
 body:is(.page-home, .page-marketing) .nav-mobile-overlay--open {
   transform: translate3d(0, 0, 0);
+}
+
+@media (min-width: 800px) {
+  body:is(.page-home, .page-marketing) .nav-mobile-overlay {
+    padding-left: max(60px, env(safe-area-inset-left, 0px));
+    padding-right: max(60px, env(safe-area-inset-right, 0px));
+  }
 }
 
 @keyframes navMobileItemIn {
@@ -575,6 +586,8 @@ body:is(.page-home, .page-marketing) .nav-mobile-overlay--open .nav-mobile-credi
   display: flex;
   flex-wrap: wrap;
   gap: 24px 40px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .nav-mobile-secondary a {
@@ -611,7 +624,8 @@ body:is(.page-home, .page-marketing) .nav-mobile-overlay--open .nav-mobile-credi
 .nav-mobile-divider {
   height: 1px;
   width: 100%;
-  max-width: 320px;
+  max-width: 100%;
+  align-self: stretch;
   margin-bottom: 28px;
   background-color: var(--menudivider);
 }
