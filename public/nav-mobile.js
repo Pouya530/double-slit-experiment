@@ -1,5 +1,5 @@
 /**
- * Full-screen nav: burger + overlay. Narrow viewports always; desktop only on homepage (.site-header--home).
+ * Full-screen nav: burger + overlay. Narrow viewports always; desktop burger only on homepage (.site-header--home).
  * Open state uses .nav-mobile-overlay--open (not [hidden]) so CSS transitions can run.
  */
 const MQ = '(max-width: 799px)';
