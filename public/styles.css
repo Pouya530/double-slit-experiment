@@ -503,6 +503,79 @@ body.nav-mobile-open {
   pointer-events: none;
 }
 
+/* Desktop (≥800px): single full-bleed hero image; see hero-desktop-parallax.js */
+.hero-desktop-fullbleed {
+  display: none;
+}
+
+.hero-desktop-fullbleed__scale {
+  position: absolute;
+  inset: -12%;
+  transform-origin: 50% 42%;
+  will-change: transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+.hero-desktop-fullbleed__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+.hero-desktop-fullbleed__veil {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(180deg, #1a1a22 0%, #0c0c10 55%, #050508 100%);
+  opacity: 1;
+  animation: hero-desktop-veil-out 1.35s ease-out forwards;
+}
+
+@keyframes hero-desktop-veil-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@media (min-width: 800px) {
+  .hero-desktop-fullbleed {
+    display: block;
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  .hero-collage {
+    display: none !important;
+  }
+
+  .hero-mobile-fullbleed {
+    display: none !important;
+  }
+}
+
+@media (min-width: 800px) and (prefers-reduced-motion: reduce) {
+  .hero-desktop-fullbleed__veil {
+    animation: none;
+    opacity: 0;
+  }
+
+  .hero-desktop-fullbleed__scale {
+    will-change: auto;
+    transform: none !important;
+  }
+}
+
 .hero-collage {
   position: absolute;
   inset: -4% -2%;
