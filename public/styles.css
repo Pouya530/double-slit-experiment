@@ -94,13 +94,28 @@ body.nav-mobile-open {
   display: block;
 }
 
-/* Homepage desktop: smaller uppercase wordmark (icon unchanged via parent em) */
-@media (min-width: 800px) {
-  body.page-home .logo > span {
-    font-size: 50%;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-  }
+/* Homepage only (index): stacked wordmark — line 2 half size, centred under line 1 */
+body.page-home .logo--home-wordmark .logo-wordmark-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  line-height: 1.12;
+  min-width: 0;
+}
+
+body.page-home .logo--home-wordmark .logo-wordmark-line1 {
+  font-weight: inherit;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+body.page-home .logo--home-wordmark .logo-wordmark-line2 {
+  font-size: 50%;
+  font-weight: inherit;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-top: 0.1em;
 }
 
 .nav-burger {
@@ -463,8 +478,21 @@ body.nav-mobile-open {
     align-self: center;
   }
 
-  .site-header .logo > span {
+  .site-header .logo > span:not(.logo-wordmark-stack) {
     min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .site-header .logo--home-wordmark .logo-wordmark-stack {
+    min-width: 0;
+    align-items: center;
+  }
+
+  .site-header .logo--home-wordmark .logo-wordmark-line1,
+  .site-header .logo--home-wordmark .logo-wordmark-line2 {
+    max-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
