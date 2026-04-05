@@ -56,7 +56,7 @@
   <link rel="icon" href="/favicon.png" type="image/png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/demo/demo.css?v=25">
+  <link rel="stylesheet" href="/demo/demo.css?v=26">
   <script type="application/ld+json">
   {"@context":"https://schema.org","@graph":[{"@type":"WebPage","@id":"https://doubleslitexperiment.app/demo/classic.html#webpage","name":"Double Slit Experiment — Classic demo (guided tour)","description":"Double Slit classic guided demo: step-through tour of the 3D double-slit experiment, wave interference, and observer effects.","url":"https://doubleslitexperiment.app/demo/classic.html","isPartOf":{"@type":"WebSite","name":"Double Slit Experiment","url":"https://doubleslitexperiment.app/"},"breadcrumb":{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://doubleslitexperiment.app/"},{"@type":"ListItem","position":2,"name":"Demo","item":"https://doubleslitexperiment.app/demo/"},{"@type":"ListItem","position":3,"name":"Classic guided demo","item":"https://doubleslitexperiment.app/demo/classic.html"}]}}]}
   </script>
@@ -75,6 +75,10 @@
         <button class="theme-btn" id="theme-toggle" aria-label="Toggle light/dark mode" title="Toggle theme">
           <span class="theme-icon">☀</span>
           <span class="theme-label">Light</span>
+        </button>
+        <button type="button" class="fullscreen-btn" id="demo-fullscreen-btn" aria-label="Enter fullscreen" aria-pressed="false" title="Fullscreen">
+          <span class="fullscreen-icon" aria-hidden="true">⛶</span>
+          <span class="fullscreen-label">Full screen</span>
         </button>
         <a href="/demo/" class="back demo-mode-link">Main demo</a>
         <a href="/" class="back">← Home</a>
@@ -191,12 +195,14 @@
         <li><strong>Parameters &amp; Recompute</strong> — Slit width, separation, and wavelength (colour). After edits, <strong>Recompute</strong> regenerates the particle set.</li>
         <li><strong>Interpretations &amp; ℹ</strong> — Tabs switch the story and overlays. The <strong>ℹ</strong> panel explains the active view without changing the underlying simulation.</li>
         <li><strong>Theme</strong> — Use the sun/moon control in the header for light or dark UI.</li>
+        <li><strong>Full screen</strong> — Use the expand control in the header to fill the display (browser / OS permitting). Press <strong>Esc</strong> or the button again to exit.</li>
       </ul>
       <p id="features-help-tour-note" class="demo-modal-note" hidden><strong>Tour</strong> — Use ▶ Tour next to ℹ for a guided walkthrough of these controls.</p>
     </div>
   </div>
 
   <script src="/demo/help-modal.js?v=6" defer></script>
+  <script src="/demo/demo-fullscreen.js?v=1" defer></script>
   <script type="module" src="/demo/main.js?v=18"></script>
 </body>
 </html>
