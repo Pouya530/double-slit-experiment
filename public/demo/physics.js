@@ -51,8 +51,10 @@ function sinThetaFromZ(z, L) {
 }
 
 /**
- * Double-slit intensity with continuous decoherence (SPEC-MEASUREMENT.md §1.4).
- * At γ=0 matches cos²(β)·sinc²(α); at γ=1, pure single-slit envelope (no fringes).
+ * Double-slit intensity with continuous decoherence (SPEC-MEASUREMENT.md).
+ * I = 0.5 × sinc²(πa·sinθ/λ) × [1 + V(γ)·cos(2πd·sinθ/λ)] with sinθ from z/L geometry.
+ * Englert complementarity: use model `quadratic` so V(γ) = √(1 − γ²), D = γ, D² + V² = 1.
+ * At γ=0: standard cos²(β)·sinc²; at γ=1: pure diffraction envelope (no fringes).
  */
 function intensityWithDecoherenceZ(z, L, d, a, lambda, gamma, visModel) {
   const sinTheta = sinThetaFromZ(z, L);

@@ -56,7 +56,7 @@
   <link rel="icon" href="/favicon.png" type="image/png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/demo/demo.css?v=22">
+  <link rel="stylesheet" href="/demo/demo.css?v=23">
   <script type="application/ld+json">
   {"@context":"https://schema.org","@graph":[{"@type":"WebPage","@id":"https://doubleslitexperiment.app/demo/#webpage","name":"Double Slit Experiment — Interactive Demo","description":"Run the Double Slit 3D demo: double-slit interference, measurement strength (continuous decoherence), quantum interpretations, and live parameters in your browser.","url":"https://doubleslitexperiment.app/demo/","isPartOf":{"@type":"WebSite","name":"Double Slit Experiment","url":"https://doubleslitexperiment.app/"},"breadcrumb":{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://doubleslitexperiment.app/"},{"@type":"ListItem","position":2,"name":"Demo","item":"https://doubleslitexperiment.app/demo/"}]}},{"@type":"SoftwareApplication","name":"Double Slit Experiment","applicationCategory":"EducationalApplication","operatingSystem":"Web","url":"https://doubleslitexperiment.app/demo/","description":"Interactive 3D double-slit experiment with timeline scrubber, measurement-strength control, interpretations, and adjustable experimental parameters.","author":{"@type":"Organization","name":"Nocturnal Cloud","url":"https://nocturnal.cloud"},"offers":{"@type":"Offer","price":"0","priceCurrency":"GBP","availability":"https://schema.org/InStock"}}]}
   </script>
@@ -72,7 +72,6 @@
         <button type="button" class="help-features-btn" id="features-help-open" aria-haspopup="dialog" aria-controls="features-help-modal" aria-expanded="false">
           How it works
         </button>
-        <button type="button" class="hud-toggle-btn" id="complementarity-hud-toggle" aria-pressed="true" aria-label="Toggle complementarity diagram" title="Complementarity (D vs V)">D–V</button>
         <button class="theme-btn" id="theme-toggle" aria-label="Toggle light/dark mode" title="Toggle theme">
           <span class="theme-icon">☀</span>
           <span class="theme-label">Light</span>
@@ -131,25 +130,6 @@
 
     <div id="canvas"></div>
 
-    <div class="complementarity-hud" id="complementarity-hud" role="img" aria-label="Complementarity: which-path knowledge D versus fringe visibility V">
-      <div class="complementarity-hud-title">Complementarity</div>
-      <svg class="complementarity-hud-svg" viewBox="0 0 120 120" aria-hidden="true">
-        <path d="M 20 100 A 80 80 0 0 1 100 20" fill="none" stroke="currentColor" stroke-width="1.2" opacity="0.35" />
-        <line x1="20" y1="100" x2="100" y2="100" stroke="currentColor" stroke-width="0.8" opacity="0.25" />
-        <line x1="20" y1="100" x2="20" y2="20" stroke="currentColor" stroke-width="0.8" opacity="0.25" />
-        <text x="22" y="114" font-size="8" fill="currentColor" opacity="0.7">D</text>
-        <text x="4" y="28" font-size="8" fill="currentColor" opacity="0.7">V</text>
-        <circle id="complementarity-point" cx="20" cy="100" r="5" fill="url(#comp-grad)" />
-        <defs>
-          <linearGradient id="comp-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="#38bdf8" />
-            <stop offset="100%" stop-color="#f59e0b" />
-          </linearGradient>
-        </defs>
-      </svg>
-      <div class="complementarity-hud-sum" id="complementarity-sum">D² + V² = 1.00</div>
-    </div>
-
     <div class="info-panel" id="info-panel">
       <button class="info-close" id="info-close" aria-label="Close">×</button>
       <div class="info-content" id="info-content"></div>
@@ -162,23 +142,50 @@
         <button type="button" class="play-btn play-btn--playing" id="play" aria-label="Pause">❚❚</button>
         <span class="particle-count" id="particle-count">0 / 2000 particles</span>
       </div>
-      <div class="controls-row controls-row--measurement">
-        <div class="measurement-block" id="measurement-block">
-          <div class="measurement-slider-row">
-            <span class="measurement-icon measurement-icon--wave" aria-hidden="true">〰</span>
-            <input type="range" id="measurement-slider" min="0" max="100" value="0" step="1" aria-labelledby="measurement-label" aria-valuetext="0%" disabled>
-            <span class="measurement-icon measurement-icon--particle" aria-hidden="true">●</span>
-          </div>
-          <div class="measurement-meta">
-            <span id="measurement-label" class="measurement-label">Measurement strength</span>
-            <span id="measurement-value-readout" class="measurement-readout">0%</span>
-          </div>
-          <p id="measurement-narrative" class="measurement-narrative" hidden></p>
-        </div>
+      <div class="controls-row">
+        <button class="observe-btn" id="observe" type="button" aria-pressed="false">
+          <span>📷</span>
+          <span>Not observing</span>
+        </button>
         <button class="observe-btn reset-btn" id="reset">
           ↺ Reset
         </button>
       </div>
+      <details class="explore-deeper" id="explore-deeper">
+        <summary class="explore-deeper-summary">Explore deeper — continuous measurement (γ)</summary>
+        <div class="explore-deeper-body">
+          <div class="explore-deeper-controls">
+            <div class="measurement-slider-row measurement-slider-row--explore">
+              <span class="measurement-icon measurement-icon--wave" aria-hidden="true">〰</span>
+              <input type="range" id="measurement-slider-explore" min="0" max="100" value="0" step="1" aria-labelledby="measurement-label-explore" aria-valuetext="0%">
+              <span class="measurement-icon measurement-icon--particle" aria-hidden="true">●</span>
+            </div>
+            <div class="measurement-meta">
+              <span id="measurement-label-explore" class="measurement-label">Measurement strength γ</span>
+              <span id="measurement-value-readout-explore" class="measurement-readout">0%</span>
+            </div>
+            <p id="measurement-narrative-explore" class="measurement-narrative measurement-narrative--compact"></p>
+          </div>
+          <div class="complementarity-hud complementarity-hud--inline" id="complementarity-hud-explore" role="img" aria-label="Complementarity diagram: D equals gamma, V is fringe visibility">
+            <div class="complementarity-hud-title">D vs V</div>
+            <svg class="complementarity-hud-svg complementarity-hud-svg--sm" viewBox="0 0 88 88" aria-hidden="true">
+              <path d="M 14 74 A 60 60 0 0 1 74 14" fill="none" stroke="currentColor" stroke-width="1" opacity="0.35" />
+              <line x1="14" y1="74" x2="74" y2="74" stroke="currentColor" stroke-width="0.6" opacity="0.25" />
+              <line x1="14" y1="74" x2="14" y2="14" stroke="currentColor" stroke-width="0.6" opacity="0.25" />
+              <text x="16" y="84" font-size="7" fill="currentColor" opacity="0.7">D</text>
+              <text x="4" y="22" font-size="7" fill="currentColor" opacity="0.7">V</text>
+              <circle id="complementarity-point-explore" cx="14" cy="74" r="4" fill="url(#comp-grad-explore)" />
+              <defs>
+                <linearGradient id="comp-grad-explore" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#38bdf8" />
+                  <stop offset="100%" stop-color="#f59e0b" />
+                </linearGradient>
+              </defs>
+            </svg>
+            <div class="complementarity-hud-sum complementarity-hud-sum--sm" id="complementarity-sum-explore">D² + V² = 1.00</div>
+          </div>
+        </div>
+      </details>
     </div>
   </div>
 
@@ -196,7 +203,8 @@
       <p class="demo-modal-lead">These controls mirror the main product: timeline, observer, camera, and experiment parameters.</p>
       <ul class="demo-modal-list">
         <li><strong>Timeline</strong> — Drag the slider to scrub through time, or use Play to watch hits accumulate on the detection screen. Reset jumps back to the start.</li>
-        <li><strong>Measurement strength</strong> — Drag the slider from full interference (wave-like) toward strong which-path information; the pattern continuously moves from fringes toward a single-slit-like envelope. Interpretations relabel what the slider means in the story panel (ℹ).</li>
+        <li><strong>Observer</strong> — Quick snap: turns effective measurement strength γ between 0 (full interference) and 1 (pure diffraction envelope, no fringes) with a short smooth transition.</li>
+        <li><strong>Explore deeper</strong> — The γ slider sets any value in between and updates the pattern using Englert complementarity (V = √(1−γ²)). A small diagram shows (D, V) with D = γ.</li>
         <li><strong>Camera</strong> — Drag to orbit, scroll or pinch to zoom, right-drag (or trackpad two-finger) to pan—full 3D around the bench.</li>
         <li><strong>Parameters &amp; Recompute</strong> — Slit width, separation, and wavelength (colour). After edits, <strong>Recompute</strong> regenerates the particle set. Extended options in this build add mass-related behaviour for some interpretations.</li>
         <li><strong>Interpretations &amp; ℹ</strong> — Tabs switch the story and overlays (Copenhagen, pilot-wave, etc.). The <strong>ℹ</strong> panel explains the active view without changing the underlying simulation.</li>
@@ -207,6 +215,6 @@
   </div>
 
   <script src="/demo/help-modal.js?v=6" defer></script>
-  <script type="module" src="/demo/advanced-main.js?v=13"></script>
+  <script type="module" src="/demo/advanced-main.js?v=14"></script>
 </body>
 </html>

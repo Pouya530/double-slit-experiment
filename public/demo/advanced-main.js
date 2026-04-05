@@ -108,6 +108,7 @@ function syncInterpretationUI() {
   document.querySelectorAll('.interp-tab').forEach((b) => b.classList.toggle('active', b.dataset.interp === activeInterpretation));
   if (showInfoPanel) renderInfoPanel(activeInterpretation);
   updateObserveAndAdvancedControls();
+  syncObserveAria();
   syncPlayButton();
   const interpMobile = document.getElementById('interp-select-mobile');
   if (interpMobile) interpMobile.value = activeInterpretation;
@@ -129,8 +130,13 @@ let scene, camera, renderer, controls;
 let particleMesh, detectionTexture, detectionCanvas;
 let particleBuffer, visibleCount = 0;
 let currentTime = 0, tMax = 30, effectiveTMax = 30, isPlaying = true, lastTime = performance.now();
-/** Continuous measurement strength γ ∈ [0,1] for interpretations with a binary-style control. */
+/** Slider value / stored γ (synced with observerTransition except during toggle-only animation). */
 let measurementStrength = 0;
+let isObserving = false;
+let observerTarget = 0;
+let observerTransition = 0;
+let exploreSliderDragging = false;
+let lastToggleAnimRebuild = 0;
 let gridHelper, sourceMesh, sourceGlow, barrierLeft, barrierCenter, barrierRight, screenFrame;
 let waveOverlay, envParticles, qbismOverlay;
 let isDarkMode = false;
@@ -140,12 +146,11 @@ let singleParticleMode = false;
 let particleMassAmu = 0.00055;
 let envCoupling = 0;
 let perspective = 'external';
-let showComplementarityHud = true;
 let gammaRecomputeTimer = null;
 
 /** Per-interpretation persisted knobs (slit λ / geometry stay global on the form). */
 const DEFAULT_ELECTRON_AMU = 0.00055;
-/** @type {Record<string, { particleMassAmu: number; envCoupling: number; perspective: string; measurementStrength: number; isObserving?: boolean }>} */
+/** @type {Record<string, { particleMassAmu: number; envCoupling: number; perspective: string; measurementStrength: number; isObserving: boolean }>} */
 let interpParamSnapshots = {};
 
 function createDefaultInterpParams() {
@@ -154,6 +159,7 @@ function createDefaultInterpParams() {
     envCoupling: 0,
     perspective: 'external',
     measurementStrength: 0,
+    isObserving: false,
   };
 }
 
@@ -162,11 +168,15 @@ function cloneInterpParams(p) {
   if (typeof ms !== 'number' || Number.isNaN(ms)) {
     ms = p.isObserving ? 1 : 0;
   }
+  ms = Math.max(0, Math.min(1, ms));
+  const obs =
+    typeof p.isObserving === 'boolean' ? p.isObserving : ms > 0.5;
   return {
     particleMassAmu: p.particleMassAmu,
     envCoupling: p.envCoupling,
     perspective: p.perspective,
-    measurementStrength: Math.max(0, Math.min(1, ms)),
+    measurementStrength: ms,
+    isObserving: obs,
   };
 }
 
@@ -176,6 +186,7 @@ function captureParamsFromGlobals() {
     envCoupling,
     perspective,
     measurementStrength,
+    isObserving,
   });
 }
 
@@ -213,10 +224,14 @@ function switchInterpretation(nextId) {
   interpParamSnapshots[activeInterpretation] = captureParamsFromGlobals();
   activeInterpretation = nextId;
   const snap = interpParamSnapshots[activeInterpretation] || createDefaultInterpParams();
+  const hydrated = cloneInterpParams(snap);
   particleMassAmu = snap.particleMassAmu;
   envCoupling = snap.envCoupling;
   perspective = snap.perspective;
-  measurementStrength = cloneInterpParams(snap).measurementStrength;
+  measurementStrength = hydrated.measurementStrength;
+  isObserving = hydrated.isObserving;
+  observerTarget = isObserving ? 1 : 0;
+  observerTransition = measurementStrength;
   syncAdvancedControlsFromGlobals();
   updateObserveAndAdvancedControls();
   snapPhysicsStateImmediate();
@@ -257,9 +272,15 @@ function getActiveVisibilityModel() {
   return MEASUREMENT_CONFIGS[activeInterpretation]?.preferredVisModel ?? 'quadratic';
 }
 
+/** Simulation visibility: Englert V = √(1−γ²) for binary observer + explore slider (SPEC-MEASUREMENT). */
+function getSimulationVisibilityModel() {
+  const mode = getInterpDef()?.observerToggleMode ?? 'binary';
+  if (mode === 'binary') return 'quadratic';
+  return getActiveVisibilityModel();
+}
+
 /** Effective measurement strength γ for the active interpretation (SPEC-MEASUREMENT). */
 function computeMeasurementGamma() {
-  const id = activeInterpretation;
   const def = getInterpDef();
   const mode = def?.observerToggleMode ?? 'binary';
   if (mode === 'slider') return Math.max(0, Math.min(1, envCoupling));
@@ -269,7 +290,7 @@ function computeMeasurementGamma() {
     if (perspective === 'detector') return 1;
     return 0.45;
   }
-  return Math.max(0, Math.min(1, measurementStrength));
+  return Math.max(0, Math.min(1, observerTransition));
 }
 
 function scheduleGammaRecompute(immediate = false) {
@@ -288,7 +309,7 @@ function scheduleGammaRecompute(immediate = false) {
 /** Fringe visibility V(γ) for overlay / HUD copy. */
 function currentFringeVisibility() {
   const g = computeMeasurementGamma();
-  return fringeVisibility(g, getActiveVisibilityModel());
+  return fringeVisibility(g, getSimulationVisibilityModel());
 }
 
 function massSliderToAmu(t) {
@@ -321,7 +342,7 @@ function rebuildParticleBuffer(seed) {
   const userLambda = parseFloat(document.getElementById('wavelength')?.value || 550) * 1e-9;
   const lambdaEff = effectiveWavelength(particleMassAmu, userLambda);
   const gamma = computeMeasurementGamma();
-  const visibilityModel = getActiveVisibilityModel();
+  const visibilityModel = getSimulationVisibilityModel();
   particleBuffer = createParticleBuffer(
     {
       slitWidth,
@@ -339,61 +360,52 @@ function rebuildParticleBuffer(seed) {
   effectiveTMax = singleParticleMode ? FLIGHT_TIME + 0.4 : tMax;
 }
 
-function updateComplementarityHudDisplay() {
-  const hud = document.getElementById('complementarity-hud');
-  const sumEl = document.getElementById('complementarity-sum');
-  const pt = document.getElementById('complementarity-point');
-  if (!hud || !sumEl || !pt) return;
-  hud.hidden = !showComplementarityHud;
+/** Inline complementarity HUD (Englert / quadratic: D² + V² = 1). */
+function updateExploreComplementarityHud() {
+  const sumEl = document.getElementById('complementarity-sum-explore');
+  const pt = document.getElementById('complementarity-point-explore');
+  if (!sumEl || !pt) return;
   const g = computeMeasurementGamma();
-  const model = getActiveVisibilityModel();
+  const model = getSimulationVisibilityModel();
   const { distinguishability: D, visibility: V, complementarityCheck } = getComplementarity(g, model);
   sumEl.textContent = `D² + V² = ${complementarityCheck.toFixed(2)}`;
-  const cx = 20 + D * 80;
-  const cy = 100 - V * 80;
+  const cx = 14 + D * 60;
+  const cy = 74 - V * 60;
   pt.setAttribute('cx', String(cx));
   pt.setAttribute('cy', String(cy));
 }
 
-function updateMeasurementChrome() {
+function updateExploreSection() {
   const def = getInterpDef();
   const mode = def?.observerToggleMode ?? 'binary';
-  const slider = document.getElementById('measurement-slider');
-  const labelEl = document.getElementById('measurement-label');
-  const readout = document.getElementById('measurement-value-readout');
-  const narrative = document.getElementById('measurement-narrative');
+  const explore = document.getElementById('explore-deeper');
+  if (explore) explore.hidden = mode !== 'binary';
+
+  const gUi = computeMeasurementGamma();
+  const slider = document.getElementById('measurement-slider-explore');
+  const labelEl = document.getElementById('measurement-label-explore');
+  const readout = document.getElementById('measurement-value-readout-explore');
+  const narrative = document.getElementById('measurement-narrative-explore');
   const config = MEASUREMENT_CONFIGS[activeInterpretation];
-  const gUi = mode === 'binary' ? measurementStrength : computeMeasurementGamma();
 
-  if (labelEl && config) {
-    if (mode === 'binary') labelEl.textContent = config.sliderLabel;
-    else if (mode === 'slider') labelEl.textContent = 'Use environment coupling (above)';
-    else if (mode === 'perspective') labelEl.textContent = 'Use RQM perspective control';
-    else labelEl.textContent = 'Use particle mass control';
+  if (labelEl && config && mode === 'binary') {
+    labelEl.textContent = `${config.sliderLabel} (γ)`;
   }
 
-  if (slider) {
-    const show = mode === 'binary';
-    slider.disabled = !show;
-    if (show) {
-      slider.value = String(Math.round(measurementStrength * 100));
-      slider.setAttribute('aria-valuetext', `${Math.round(measurementStrength * 100)}%`);
-    } else {
-      slider.value = String(Math.round(gUi * 100));
-      slider.setAttribute('aria-valuetext', `${Math.round(gUi * 100)}% (read‑only)`);
-    }
+  if (slider && mode === 'binary' && !exploreSliderDragging) {
+    slider.value = String(Math.round(observerTransition * 100));
+    slider.setAttribute('aria-valuetext', `${Math.round(observerTransition * 100)}%`);
   }
 
-  if (readout) {
+  if (readout && mode === 'binary') {
     readout.textContent = `${Math.round(gUi * 100)}%`;
   }
 
-  if (narrative && config) {
+  if (narrative && config && mode === 'binary') {
     narrative.textContent = narrativeForGamma(gUi, config);
-    narrative.hidden = false;
   }
 
-  updateComplementarityHudDisplay();
+  if (mode === 'binary') updateExploreComplementarityHud();
 }
 
 function updateObserveAndAdvancedControls() {
@@ -418,7 +430,34 @@ function updateObserveAndAdvancedControls() {
     massReadout.textContent = label;
   }
 
-  updateMeasurementChrome();
+  const ob = document.getElementById('observe');
+  if (!ob) {
+    updateExploreSection();
+    return;
+  }
+  const mode = def?.observerToggleMode ?? 'binary';
+  const disabled = mode === 'disabled' || mode === 'slider' || mode === 'perspective';
+  ob.disabled = disabled;
+  ob.setAttribute('aria-disabled', disabled ? 'true' : 'false');
+  ob.classList.toggle('active', isObserving && !disabled);
+
+  const span = ob.querySelector('span:last-child');
+  if (mode === 'slider' && span) {
+    span.textContent = 'Use environment slider';
+  } else if (mode === 'perspective' && span) {
+    span.textContent = 'Use perspective control';
+  } else if (mode === 'disabled' && span) {
+    span.textContent = 'Observer N/A — use mass';
+  } else if (span) {
+    span.textContent = isObserving ? 'Observing' : 'Not observing';
+  }
+
+  updateExploreSection();
+}
+
+function syncObserveAria() {
+  const ob = document.getElementById('observe');
+  if (ob && !ob.disabled) ob.setAttribute('aria-pressed', isObserving ? 'true' : 'false');
 }
 
 function init() {
@@ -1074,17 +1113,59 @@ function setupUI() {
     syncPlayButton();
   });
 
-  const msEl = document.getElementById('measurement-slider');
-  msEl?.addEventListener('input', () => {
-    if (msEl.disabled) return;
-    measurementStrength = Math.max(0, Math.min(1, Number(msEl.value) / 100));
-    updateMeasurementChrome();
+  const observeBtn = document.getElementById('observe');
+  observeBtn?.addEventListener('click', () => {
+    if (observeBtn.disabled) return;
+    isObserving = !isObserving;
+    observerTarget = isObserving ? 1 : 0;
+    observeBtn.classList.toggle('active', isObserving);
+    const span = observeBtn.querySelector('span:last-child');
+    if (span && !observeBtn.disabled) {
+      const mode = getInterpDef()?.observerToggleMode ?? 'binary';
+      if (mode === 'binary') span.textContent = isObserving ? 'Observing' : 'Not observing';
+    }
+    syncObserveAria();
+    if (showInfoPanel) renderInfoPanel(activeInterpretation);
+    lastToggleAnimRebuild = 0;
+  });
+
+  const exEl = document.getElementById('measurement-slider-explore');
+  exEl?.addEventListener('pointerdown', () => {
+    exploreSliderDragging = true;
+  });
+  exEl?.addEventListener('pointerup', () => {
+    exploreSliderDragging = false;
+    measurementStrength = observerTransition;
+    updateObserveAndAdvancedControls();
+  });
+  exEl?.addEventListener('pointercancel', () => {
+    exploreSliderDragging = false;
+    measurementStrength = observerTransition;
+    updateObserveAndAdvancedControls();
+  });
+  exEl?.addEventListener('input', () => {
+    const mode = getInterpDef()?.observerToggleMode ?? 'binary';
+    if (mode !== 'binary') return;
+    const g = Math.max(0, Math.min(1, Number(exEl.value) / 100));
+    measurementStrength = g;
+    observerTransition = g;
+    observerTarget = g > 0.5 ? 1 : 0;
+    isObserving = observerTarget === 1;
+    const ob = document.getElementById('observe');
+    if (ob) {
+      ob.classList.toggle('active', isObserving);
+      const span = ob.querySelector('span:last-child');
+      if (span) span.textContent = isObserving ? 'Observing' : 'Not observing';
+    }
+    syncObserveAria();
+    updateExploreSection();
     if (showInfoPanel) renderInfoPanel(activeInterpretation);
     scheduleGammaRecompute();
   });
-  msEl?.addEventListener('dblclick', () => {
-    if (msEl.disabled) return;
-    const v = Number(msEl.value) / 100;
+  exEl?.addEventListener('dblclick', () => {
+    const mode = getInterpDef()?.observerToggleMode ?? 'binary';
+    if (mode !== 'binary') return;
+    const v = Number(exEl.value) / 100;
     const snaps = [0, 0.5, 1];
     let nearest = snaps[0];
     let best = Math.abs(v - snaps[0]);
@@ -1096,22 +1177,21 @@ function setupUI() {
       }
     }
     measurementStrength = nearest;
-    updateMeasurementChrome();
+    observerTransition = nearest;
+    observerTarget = nearest > 0.5 ? 1 : 0;
+    isObserving = observerTarget === 1;
+    const ob = document.getElementById('observe');
+    if (ob) {
+      ob.classList.toggle('active', isObserving);
+      const span = ob.querySelector('span:last-child');
+      if (span) span.textContent = isObserving ? 'Observing' : 'Not observing';
+    }
+    syncObserveAria();
+    updateExploreSection();
     clearTimeout(gammaRecomputeTimer);
     gammaRecomputeTimer = null;
     rebuildParticleBuffer(Date.now());
     if (showInfoPanel) renderInfoPanel(activeInterpretation);
-  });
-
-  const hudPref = localStorage.getItem('doubleSlitComplementarityHud');
-  if (hudPref === '0') showComplementarityHud = false;
-  const hudBtn = document.getElementById('complementarity-hud-toggle');
-  hudBtn?.setAttribute('aria-pressed', showComplementarityHud ? 'true' : 'false');
-  hudBtn?.addEventListener('click', () => {
-    showComplementarityHud = !showComplementarityHud;
-    hudBtn.setAttribute('aria-pressed', showComplementarityHud ? 'true' : 'false');
-    localStorage.setItem('doubleSlitComplementarityHud', showComplementarityHud ? '1' : '0');
-    updateComplementarityHudDisplay();
   });
 
   document.getElementById('recompute')?.addEventListener('click', () => {
@@ -1163,7 +1243,7 @@ function setupUI() {
   if (envEl) {
     envEl.addEventListener('input', () => {
       envCoupling = Number(envEl.value) / 100;
-      updateMeasurementChrome();
+      updateObserveAndAdvancedControls();
       if (showInfoPanel) renderInfoPanel(activeInterpretation);
       scheduleGammaRecompute();
     });
@@ -1172,7 +1252,7 @@ function setupUI() {
   document.querySelectorAll('input[name="perspective"]').forEach((radio) => {
     radio.addEventListener('change', () => {
       if (radio.checked) perspective = radio.value;
-      updateMeasurementChrome();
+      updateObserveAndAdvancedControls();
       if (showInfoPanel) renderInfoPanel(activeInterpretation);
       scheduleGammaRecompute();
     });
@@ -1203,6 +1283,21 @@ function animate(now = 0) {
     }
     const tl = document.getElementById('timeline');
     if (tl) tl.value = (currentTime / effectiveTMax) * 100;
+  }
+
+  const defAnim = getInterpDef();
+  const modeAnim = defAnim?.observerToggleMode ?? 'binary';
+  if (modeAnim === 'binary' && !exploreSliderDragging) {
+    observerTransition += (observerTarget - observerTransition) * Math.min(1, dt * 5);
+    measurementStrength = observerTransition;
+    if (Math.abs(observerTarget - observerTransition) > 0.004) {
+      const tNow = performance.now();
+      if (tNow - lastToggleAnimRebuild >= 100) {
+        lastToggleAnimRebuild = tNow;
+        rebuildParticleBuffer(Date.now());
+      }
+    }
+    updateExploreSection();
   }
 
   if (particleMesh?.userData?.update) particleMesh.userData.update();
