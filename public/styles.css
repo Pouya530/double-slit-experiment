@@ -94,6 +94,15 @@ body.nav-mobile-open {
   display: block;
 }
 
+/* Homepage desktop: smaller uppercase wordmark (icon unchanged via parent em) */
+@media (min-width: 800px) {
+  body.page-home .logo > span {
+    font-size: 50%;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+}
+
 .nav-burger {
   display: none;
   align-items: center;
