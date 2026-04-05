@@ -978,3 +978,68 @@ body {
   border: 1px solid var(--panel-border);
 }
 
+/* --------------------------------------------------------------------------
+   Demo /demo only — Samsung-style mobile chrome (not the marketing homepage)
+   Light frosted bar + #000 controls when UI is dark theme; light theme unchanged.
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  html:not([data-theme='light']) .demo-header {
+    background: rgba(255, 255, 255, 0.92);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  }
+
+  html:not([data-theme='light']) .demo-header .logo,
+  html:not([data-theme='light']) .demo-header .logo-text {
+    color: #000000;
+  }
+
+  html:not([data-theme='light']) .demo-header .back {
+    color: rgba(0, 0, 0, 0.72);
+  }
+
+  html:not([data-theme='light']) .demo-header .back:hover {
+    color: #000000;
+  }
+
+  html:not([data-theme='light']) .demo-header .help-features-btn {
+    color: #000000;
+    border-color: rgba(0, 0, 0, 0.14);
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  html:not([data-theme='light']) .demo-header .help-features-btn:hover {
+    background: rgba(0, 0, 0, 0.08);
+  }
+
+  html:not([data-theme='light']) .demo-header .theme-btn {
+    color: #000000;
+    border-color: rgba(0, 0, 0, 0.14);
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  html:not([data-theme='light']) .demo-header .theme-btn:hover {
+    background: rgba(0, 0, 0, 0.08);
+  }
+}
+
+/* Z Fold cover (~344–400 CSS px): safe horizontal inset for header row */
+@media (max-width: 400px) {
+  .demo-header {
+    padding-left: max(10px, env(safe-area-inset-left, 0px));
+    padding-right: max(10px, env(safe-area-inset-right, 0px));
+  }
+}
+
+/* Z Fold inner (~673–686 CSS px lands here): slightly lower toolbar under taller header chrome */
+@media (min-width: 650px) and (max-width: 768px) {
+  .demo-toolbar-cluster {
+    top: calc(env(safe-area-inset-top, 0px) + 72px);
+  }
+
+  .demo-layout-advanced .demo-toolbar-cluster {
+    top: calc(env(safe-area-inset-top, 0px) + 72px);
+  }
+}
+

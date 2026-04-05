@@ -277,35 +277,9 @@ body.nav-mobile-open {
   }
 }
 
-/* Mobile: light header bar + #000 logo/burger/inline nav; full-screen menu uses base dark sheet */
 @media (max-width: 799px) {
-  .site-header {
-    padding: 20px;
-    background: rgba(255, 255, 255, 0.92);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-  }
-
-  .site-header--menu-open {
-    background: rgba(255, 255, 255, 0.98);
-  }
-
-  .site-header .logo {
-    color: #000000;
-  }
-
   .nav-burger {
     display: flex;
-    color: #000000;
-  }
-
-  .nav-burger-label {
-    color: #000000;
-  }
-
-  .site-header .nav--desktop a {
-    color: #000000;
   }
 }
 
@@ -1243,109 +1217,5 @@ body.nav-mobile-open {
   }
   .credits-bar span:last-child {
     text-align: center;
-  }
-}
-
-/* ==========================================================================
-   Samsung Galaxy Z Fold (logical CSS px) — cover vs inner screens
-   Fold 4/5 cover ~904×2316, inner ~1812×2176. Fold 6 cover ~968×2376, inner ~1856×2160.
-   Cover width band ~344–360px; inner ~673–686px at typical browser scaling.
-   Layers after existing mobile/tablet rules so it only refines those ranges.
-   ========================================================================== */
-
-/* Cover + other very narrow viewports: reduce hero crowding / overflow */
-@media (max-width: 400px) {
-  .hero-collage {
-    grid-template-rows: minmax(116px, 20vh) minmax(78px, 12.5vh) minmax(78px, 12.5vh);
-    padding: 50px 10px 12px;
-    gap: 6px;
-  }
-
-  .innerspacer {
-    padding-left: 16px;
-    padding-right: 16px;
-  }
-
-  .site-header {
-    padding-left: max(14px, env(safe-area-inset-left, 0px));
-    padding-right: max(14px, env(safe-area-inset-right, 0px));
-  }
-
-  .hero-title {
-    font-size: clamp(28px, 8.8vw, 42px);
-  }
-
-  .hero-content .mainbutton + .mainbutton {
-    margin-left: 16px !important;
-  }
-
-  .preview-card {
-    position: relative;
-    top: auto;
-  }
-}
-
-/* Inner unfolded width (~650–799px): tablet-style nav + grids without jumping to full desktop */
-@media (min-width: 650px) and (max-width: 799px) {
-  .nav-burger {
-    display: none;
-  }
-
-  .nav--desktop {
-    display: flex;
-    gap: 28px;
-  }
-
-  .site-header {
-    padding: 18px max(28px, env(safe-area-inset-right, 0px)) 18px max(28px, env(safe-area-inset-left, 0px));
-  }
-
-  .grid-sidebyside {
-    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
-    gap: 36px;
-  }
-
-  .audience-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 28px;
-  }
-
-  .benefits-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
-  }
-
-  .footer-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 36px;
-  }
-
-  .footer-grid > .footer-brand {
-    grid-column: 1 / -1;
-  }
-
-  .hero-collage {
-    grid-template-rows: minmax(148px, 25vh) minmax(118px, 17.5vh) minmax(118px, 17.5vh);
-    gap: 10px;
-    padding: 68px 18px 18px;
-  }
-
-  .features-timeline-sticky {
-    top: 80px;
-    padding: 48px 24px 56px;
-  }
-
-  .credits-bar {
-    grid-template-columns: 1fr 1fr;
-    text-align: left;
-  }
-
-  .credits-bar span:last-child {
-    text-align: right;
-  }
-
-  .preview-card {
-    position: relative;
-    top: auto;
   }
 }
