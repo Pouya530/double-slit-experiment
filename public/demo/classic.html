@@ -56,14 +56,47 @@
   <link rel="icon" href="/favicon.png" type="image/png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/demo/demo.css?v=15">
+  <link rel="stylesheet" href="/styles.css?v=nav-unify-2">
+  <link rel="stylesheet" href="/demo/demo.css?v=16">
   <script type="application/ld+json">
   {"@context":"https://schema.org","@graph":[{"@type":"WebPage","@id":"https://doubleslitexperiment.app/demo/classic.html#webpage","name":"Double Slit Experiment — Classic demo (guided tour)","description":"Double Slit classic guided demo: step-through tour of the 3D double-slit experiment, wave interference, and observer effects.","url":"https://doubleslitexperiment.app/demo/classic.html","isPartOf":{"@type":"WebSite","name":"Double Slit Experiment","url":"https://doubleslitexperiment.app/"},"breadcrumb":{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://doubleslitexperiment.app/"},{"@type":"ListItem","position":2,"name":"Demo","item":"https://doubleslitexperiment.app/demo/"},{"@type":"ListItem","position":3,"name":"Classic guided demo","item":"https://doubleslitexperiment.app/demo/classic.html"}]}}]}
   </script>
 </head>
 <body>
+  <div
+    class="nav-mobile-overlay"
+    id="nav-mobile-overlay"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="nav-mobile-title"
+    hidden
+  >
+    <h2 id="nav-mobile-title" class="visually-hidden">Menu</h2>
+    <nav class="nav-mobile" aria-label="Site sections">
+      <ul class="nav-mobile-main">
+        <li><a href="/">Home</a></li>
+        <li><a href="/demo/">Demo</a></li>
+        <li><a href="/demo/?how=1">How it works</a></li>
+        <li><a href="/preview/about">About</a></li>
+      </ul>
+      <div class="nav-mobile-divider" role="presentation"></div>
+      <ul class="nav-mobile-secondary">
+        <li><a href="/preview/who">Who it&rsquo;s for</a></li>
+        <li><a href="/preview/features">Features</a></li>
+        <li><a href="/preview/benefits">Benefits</a></li>
+      </ul>
+    </nav>
+    <div class="nav-mobile-credits" role="contentinfo" aria-label="Copyright and credits">
+      <span>© Double Slit Experiment</span>
+      <span class="nav-mobile-credits__by">
+        Built by
+        <a href="https://nocturnal.cloud" target="_blank" rel="noopener noreferrer">Nocturnal Cloud</a>
+      </span>
+    </div>
+  </div>
+
   <div class="demo-layout">
-    <div class="demo-header">
+    <div class="demo-header" id="site-header">
       <a href="/" class="logo">
         <img src="/double-slit-experiment-logo-icon.png" alt="" class="logo-mark" width="64" height="64" decoding="async">
         <span class="logo-text">Double Slit Experiment</span>
@@ -78,6 +111,21 @@
         </button>
         <a href="/demo/" class="back demo-mode-link">Main demo</a>
         <a href="/" class="back">← Home</a>
+        <button
+          type="button"
+          class="nav-burger"
+          id="nav-burger"
+          aria-expanded="false"
+          aria-controls="nav-mobile-overlay"
+          aria-label="Open menu"
+        >
+          <span class="nav-burger-icon" aria-hidden="true">
+            <span class="nav-burger-line"></span>
+            <span class="nav-burger-line"></span>
+          </span>
+          <span class="nav-burger-label nav-burger-label--open">Menu</span>
+          <span class="nav-burger-label nav-burger-label--close">Close</span>
+        </button>
       </div>
     </div>
 
@@ -189,6 +237,7 @@
   </div>
 
   <script src="/demo/help-modal.js?v=6" defer></script>
+  <script type="module" src="/nav-mobile.js"></script>
   <script type="module" src="/demo/main.js?v=9"></script>
 </body>
 </html>

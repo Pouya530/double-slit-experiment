@@ -79,11 +79,27 @@ body {
   top: 0;
   left: 0;
   right: 0;
+  z-index: 9990;
   padding: 20px 32px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   background: linear-gradient(180deg, var(--bg-overlay-top) 0%, transparent);
+  transition: background 0.25s ease-in-out;
+}
+
+.demo-header.site-header--menu-open {
+  background: rgba(30, 30, 30, 0.92);
+}
+
+/* Mobile menu control — colours follow demo theme (styles.css provides layout) */
+.demo-header .nav-burger {
+  color: var(--text);
+}
+
+.demo-header .nav-burger-label {
+  color: inherit;
+  opacity: 0.95;
 }
 [data-theme="light"] .demo-header {
   background: linear-gradient(180deg, var(--bg-overlay-top) 0%, transparent);
