@@ -33,44 +33,72 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../styles.css">
-  <style>
-    .preview-page { min-height: 100vh; padding-top: 80px; }
-    .preview-back { margin-bottom: 40px; }
-    .preview-back a { color: white; text-decoration: none; font-size: 14px; opacity: 0.8; }
-  </style>
+  <link rel="stylesheet" href="../styles.css?v=preview-fullbleed-1">
   <script type="application/ld+json">
   {"@context":"https://schema.org","@graph":[{"@type":"WebPage","@id":"https://doubleslitexperiment.app/preview/who.html#webpage","name":"Who is Double Slit for?","description":"Double Slit serves A-level physics students, teachers, KS3/KS4 students, and science museums.","url":"https://doubleslitexperiment.app/preview/who.html","isPartOf":{"@type":"WebSite","name":"Double Slit","url":"https://doubleslitexperiment.app/"},"breadcrumb":{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://doubleslitexperiment.app/"},{"@type":"ListItem","position":2,"name":"Who it's for","item":"https://doubleslitexperiment.app/preview/who.html"}]}}]}
   </script>
 </head>
-<body>
-  <section class="section section-dark preview-page">
+<body class="preview-fullbleed preview-fullbleed--scrim-dark" style="--preview-bg-image: url('/images/benefit-2.png'); --preview-kenburns-duration: 30s;">
+  <div class="preview-fullbleed__bg" role="presentation" aria-hidden="true"></div>
+  <main class="preview-fullbleed__main innerspacer section-dark">
+    <p class="preview-fullbleed__back">
+      <a href="/">← Back to Double Slit</a>
+    </p>
+    <h1 class="section-title">Who it's for</h1>
+    <div class="audience-grid" style="max-width: 900px;">
+      <article class="audience-card">
+        <h3>Primary: A-level students</h3>
+        <p>Ages 16–18. Core required practical across AQA, OCR, Edexcel, and WJEC.</p>
+      </article>
+      <article class="audience-card">
+        <h3>Teachers</h3>
+        <p>25% of schools lack specialist physics teachers. Double Slit scaffolds understanding.</p>
+      </article>
+      <article class="audience-card">
+        <h3>KS3 / KS4</h3>
+        <p>Ages 11–16. Scaffolded introductory modes for wave behaviour and photon model.</p>
+      </article>
+      <article class="audience-card">
+        <h3>Science museums</h3>
+        <p>2–4 minute walk-up interactions. Museum mode with large touch targets.</p>
+      </article>
+    </div>
+    <div class="stats" style="margin-top: 48px;">
+      <span><strong>44,947</strong> A-level physics entries in 2025</span>
+      <span><strong>5,877</strong> secondary schools in England</span>
+    </div>
+  </main>
+  <footer class="site-footer">
     <div class="innerspacer">
-      <a href="/" class="preview-back">← Back to Double Slit</a>
-      <h1 class="section-title">Who it's for</h1>
-      <div class="audience-grid" style="max-width: 900px;">
-        <article class="audience-card">
-          <h3>Primary: A-level students</h3>
-          <p>Ages 16–18. Core required practical across AQA, OCR, Edexcel, and WJEC.</p>
-        </article>
-        <article class="audience-card">
-          <h3>Teachers</h3>
-          <p>25% of schools lack specialist physics teachers. Double Slit scaffolds understanding.</p>
-        </article>
-        <article class="audience-card">
-          <h3>KS3 / KS4</h3>
-          <p>Ages 11–16. Scaffolded introductory modes for wave behaviour and photon model.</p>
-        </article>
-        <article class="audience-card">
-          <h3>Science museums</h3>
-          <p>2–4 minute walk-up interactions. Museum mode with large touch targets.</p>
-        </article>
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <h3 class="logo">
+            <img src="/double-slit-experiment-logo-icon.png" alt="" class="logo-mark" width="64" height="64" decoding="async">
+            <span>Double Slit Experiment</span>
+          </h3>
+          <p>Interactive 3D Quantum Experiment Visualiser</p>
+        </div>
+        <div class="footer-links">
+          <h4>Pages</h4>
+          <a href="/demo/">Demo</a>
+          <a href="/preview/about">About</a>
+          <a href="/preview/who">Who it&rsquo;s for</a>
+          <a href="/preview/features">Features</a>
+          <a href="/preview/benefits">Benefits</a>
+        </div>
+        <div class="footer-credits">
+          <h4>References</h4>
+          <a href="https://phet.colorado.edu/en/simulations/wave-interference" target="_blank" rel="noopener">PhET Wave Interference</a>
+        </div>
       </div>
-      <div class="stats" style="margin-top: 48px;">
-        <span><strong>44,947</strong> A-level physics entries in 2025</span>
-        <span><strong>5,877</strong> secondary schools in England</span>
+      <div class="credits-bar">
+        <span>© Double Slit Experiment</span>
+        <span class="credits-bar__by">
+          Built by
+          <a href="https://nocturnal.cloud" target="_blank" rel="noopener noreferrer">Nocturnal Cloud</a>
+        </span>
       </div>
     </div>
-  </section>
+  </footer>
 </body>
 </html>

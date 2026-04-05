@@ -1107,6 +1107,122 @@ body.nav-mobile-open {
   color: rgba(255, 255, 255, 0.85);
 }
 
+/* Preview marketing pages (/preview/*.html): full-bleed image + Ken Burns */
+.preview-fullbleed {
+  --preview-bg-image: url('/images/benefit-1.png');
+  --preview-kenburns-duration: 28s;
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.preview-fullbleed__bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-image: var(--preview-bg-image);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  transform: scale(1);
+  transform-origin: center center;
+  will-change: transform;
+  animation: preview-fullbleed-kenburns var(--preview-kenburns-duration) ease-in-out infinite alternate;
+}
+
+.preview-fullbleed__bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.preview-fullbleed--scrim-light .preview-fullbleed__bg::after {
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.93) 0%,
+    rgba(248, 250, 252, 0.88) 45%,
+    rgba(255, 255, 255, 0.91) 100%
+  );
+}
+
+.preview-fullbleed--scrim-dark .preview-fullbleed__bg::after {
+  background: linear-gradient(
+    145deg,
+    rgba(12, 18, 28, 0.82) 0%,
+    rgba(18, 24, 36, 0.76) 50%,
+    rgba(10, 14, 22, 0.85) 100%
+  );
+}
+
+@keyframes preview-fullbleed-kenburns {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.07);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .preview-fullbleed__bg {
+    animation: none;
+  }
+}
+
+.preview-fullbleed__main {
+  flex: 1 0 auto;
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  padding-top: 48px;
+  padding-bottom: 64px;
+}
+
+.preview-fullbleed main.section-dark,
+.preview-fullbleed main.section-light {
+  background: transparent;
+}
+
+.preview-fullbleed .site-footer {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  margin-top: auto;
+}
+
+.preview-fullbleed__back {
+  margin-bottom: 32px;
+}
+
+.preview-fullbleed__back a {
+  color: var(--linkgrey);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.preview-fullbleed--scrim-dark .preview-fullbleed__back a {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.preview-fullbleed--scrim-dark .preview-fullbleed__back a:hover {
+  color: #fff;
+}
+
+.preview-fullbleed--scrim-light .preview-fullbleed__back a:hover {
+  color: var(--maintext);
+}
+
+/* Standalone preview lists: homepage timeline uses dimmed feature cards */
+.preview-fullbleed .feature-card {
+  opacity: 1;
+  filter: none;
+  border-left-color: rgba(93, 212, 196, 0.45);
+  background: rgba(255, 255, 255, 0.06);
+}
+
 /* Footer */
 .site-footer {
   background: var(--maintext);

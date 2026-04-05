@@ -33,44 +33,72 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../styles.css">
-  <style>
-    .preview-page { min-height: 100vh; padding-top: 80px; }
-    .preview-back { margin-bottom: 40px; }
-    .preview-back a { color: var(--linkgrey); text-decoration: none; font-size: 14px; }
-  </style>
+  <link rel="stylesheet" href="../styles.css?v=preview-fullbleed-1">
   <script type="application/ld+json">
   {"@context":"https://schema.org","@graph":[{"@type":"WebPage","@id":"https://doubleslitexperiment.app/preview/benefits.html#webpage","name":"Benefits of Double Slit","description":"Benefits for schools and teachers: classroom-ready hardware fit, richer 3D than flat alternatives, accessibility, shareable states.","url":"https://doubleslitexperiment.app/preview/benefits.html","isPartOf":{"@type":"WebSite","name":"Double Slit","url":"https://doubleslitexperiment.app/"},"breadcrumb":{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://doubleslitexperiment.app/"},{"@type":"ListItem","position":2,"name":"Benefits","item":"https://doubleslitexperiment.app/preview/benefits.html"}]}}]}
   </script>
 </head>
-<body>
-  <section class="section section-light preview-page">
-    <div class="innerspacer">
-      <a href="/" class="preview-back">← Back to Double Slit</a>
-      <h1 class="section-title">Benefits</h1>
-      <div class="benefits-grid" style="max-width: 900px;">
-        <div class="benefit-item">
-          <span class="benefit-icon">⊕</span>
-          <h3>Built for UK schools</h3>
-          <p>Runs on school Chromebooks (Intel Celeron N4500). Adaptive quality keeps 30fps on low-end hardware.</p>
-        </div>
-        <div class="benefit-item">
-          <span class="benefit-icon">⊖</span>
-          <h3>Beyond PhET</h3>
-          <p>PhET is 2D. Double Slit adds timeline scrubber, observer toggle, and full 3D rendering.</p>
-        </div>
-        <div class="benefit-item">
-          <span class="benefit-icon">⊗</span>
-          <h3>Compliant & accessible</h3>
-          <p>ICO Children's Code, WCAG 2.2 AA, cookieless analytics. No engagement loops.</p>
-        </div>
-        <div class="benefit-item">
-          <span class="benefit-icon">⊙</span>
-          <h3>Shareable states</h3>
-          <p>Teachers share experiment URLs with exact parameters. Deep links for classrooms.</p>
-        </div>
+<body class="preview-fullbleed preview-fullbleed--scrim-light" style="--preview-bg-image: url('/images/benefit-4.png'); --preview-kenburns-duration: 34s;">
+  <div class="preview-fullbleed__bg" role="presentation" aria-hidden="true"></div>
+  <main class="preview-fullbleed__main innerspacer section-light">
+    <p class="preview-fullbleed__back">
+      <a href="/">← Back to Double Slit</a>
+    </p>
+    <h1 class="section-title">Benefits</h1>
+    <div class="benefits-grid" style="max-width: 900px;">
+      <div class="benefit-item">
+        <span class="benefit-icon">⊕</span>
+        <h3>Built for UK schools</h3>
+        <p>Runs on school Chromebooks (Intel Celeron N4500). Adaptive quality keeps 30fps on low-end hardware.</p>
+      </div>
+      <div class="benefit-item">
+        <span class="benefit-icon">⊖</span>
+        <h3>Beyond PhET</h3>
+        <p>PhET is 2D. Double Slit adds timeline scrubber, observer toggle, and full 3D rendering.</p>
+      </div>
+      <div class="benefit-item">
+        <span class="benefit-icon">⊗</span>
+        <h3>Compliant & accessible</h3>
+        <p>ICO Children's Code, WCAG 2.2 AA, cookieless analytics. No engagement loops.</p>
+      </div>
+      <div class="benefit-item">
+        <span class="benefit-icon">⊙</span>
+        <h3>Shareable states</h3>
+        <p>Teachers share experiment URLs with exact parameters. Deep links for classrooms.</p>
       </div>
     </div>
-  </section>
+  </main>
+  <footer class="site-footer">
+    <div class="innerspacer">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <h3 class="logo">
+            <img src="/double-slit-experiment-logo-icon.png" alt="" class="logo-mark" width="64" height="64" decoding="async">
+            <span>Double Slit Experiment</span>
+          </h3>
+          <p>Interactive 3D Quantum Experiment Visualiser</p>
+        </div>
+        <div class="footer-links">
+          <h4>Pages</h4>
+          <a href="/demo/">Demo</a>
+          <a href="/preview/about">About</a>
+          <a href="/preview/who">Who it&rsquo;s for</a>
+          <a href="/preview/features">Features</a>
+          <a href="/preview/benefits">Benefits</a>
+        </div>
+        <div class="footer-credits">
+          <h4>References</h4>
+          <a href="https://phet.colorado.edu/en/simulations/wave-interference" target="_blank" rel="noopener">PhET Wave Interference</a>
+        </div>
+      </div>
+      <div class="credits-bar">
+        <span>© Double Slit Experiment</span>
+        <span class="credits-bar__by">
+          Built by
+          <a href="https://nocturnal.cloud" target="_blank" rel="noopener noreferrer">Nocturnal Cloud</a>
+        </span>
+      </div>
+    </div>
+  </footer>
 </body>
 </html>

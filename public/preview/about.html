@@ -33,81 +33,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../styles.css?v=about-bg-1">
+  <link rel="stylesheet" href="../styles.css?v=preview-fullbleed-1">
   <style>
-    .page-about {
-      margin: 0;
-      min-height: 100vh;
-    }
-
-    .page-about__bg {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      background-image: url('/images/benefit-1.png');
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      transform: scale(1);
-      transform-origin: center center;
-      will-change: transform;
-      animation: page-about-kenburns 28s ease-in-out infinite alternate;
-    }
-
-    .page-about__bg::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(
-        145deg,
-        rgba(255, 255, 255, 0.93) 0%,
-        rgba(248, 250, 252, 0.88) 45%,
-        rgba(255, 255, 255, 0.91) 100%
-      );
-      pointer-events: none;
-    }
-
-    @keyframes page-about-kenburns {
-      from {
-        transform: scale(1);
-      }
-      to {
-        transform: scale(1.07);
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .page-about__bg {
-        animation: none;
-      }
-    }
-
-    .page-about__main {
-      position: relative;
-      z-index: 1;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding-top: 48px;
-      padding-bottom: 48px;
-    }
-
-    .page-about__back {
-      margin-bottom: 32px;
-    }
-
-    .page-about__back a {
-      color: var(--linkgrey);
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: 500;
-    }
-
-    .page-about__back a:hover {
-      color: var(--maintext);
-    }
-
     .page-about__panel {
       max-width: 720px;
       background: rgba(255, 255, 255, 0.72);
@@ -123,7 +50,6 @@
       }
     }
 
-    /* CTA inherits global .mainbutton motion but needs dark ink on the light panel */
     .page-about__panel .mainbutton {
       color: var(--maintext);
     }
@@ -136,10 +62,10 @@
   {"@context":"https://schema.org","@graph":[{"@type":"WebPage","@id":"https://doubleslitexperiment.app/preview/about.html#webpage","name":"About — Double Slit Experiment","description":"An interactive 3D web application that visualises the quantum double-slit experiment.","url":"https://doubleslitexperiment.app/preview/about.html","isPartOf":{"@type":"WebSite","name":"Double Slit Experiment","url":"https://doubleslitexperiment.app/"},"breadcrumb":{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://doubleslitexperiment.app/"},{"@type":"ListItem","position":2,"name":"About","item":"https://doubleslitexperiment.app/preview/about.html"}]}}]}
   </script>
 </head>
-<body class="page-about">
-  <div class="page-about__bg" role="presentation" aria-hidden="true"></div>
-  <main class="page-about__main innerspacer">
-    <p class="page-about__back">
+<body class="preview-fullbleed preview-fullbleed--scrim-light" style="--preview-bg-image: url('/images/benefit-1.png'); --preview-kenburns-duration: 28s;">
+  <div class="preview-fullbleed__bg" role="presentation" aria-hidden="true"></div>
+  <main class="preview-fullbleed__main innerspacer">
+    <p class="preview-fullbleed__back">
       <a href="/">← Back to Double Slit</a>
     </p>
     <h1 class="section-title">About</h1>
@@ -163,5 +89,37 @@
       </div>
     </div>
   </main>
+  <footer class="site-footer">
+    <div class="innerspacer">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <h3 class="logo">
+            <img src="/double-slit-experiment-logo-icon.png" alt="" class="logo-mark" width="64" height="64" decoding="async">
+            <span>Double Slit Experiment</span>
+          </h3>
+          <p>Interactive 3D Quantum Experiment Visualiser</p>
+        </div>
+        <div class="footer-links">
+          <h4>Pages</h4>
+          <a href="/demo/">Demo</a>
+          <a href="/preview/about">About</a>
+          <a href="/preview/who">Who it&rsquo;s for</a>
+          <a href="/preview/features">Features</a>
+          <a href="/preview/benefits">Benefits</a>
+        </div>
+        <div class="footer-credits">
+          <h4>References</h4>
+          <a href="https://phet.colorado.edu/en/simulations/wave-interference" target="_blank" rel="noopener">PhET Wave Interference</a>
+        </div>
+      </div>
+      <div class="credits-bar">
+        <span>© Double Slit Experiment</span>
+        <span class="credits-bar__by">
+          Built by
+          <a href="https://nocturnal.cloud" target="_blank" rel="noopener noreferrer">Nocturnal Cloud</a>
+        </span>
+      </div>
+    </div>
+  </footer>
 </body>
 </html>
