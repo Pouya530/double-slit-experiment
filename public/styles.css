@@ -116,22 +116,17 @@ body.nav-mobile-open {
   -webkit-backdrop-filter: blur(8px);
 }
 
-/* Marketing wordmark — same as homepage (mobile + desktop) */
+/* Header wordmark — homepage + marketing previews only (demo uses demo.css) */
 .logo.logo--home > span,
 .logo.logo--wordmark > span {
-  font-size: clamp(11px, 2.5vw, 13px);
-  font-weight: 500;
+  font-size: 12px;
+  font-weight: 600;
   line-height: 1.5;
   text-transform: uppercase;
   letter-spacing: 2.4px;
 }
 
 @media (min-width: 800px) {
-  .logo.logo--home > span,
-  .logo.logo--wordmark > span {
-    font-size: 13px;
-  }
-
   /* Logo scale (icon follows 2em) */
   .site-header--home .logo,
   .site-header--marketing .logo {
