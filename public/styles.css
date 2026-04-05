@@ -75,17 +75,17 @@ body.nav-mobile-open {
 
 /* Header bar colour: same duration as nav overlay open/close (see .nav-mobile-overlay) */
 @media (max-width: 799px) {
-  body.page-home {
+  body:is(.page-home, .page-marketing) {
     --site-header-bg-duration: 0.28s;
   }
 
-  body:not(.page-home) {
+  body:not(:is(.page-home, .page-marketing)) {
     --site-header-bg-duration: 0.22s;
   }
 }
 
 @media (min-width: 800px) {
-  body.page-home {
+  body:is(.page-home, .page-marketing) {
     --site-header-bg-duration: 0.392s;
   }
 }
@@ -94,38 +94,48 @@ body.nav-mobile-open {
   background: rgba(30, 30, 30, 0.92);
 }
 
-/* Homepage (all viewports): transparent at top; darker after scroll; menu-open keeps solid bar + blur */
-.site-header--home {
+/* Homepage + marketing preview pages: transparent at top; darker after scroll; menu-open solid bar */
+.site-header--home,
+.site-header--marketing {
   background: transparent;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
 
-.site-header--home.site-header--scrolled {
+.site-header--home.site-header--scrolled,
+.site-header--marketing.site-header--scrolled {
   background: rgba(0, 0, 0, 0.8);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
 }
 
-.site-header--home.site-header--menu-open {
+.site-header--home.site-header--menu-open,
+.site-header--marketing.site-header--menu-open {
   background: rgba(30, 30, 30, 0.92);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
 }
 
+/* Marketing wordmark — same as homepage (mobile + desktop) */
+.logo.logo--home > span,
+.logo.logo--wordmark > span {
+  font-size: clamp(11px, 2.5vw, 13px);
+  font-weight: 500;
+  line-height: 1.5;
+  text-transform: uppercase;
+  letter-spacing: 2.4px;
+}
+
 @media (min-width: 800px) {
-  /* Homepage logo scale (icon follows 2em) */
-  .site-header--home .logo {
-    font-size: clamp(13.5px, 1.95vw, 24px);
+  .logo.logo--home > span,
+  .logo.logo--wordmark > span {
+    font-size: 13px;
   }
 
-  /* Homepage desktop: wordmark typography */
-  .logo.logo--home > span {
-    font-size: 13px;
-    font-weight: 500;
-    line-height: 1.5;
-    text-transform: uppercase;
-    letter-spacing: 2.4px;
+  /* Logo scale (icon follows 2em) */
+  .site-header--home .logo,
+  .site-header--marketing .logo {
+    font-size: clamp(13.5px, 1.95vw, 24px);
   }
 }
 
@@ -308,13 +318,18 @@ body.nav-mobile-open {
   }
 }
 
-/* Homepage only: burger visible on desktop (no horizontal nav) */
+/* Homepage + marketing: burger on desktop (horizontal nav removed on marketing pages) */
 @media (min-width: 800px) {
-  .site-header--home .nav-burger {
+  .site-header--home .nav-burger,
+  .site-header--marketing .nav-burger {
     display: flex;
     flex: 0 0 auto;
     margin-left: auto;
     align-self: center;
+  }
+
+  .site-header--marketing .nav--desktop {
+    display: none !important;
   }
 }
 
@@ -347,11 +362,11 @@ body.nav-mobile-open {
 }
 
 /* Homepage: full-screen sheet slides in from the right (fast, GPU-friendly) */
-body.page-home .nav-mobile-overlay:not(.nav-mobile-overlay--open) {
+body:is(.page-home, .page-marketing) .nav-mobile-overlay:not(.nav-mobile-overlay--open) {
   transform: translate3d(100%, 0, 0);
 }
 
-body.page-home .nav-mobile-overlay--open {
+body:is(.page-home, .page-marketing) .nav-mobile-overlay--open {
   transform: translate3d(0, 0, 0);
 }
 
@@ -376,135 +391,135 @@ body.page-home .nav-mobile-overlay--open {
 }
 
 /* Homepage: stagger main + secondary links top → bottom */
-body.page-home .nav-mobile-overlay--open .nav-mobile-main li:nth-child(1) a {
+body:is(.page-home, .page-marketing) .nav-mobile-overlay--open .nav-mobile-main li:nth-child(1) a {
   animation: navMobileItemIn 0.26s cubic-bezier(0.32, 1, 0.36, 1) both;
   animation-delay: 0.04s;
 }
 
-body.page-home .nav-mobile-overlay--open .nav-mobile-main li:nth-child(2) a {
+body:is(.page-home, .page-marketing) .nav-mobile-overlay--open .nav-mobile-main li:nth-child(2) a {
   animation: navMobileItemIn 0.26s cubic-bezier(0.32, 1, 0.36, 1) both;
   animation-delay: 0.08s;
 }
 
-body.page-home .nav-mobile-overlay--open .nav-mobile-main li:nth-child(3) a {
+body:is(.page-home, .page-marketing) .nav-mobile-overlay--open .nav-mobile-main li:nth-child(3) a {
   animation: navMobileItemIn 0.26s cubic-bezier(0.32, 1, 0.36, 1) both;
   animation-delay: 0.12s;
 }
 
-body.page-home .nav-mobile-overlay--open .nav-mobile-main li:nth-child(4) a {
+body:is(.page-home, .page-marketing) .nav-mobile-overlay--open .nav-mobile-main li:nth-child(4) a {
   animation: navMobileItemIn 0.26s cubic-bezier(0.32, 1, 0.36, 1) both;
   animation-delay: 0.16s;
 }
 
-body.page-home .nav-mobile-overlay--open .nav-mobile-main li:nth-child(5) a {
+body:is(.page-home, .page-marketing) .nav-mobile-overlay--open .nav-mobile-main li:nth-child(5) a {
   animation: navMobileItemIn 0.26s cubic-bezier(0.32, 1, 0.36, 1) both;
   animation-delay: 0.2s;
 }
 
-body.page-home .nav-mobile-overlay--open .nav-mobile-secondary li:nth-child(1) a {
+body:is(.page-home, .page-marketing) .nav-mobile-overlay--open .nav-mobile-secondary li:nth-child(1) a {
   animation: navMobileItemIn 0.26s cubic-bezier(0.32, 1, 0.36, 1) both;
   animation-delay: 0.17s;
 }
 
-body.page-home .nav-mobile-overlay--open .nav-mobile-secondary li:nth-child(2) a {
+body:is(.page-home, .page-marketing) .nav-mobile-overlay--open .nav-mobile-secondary li:nth-child(2) a {
   animation: navMobileItemIn 0.26s cubic-bezier(0.32, 1, 0.36, 1) both;
   animation-delay: 0.2s;
 }
 
-body.page-home .nav-mobile-overlay--open .nav-mobile-secondary li:nth-child(3) a {
+body:is(.page-home, .page-marketing) .nav-mobile-overlay--open .nav-mobile-secondary li:nth-child(3) a {
   animation: navMobileItemIn 0.26s cubic-bezier(0.32, 1, 0.36, 1) both;
   animation-delay: 0.23s;
 }
 
-body.page-home .nav-mobile-overlay--open .nav-mobile-secondary li:nth-child(4) a {
+body:is(.page-home, .page-marketing) .nav-mobile-overlay--open .nav-mobile-secondary li:nth-child(4) a {
   animation: navMobileItemIn 0.26s cubic-bezier(0.32, 1, 0.36, 1) both;
   animation-delay: 0.26s;
 }
 
-body.page-home .nav-mobile-overlay--open .nav-mobile-secondary li:nth-child(5) a {
+body:is(.page-home, .page-marketing) .nav-mobile-overlay--open .nav-mobile-secondary li:nth-child(5) a {
   animation: navMobileItemIn 0.26s cubic-bezier(0.32, 1, 0.36, 1) both;
   animation-delay: 0.29s;
 }
 
-body.page-home .nav-mobile-overlay--open .nav-mobile-divider {
+body:is(.page-home, .page-marketing) .nav-mobile-overlay--open .nav-mobile-divider {
   animation: navMobileFadeIn 0.22s ease both;
   animation-delay: 0.14s;
 }
 
-body.page-home .nav-mobile-overlay--open .nav-mobile-credits {
+body:is(.page-home, .page-marketing) .nav-mobile-overlay--open .nav-mobile-credits {
   animation: navMobileFadeIn 0.22s ease both;
   animation-delay: 0.18s;
 }
 
 /* Desktop homepage: +40% duration (1.4×) for sheet, links, and burger X */
 @media (min-width: 800px) {
-  body.page-home .nav-mobile-overlay {
+  body:is(.page-home, .page-marketing) .nav-mobile-overlay {
     transition:
       opacity 0.308s cubic-bezier(0.33, 1, 0.36, 1),
       visibility 0.308s,
       transform 0.392s cubic-bezier(0.32, 1, 0.36, 1);
   }
 
-  body.page-home .nav-burger-line {
+  body:is(.page-home, .page-marketing) .nav-burger-line {
     transition: transform 0.28s ease-in-out;
   }
 
-  body.page-home .nav-mobile-overlay--open .nav-mobile-main li:nth-child(1) a {
+  body:is(.page-home, .page-marketing) .nav-mobile-overlay--open .nav-mobile-main li:nth-child(1) a {
     animation-duration: 0.364s;
     animation-delay: 0.056s;
   }
 
-  body.page-home .nav-mobile-overlay--open .nav-mobile-main li:nth-child(2) a {
+  body:is(.page-home, .page-marketing) .nav-mobile-overlay--open .nav-mobile-main li:nth-child(2) a {
     animation-duration: 0.364s;
     animation-delay: 0.112s;
   }
 
-  body.page-home .nav-mobile-overlay--open .nav-mobile-main li:nth-child(3) a {
+  body:is(.page-home, .page-marketing) .nav-mobile-overlay--open .nav-mobile-main li:nth-child(3) a {
     animation-duration: 0.364s;
     animation-delay: 0.168s;
   }
 
-  body.page-home .nav-mobile-overlay--open .nav-mobile-main li:nth-child(4) a {
+  body:is(.page-home, .page-marketing) .nav-mobile-overlay--open .nav-mobile-main li:nth-child(4) a {
     animation-duration: 0.364s;
     animation-delay: 0.224s;
   }
 
-  body.page-home .nav-mobile-overlay--open .nav-mobile-main li:nth-child(5) a {
+  body:is(.page-home, .page-marketing) .nav-mobile-overlay--open .nav-mobile-main li:nth-child(5) a {
     animation-duration: 0.364s;
     animation-delay: 0.28s;
   }
 
-  body.page-home .nav-mobile-overlay--open .nav-mobile-secondary li:nth-child(1) a {
+  body:is(.page-home, .page-marketing) .nav-mobile-overlay--open .nav-mobile-secondary li:nth-child(1) a {
     animation-duration: 0.364s;
     animation-delay: 0.238s;
   }
 
-  body.page-home .nav-mobile-overlay--open .nav-mobile-secondary li:nth-child(2) a {
+  body:is(.page-home, .page-marketing) .nav-mobile-overlay--open .nav-mobile-secondary li:nth-child(2) a {
     animation-duration: 0.364s;
     animation-delay: 0.28s;
   }
 
-  body.page-home .nav-mobile-overlay--open .nav-mobile-secondary li:nth-child(3) a {
+  body:is(.page-home, .page-marketing) .nav-mobile-overlay--open .nav-mobile-secondary li:nth-child(3) a {
     animation-duration: 0.364s;
     animation-delay: 0.322s;
   }
 
-  body.page-home .nav-mobile-overlay--open .nav-mobile-secondary li:nth-child(4) a {
+  body:is(.page-home, .page-marketing) .nav-mobile-overlay--open .nav-mobile-secondary li:nth-child(4) a {
     animation-duration: 0.364s;
     animation-delay: 0.364s;
   }
 
-  body.page-home .nav-mobile-overlay--open .nav-mobile-secondary li:nth-child(5) a {
+  body:is(.page-home, .page-marketing) .nav-mobile-overlay--open .nav-mobile-secondary li:nth-child(5) a {
     animation-duration: 0.364s;
     animation-delay: 0.406s;
   }
 
-  body.page-home .nav-mobile-overlay--open .nav-mobile-divider {
+  body:is(.page-home, .page-marketing) .nav-mobile-overlay--open .nav-mobile-divider {
     animation-duration: 0.308s;
     animation-delay: 0.196s;
   }
 
-  body.page-home .nav-mobile-overlay--open .nav-mobile-credits {
+  body:is(.page-home, .page-marketing) .nav-mobile-overlay--open .nav-mobile-credits {
     animation-duration: 0.308s;
     animation-delay: 0.252s;
   }
@@ -556,7 +571,7 @@ body.page-home .nav-mobile-overlay--open .nav-mobile-credits {
 
 /* Homepage only: desktop pull-out main links (~100% over base, then −20% for legibility) */
 @media (min-width: 800px) {
-  .page-home .nav-mobile-main a {
+  :is(.page-home, .page-marketing) .nav-mobile-main a {
     font-size: clamp(64px, 16vw, 141px);
   }
 }
@@ -695,14 +710,14 @@ body.page-home .nav-mobile-overlay--open .nav-mobile-credits {
     transition: none;
   }
 
-  body.page-home .nav-mobile-overlay {
+  body:is(.page-home, .page-marketing) .nav-mobile-overlay {
     transform: none !important;
   }
 
-  body.page-home .nav-mobile-overlay--open .nav-mobile-main a,
-  body.page-home .nav-mobile-overlay--open .nav-mobile-secondary a,
-  body.page-home .nav-mobile-overlay--open .nav-mobile-divider,
-  body.page-home .nav-mobile-overlay--open .nav-mobile-credits {
+  body:is(.page-home, .page-marketing) .nav-mobile-overlay--open .nav-mobile-main a,
+  body:is(.page-home, .page-marketing) .nav-mobile-overlay--open .nav-mobile-secondary a,
+  body:is(.page-home, .page-marketing) .nav-mobile-overlay--open .nav-mobile-divider,
+  body:is(.page-home, .page-marketing) .nav-mobile-overlay--open .nav-mobile-credits {
     animation: none !important;
   }
 }

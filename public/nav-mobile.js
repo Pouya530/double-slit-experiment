@@ -1,5 +1,5 @@
 /**
- * Full-screen nav: burger + overlay. Narrow viewports always; desktop burger only on homepage (.site-header--home).
+ * Full-screen nav: burger + overlay. Narrow viewports always; desktop burger on homepage + marketing previews (.site-header--home | --marketing).
  * Open state uses .nav-mobile-overlay--open (not [hidden]) so CSS transitions can run.
  */
 const MQ = '(max-width: 799px)';
@@ -27,7 +27,11 @@ function initMobileNav() {
   }
 
   function overlayEnabled() {
-    return isMobile() || header?.classList.contains('site-header--home');
+    return (
+      isMobile() ||
+      header?.classList.contains('site-header--home') ||
+      header?.classList.contains('site-header--marketing')
+    );
   }
 
   function open() {
@@ -78,10 +82,11 @@ function initMobileNav() {
     };
 
     overlay.addEventListener('transitionend', onEnd);
-    const homeDesktop =
-      document.body.classList.contains('page-home') &&
+    const sheetDesktop =
+      (document.body.classList.contains('page-home') ||
+        document.body.classList.contains('page-marketing')) &&
       window.matchMedia('(min-width: 800px)').matches;
-    const fallbackMs = homeDesktop ? 560 : 400;
+    const fallbackMs = sheetDesktop ? 560 : 400;
     const fallback = window.setTimeout(complete, fallbackMs);
   }
 
@@ -112,16 +117,24 @@ function initMobileNav() {
   });
 
   mq.addEventListener('change', (ev) => {
-    if (!ev.matches && !header?.classList.contains('site-header--home') && isOverlayOpen(overlay)) {
+    const desktopOverlayHeader =
+      header?.classList.contains('site-header--home') ||
+      header?.classList.contains('site-header--marketing');
+    if (!ev.matches && !desktopOverlayHeader && isOverlayOpen(overlay)) {
       close();
     }
   });
 }
 
-/** Homepage header: transparent at top, dark bar after scroll (mobile + desktop). */
+/** Transparent header until scroll: homepage + marketing preview pages. */
 function initHomeHeaderScroll() {
   const header = document.getElementById('site-header');
-  if (!header?.classList.contains('site-header--home')) return;
+  if (
+    !header?.classList.contains('site-header--home') &&
+    !header?.classList.contains('site-header--marketing')
+  ) {
+    return;
+  }
 
   const scrolledClass = 'site-header--scrolled';
   const thresholdPx = 20;
