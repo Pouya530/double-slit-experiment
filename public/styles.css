@@ -277,7 +277,7 @@ body.nav-mobile-open {
   }
 }
 
-/* Mobile (incl. Samsung cover / narrow + Z Fold inner): light bar, #000 header + sheet */
+/* Mobile: light header bar + #000 logo/burger/inline nav; full-screen menu uses base dark sheet */
 @media (max-width: 799px) {
   .site-header {
     padding: 20px;
@@ -306,22 +306,6 @@ body.nav-mobile-open {
 
   .site-header .nav--desktop a {
     color: #000000;
-  }
-
-  .nav-mobile-overlay {
-    background-color: #ffffff;
-  }
-
-  .nav-mobile-main a {
-    color: #000000;
-  }
-
-  .nav-mobile-secondary a {
-    color: rgba(0, 0, 0, 0.78);
-  }
-
-  .nav-mobile-divider {
-    background-color: rgba(0, 0, 0, 0.12);
   }
 }
 
