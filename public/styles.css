@@ -67,7 +67,27 @@ body.nav-mobile-open {
   background: rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  transition: background 0.25s ease-in-out;
+  transition:
+    background var(--site-header-bg-duration, 0.25s) cubic-bezier(0.32, 1, 0.36, 1),
+    backdrop-filter var(--site-header-bg-duration, 0.25s) cubic-bezier(0.32, 1, 0.36, 1),
+    -webkit-backdrop-filter var(--site-header-bg-duration, 0.25s) cubic-bezier(0.32, 1, 0.36, 1);
+}
+
+/* Header bar colour: same duration as nav overlay open/close (see .nav-mobile-overlay) */
+@media (max-width: 799px) {
+  body.page-home {
+    --site-header-bg-duration: 0.28s;
+  }
+
+  body:not(.page-home) {
+    --site-header-bg-duration: 0.22s;
+  }
+}
+
+@media (min-width: 800px) {
+  body.page-home {
+    --site-header-bg-duration: 0.392s;
+  }
 }
 
 .site-header--menu-open {
@@ -98,6 +118,15 @@ body.nav-mobile-open {
   .site-header--home .logo {
     font-size: clamp(13.5px, 1.95vw, 24px);
   }
+
+  /* Homepage desktop: wordmark typography */
+  .logo.logo--home > span {
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.5;
+    text-transform: uppercase;
+    letter-spacing: 2.4px;
+  }
 }
 
 .logo {
@@ -118,11 +147,6 @@ body.nav-mobile-open {
   flex-shrink: 0;
   object-fit: contain;
   display: block;
-}
-
-/* Homepage only (index): single-line wordmark, title case, slightly smaller than default .logo scale */
-.logo.logo--home > span {
-  font-size: 0.9em;
 }
 
 .nav-burger {
