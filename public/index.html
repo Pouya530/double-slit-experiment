@@ -33,7 +33,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=nav-unify-3">
+  <link rel="stylesheet" href="styles.css?v=hero-mobile-1">
   <script type="application/ld+json">
   {"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://nocturnal.cloud/#org","name":"Nocturnal Cloud","url":"https://nocturnal.cloud"},{"@type":"WebSite","@id":"https://doubleslitexperiment.app/#website","name":"Double Slit Experiment","url":"https://doubleslitexperiment.app/","description":"Interactive 3D quantum double-slit experiment visualiser for physics education.","publisher":{"@id":"https://nocturnal.cloud/#org"}},{"@type":"WebPage","@id":"https://doubleslitexperiment.app/#webpage","name":"Double Slit Experiment — Interactive 3D Quantum Experiment","description":"Interactive 3D quantum experiment visualiser for A-level physics. Watch wave-particle duality in real time.","url":"https://doubleslitexperiment.app/","isPartOf":{"@id":"https://doubleslitexperiment.app/#website"},"about":{"@type":"Thing","name":"Double-slit experiment"}},{"@type":"SoftwareApplication","name":"Double Slit Experiment","applicationCategory":"EducationalApplication","operatingSystem":"Web","description":"Interactive 3D web visualiser of the quantum double-slit experiment with timeline scrubber, observer toggle, orbital camera, and adjustable parameters.","url":"https://doubleslitexperiment.app/demo/","author":{"@id":"https://nocturnal.cloud/#org"},"offers":{"@type":"Offer","price":"0","priceCurrency":"GBP","availability":"https://schema.org/InStock"}}]}
   </script>
@@ -102,6 +102,15 @@
     <!-- Hero -->
     <section class="hero">
       <div class="hero-media" aria-hidden="true">
+        <div class="hero-mobile-fullbleed">
+          <img class="hero-mobile-base" src="/img/1.png" alt="" width="1200" height="900" decoding="async" />
+          <div class="hero-mobile-slides">
+            <img class="hero-mobile-slide" src="/img/2.png" alt="" width="800" height="600" decoding="async" />
+            <img class="hero-mobile-slide" src="/img/3.png" alt="" width="800" height="600" decoding="async" />
+            <img class="hero-mobile-slide" src="/img/4.png" alt="" width="800" height="600" decoding="async" />
+            <img class="hero-mobile-slide" src="/img/5.png" alt="" width="800" height="600" decoding="async" />
+          </div>
+        </div>
         <div class="hero-collage">
           <div class="hero-slot hero-slot--a">
             <img class="hero-img" src="/img/1.png" alt="" width="800" height="600" decoding="async" />
@@ -124,8 +133,10 @@
       <div class="hero-content innerspacer">
         <h1 class="hero-title">Interactive 3D Quantum Experiment</h1>
         <p class="hero-tagline">Watch photons and electrons reveal wave-particle duality. Drag the timeline, toggle the observer, explore in 360°.</p>
-        <a href="/demo/" class="mainbutton">Try the demo</a>
-        <a href="#about" class="mainbutton" style="margin-left: 24px;">Explore</a>
+        <div class="hero-cta">
+          <a href="/demo/" class="mainbutton">Try the demo</a>
+          <a href="#about" class="mainbutton">Explore</a>
+        </div>
       </div>
     </section>
 
@@ -326,5 +337,6 @@
     </footer>
   </main>
   <script type="module" src="/nav-mobile.js"></script>
+  <script src="/hero-mobile.js?v=1" defer></script>
 </body>
 </html>
