@@ -258,6 +258,16 @@ body.nav-mobile-open {
   }
 }
 
+/* Homepage only: burger visible on desktop (no horizontal nav) */
+@media (min-width: 800px) {
+  .site-header--home .nav-burger {
+    display: flex;
+    flex: 0 0 auto;
+    margin-left: auto;
+    align-self: center;
+  }
+}
+
 .nav-mobile-overlay {
   position: fixed;
   inset: 0;

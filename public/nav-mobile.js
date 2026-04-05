@@ -1,5 +1,5 @@
 /**
- * Mobile-only full-screen nav (design.md: burger + overlay).
+ * Full-screen nav: burger + overlay. Narrow viewports always; desktop only on homepage (.site-header--home).
  */
 const MQ = '(max-width: 799px)';
 
@@ -13,6 +13,10 @@ function initMobileNav() {
 
   function isMobile() {
     return mq.matches;
+  }
+
+  function overlayEnabled() {
+    return isMobile() || header?.classList.contains('site-header--home');
   }
 
   function open() {
@@ -40,7 +44,7 @@ function initMobileNav() {
   }
 
   burger.addEventListener('click', () => {
-    if (!isMobile()) return;
+    if (!overlayEnabled()) return;
     toggle();
   });
 
@@ -56,12 +60,12 @@ function initMobileNav() {
 
   overlay.querySelectorAll('a').forEach((a) => {
     a.addEventListener('click', () => {
-      if (isMobile()) close();
+      if (overlayEnabled()) close();
     });
   });
 
   mq.addEventListener('change', (ev) => {
-    if (!ev.matches && !overlay.hidden) close();
+    if (!ev.matches && !header?.classList.contains('site-header--home') && !overlay.hidden) close();
   });
 }
 
