@@ -238,6 +238,19 @@ function samsungMobileDemoViewport() {
   return false;
 }
 
+/** Galaxy Z Fold 4 / 5 / 6 (and matching SM-F9… UA) — cover + inner; also wide inner >768 CSS px. */
+function galaxyZFoldDemoViewport() {
+  if (typeof navigator === 'undefined' || typeof window === 'undefined') return false;
+  const ua = navigator.userAgent || '';
+  return /SM-F9[0-9]{2}/i.test(ua) || /Galaxy Z Fold/i.test(ua);
+}
+
+function galaxyZFoldWideInnerViewport() {
+  if (!galaxyZFoldDemoViewport()) return false;
+  const w = window.innerWidth;
+  return w > 768 && w <= 980;
+}
+
 function tabletViewport() {
   const w = typeof window !== 'undefined' ? window.innerWidth : 1200;
   return w > 768 && w <= 1024;
@@ -245,7 +258,8 @@ function tabletViewport() {
 
 /** Call once after OrbitControls exists; tablet + desktop share the same initial angle; mobile = behind emitter + rotate/zoom overrides. */
 function applyInitialCameraAndControls() {
-  const mobile = mobileViewport();
+  const zFoldWide = galaxyZFoldWideInnerViewport();
+  const mobile = mobileViewport() || zFoldWide;
   const tablet = !mobile && tabletViewport();
 
   if (mobile) {
@@ -261,9 +275,9 @@ function applyInitialCameraAndControls() {
     const rx = off.x * c + off.z * s;
     const rz = -off.x * s + off.z * c;
     off.set(rx, off.y, rz).multiplyScalar(1.5 * 1.7 * 1.2);
-    if (samsungMobileDemoViewport()) {
+    if (samsungMobileDemoViewport() || galaxyZFoldDemoViewport()) {
       off.multiplyScalar(1 / 1.4);
-      const tilt = (20 * Math.PI) / 180;
+      const tilt = galaxyZFoldDemoViewport() ? (14 * Math.PI) / 180 : (20 * Math.PI) / 180;
       off.applyAxisAngle(new THREE.Vector3(0, 1, 0), tilt);
       const dir = off.clone().normalize();
       const right = new THREE.Vector3().crossVectors(new THREE.Vector3(0, 1, 0), dir);
@@ -271,6 +285,10 @@ function applyInitialCameraAndControls() {
         right.normalize();
         off.applyAxisAngle(right, tilt);
       }
+    }
+    if (galaxyZFoldDemoViewport()) {
+      off.multiplyScalar(1.4);
+      off.applyAxisAngle(new THREE.Vector3(0, 1, 0), (11 * Math.PI) / 180);
     }
     camera.position.copy(tgt).add(off);
     controls.target.copy(tgt);
