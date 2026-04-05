@@ -69,4 +69,37 @@ function initMobileNav() {
   });
 }
 
+function initHomeDesktopHeaderScroll() {
+  const header = document.getElementById('site-header');
+  if (!header?.classList.contains('site-header--home')) return;
+
+  const desktopMq = window.matchMedia('(min-width: 800px)');
+  const scrolledClass = 'site-header--scrolled';
+  const thresholdPx = 20;
+  let ticking = false;
+
+  function sync() {
+    ticking = false;
+    if (!desktopMq.matches) {
+      header.classList.remove(scrolledClass);
+      return;
+    }
+    if (window.scrollY > thresholdPx) header.classList.add(scrolledClass);
+    else header.classList.remove(scrolledClass);
+  }
+
+  function requestSync() {
+    if (!ticking) {
+      ticking = true;
+      requestAnimationFrame(sync);
+    }
+  }
+
+  desktopMq.addEventListener('change', sync);
+  window.addEventListener('scroll', requestSync, { passive: true });
+  window.addEventListener('resize', requestSync);
+  sync();
+}
+
 initMobileNav();
+initHomeDesktopHeaderScroll();
