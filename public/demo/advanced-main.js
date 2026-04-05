@@ -498,6 +498,7 @@ function init() {
   setupUI();
   setupInterpretationUI();
   syncInterpretationUI();
+  setupFocusViewMode();
   window.addEventListener('resize', onResize);
   animate();
 }
@@ -1245,6 +1246,121 @@ function onResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+/**
+ * Focus view: reparent interpretation, parameters, and Explore deeper into a left accordion rail.
+ * Preserves element ids; restores DOM on exit.
+ */
+function setupFocusViewMode() {
+  const layout = document.querySelector('.demo-layout-advanced');
+  const rail = document.getElementById('demo-focus-rail');
+  const enter = document.getElementById('focus-view-enter');
+  const exit = document.getElementById('focus-view-exit');
+  const helpRail = document.getElementById('focus-rail-help');
+  const cluster = document.getElementById('demo-toolbar-cluster');
+  const interp = document.getElementById('interpretation-tabs');
+  const paramsToggle = document.getElementById('params-toggle');
+  const paramsPanel = document.getElementById('params-panel');
+  const explore = document.getElementById('explore-deeper');
+  const bodyInterp = document.getElementById('focus-body-interpretation');
+  const bodyParams = document.getElementById('focus-body-parameters');
+  const bodyExplore = document.getElementById('focus-body-explore');
+
+  if (
+    !layout ||
+    !rail ||
+    !enter ||
+    !exit ||
+    !cluster ||
+    !interp ||
+    !paramsToggle ||
+    !paramsPanel ||
+    !explore ||
+    !bodyInterp ||
+    !bodyParams ||
+    !bodyExplore
+  ) {
+    return;
+  }
+
+  /** @type {Array<[HTMLElement | Element, Comment]>} */
+  let restoreList = [];
+  let active = false;
+
+  rail.querySelectorAll('.focus-acc').forEach((det) => {
+    det.addEventListener('toggle', () => {
+      if (!det.open) return;
+      rail.querySelectorAll('.focus-acc').forEach((other) => {
+        if (other !== det) other.removeAttribute('open');
+      });
+    });
+  });
+
+  function mark(node) {
+    const m = document.createComment('focus-restore');
+    node.parentNode.insertBefore(m, node);
+    restoreList.push([node, m]);
+  }
+
+  function enterFocus() {
+    if (active) return;
+    active = true;
+    restoreList = [];
+
+    mark(interp);
+    bodyInterp.appendChild(interp);
+
+    mark(paramsToggle);
+    bodyParams.appendChild(paramsToggle);
+
+    mark(paramsPanel);
+    bodyParams.appendChild(paramsPanel);
+
+    mark(explore);
+    bodyExplore.appendChild(explore);
+
+    explore.setAttribute('open', '');
+
+    layout.classList.add('demo-layout--focus');
+    rail.hidden = false;
+    const reduceMotion =
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) {
+      layout.classList.add('demo-focus-rail-ready');
+    } else {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          layout.classList.add('demo-focus-rail-ready');
+        });
+      });
+    }
+    window.dispatchEvent(new Event('resize'));
+  }
+
+  function leaveFocus() {
+    if (!active) return;
+    active = false;
+    layout.classList.remove('demo-focus-rail-ready');
+
+    for (let i = restoreList.length - 1; i >= 0; i--) {
+      const [node, marker] = restoreList[i];
+      marker.parentNode.insertBefore(node, marker);
+      marker.remove();
+    }
+    restoreList = [];
+
+    layout.classList.remove('demo-layout--focus');
+    rail.hidden = true;
+    window.dispatchEvent(new Event('resize'));
+  }
+
+  enter.addEventListener('click', enterFocus);
+  exit.addEventListener('click', leaveFocus);
+  helpRail?.addEventListener('click', () => {
+    document.getElementById('features-help-open')?.click();
+  });
 }
 
 function animate(now = 0) {
