@@ -317,6 +317,35 @@ body.nav-mobile-open {
   outline-offset: 4px;
 }
 
+/* Mobile + OS dark mode: keep full-screen nav dark (some UAs auto-invert or light-theme the overlay). */
+@media (max-width: 799px) and (prefers-color-scheme: dark) {
+  .nav-mobile-overlay {
+    background-color: #1a1a1e;
+    color-scheme: dark;
+    color: #fff;
+  }
+
+  .nav-mobile-main a {
+    color: #fff;
+  }
+
+  .nav-mobile-secondary a {
+    color: rgba(255, 255, 255, 0.88);
+  }
+
+  .nav-mobile-divider {
+    background-color: #3e3e3e;
+  }
+
+  .nav-mobile-credits {
+    color: rgba(255, 255, 255, 0.45);
+  }
+
+  .nav-mobile-credits a {
+    color: rgba(255, 255, 255, 0.72);
+  }
+}
+
 @media (hover: none) and (max-width: 799px) {
   .nav-mobile-main a:active,
   .nav-mobile-secondary a:active {
