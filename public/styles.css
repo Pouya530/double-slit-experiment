@@ -212,40 +212,6 @@ body.nav-mobile-open {
   display: inline;
 }
 
-/* Homepage header right cluster (logo stays left) */
-.site-header__end {
-  display: flex;
-  align-items: center;
-  margin-left: auto;
-  flex: 0 0 auto;
-  align-self: center;
-  gap: 0;
-}
-
-/* Desktop homepage only: Demo beside Menu — match .nav-burger-label */
-.nav-header-demo {
-  display: none;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 2.4px;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.95);
-  text-decoration: none;
-  line-height: 1;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.nav-header-demo:focus-visible {
-  outline: 2px solid rgba(255, 255, 255, 0.85);
-  outline-offset: 4px;
-}
-
-@media (hover: hover) {
-  .nav-header-demo:hover {
-    color: #fff;
-  }
-}
-
 .nav--desktop {
   display: flex;
   gap: 40px;
@@ -342,24 +308,12 @@ body.nav-mobile-open {
   }
 }
 
-/* Homepage only: burger visible on desktop (no horizontal nav); Demo link beside it */
+/* Homepage only: burger visible on desktop (no horizontal nav) */
 @media (min-width: 800px) {
-  .site-header--home .site-header__end {
-    gap: 24px;
-  }
-
-  .site-header--home .nav-header-demo {
-    display: inline-flex;
-    align-items: center;
-    align-self: center;
-    min-height: 44px;
-    padding: 8px 4px;
-  }
-
   .site-header--home .nav-burger {
     display: flex;
     flex: 0 0 auto;
-    margin-left: 0;
+    margin-left: auto;
     align-self: center;
   }
 }
