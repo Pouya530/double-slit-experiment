@@ -6,12 +6,19 @@
 import {
   mulberry32,
   gaussian,
-  sampleInterferencePosition,
+  sampleDecoherencePosition,
   sampleClassicalPosition,
 } from './physics.js';
 
+/**
+ * @param {object} params
+ * @param {number} [params.measurementGamma] 0..1
+ * @param {'linear'|'quadratic'|'exponential'} [params.visibilityModel]
+ */
 export function createParticleBuffer(params, maxParticles, seed) {
   const random = mulberry32(seed);
+  const measurementGamma = Math.max(0, Math.min(1, params.measurementGamma ?? 0));
+  const visibilityModel = params.visibilityModel ?? 'quadratic';
   const screenDistance = params.screenDistance ?? 2;
   const screenHalfWidth = 2;
   const screenHalfHeight = 1.4;
@@ -47,7 +54,16 @@ export function createParticleBuffer(params, maxParticles, seed) {
     birthTimes[i] = i / PARTICLES_PER_SECOND;
     wavelengths[i] = lambdaNm;
 
-    const iz = sampleInterferencePosition(random, screenHalfWidth, L, dNorm, aNorm, lambdaNorm);
+    const iz = sampleDecoherencePosition(
+      random,
+      screenHalfWidth,
+      L,
+      dNorm,
+      aNorm,
+      lambdaNorm,
+      measurementGamma,
+      visibilityModel
+    );
     const iy = (random() * 2 - 1) * screenHalfHeight * 0.3;
     interferencePositions[i * 3] = screenDistance;
     interferencePositions[i * 3 + 1] = iy;
@@ -59,7 +75,7 @@ export function createParticleBuffer(params, maxParticles, seed) {
     slitY[i] = Math.max(-slitHalfHeight, Math.min(slitHalfHeight, gaussian(random) * (slitHalfHeight * 0.55)));
     classicalPositions[i * 3] = screenDistance;
     classicalPositions[i * 3 + 1] = interferencePositions[i * 3 + 1];
-    classicalPositions[i * 3 + 2] = cz;
+    classicalPositions[i * 3 + 2] = iz;
   }
 
   const indices = Array.from({ length: maxParticles }, (_, i) => i);

@@ -8,6 +8,11 @@ export {
   gaussian,
   sampleInterferencePosition,
   sampleClassicalPosition,
+  sampleDecoherencePosition,
+  fringeVisibility,
+  intensityWithDecoherenceZ,
+  sinThetaFromZ,
+  getComplementarity,
   wavelengthToRGB,
 };
 
@@ -16,6 +21,59 @@ function intensity(theta, d, a, lambda) {
   const beta = (Math.PI * d * Math.sin(theta)) / lambda;
   const sinc = alpha === 0 ? 1 : Math.sin(alpha) / alpha;
   return Math.cos(beta) ** 2 * sinc ** 2;
+}
+
+/** @typedef {'linear' | 'quadratic' | 'exponential'} VisibilityModel */
+
+/**
+ * Fringe visibility V(γ) from measurement strength γ ∈ [0,1].
+ * @param {number} gamma
+ * @param {VisibilityModel} model
+ */
+function fringeVisibility(gamma, model) {
+  const g = Math.max(0, Math.min(1, gamma));
+  switch (model) {
+    case 'linear':
+      return 1 - g;
+    case 'quadratic':
+      return Math.sqrt(Math.max(0, 1 - g * g));
+    case 'exponential': {
+      const tau = 0.5;
+      return Math.exp(-(g * g) / (tau * tau));
+    }
+    default:
+      return Math.sqrt(Math.max(0, 1 - g * g));
+  }
+}
+
+function sinThetaFromZ(z, L) {
+  return z / Math.hypot(z, L);
+}
+
+/**
+ * Double-slit intensity with continuous decoherence (SPEC-MEASUREMENT.md §1.4).
+ * At γ=0 matches cos²(β)·sinc²(α); at γ=1, pure single-slit envelope (no fringes).
+ */
+function intensityWithDecoherenceZ(z, L, d, a, lambda, gamma, visModel) {
+  const sinTheta = sinThetaFromZ(z, L);
+  const alpha = (Math.PI * a * sinTheta) / lambda;
+  const sinc = alpha === 0 ? 1 : Math.sin(alpha) / alpha;
+  const envelope = sinc * sinc;
+  const beta = (Math.PI * d * sinTheta) / lambda;
+  const V = fringeVisibility(gamma, visModel);
+  const interference = 1 + V * Math.cos(2 * beta);
+  return 0.5 * envelope * interference;
+}
+
+function getComplementarity(gamma, visModel) {
+  const g = Math.max(0, Math.min(1, gamma));
+  const V = fringeVisibility(g, visModel);
+  return {
+    gamma: g,
+    distinguishability: g,
+    visibility: V,
+    complementarityCheck: g * g + V * V,
+  };
 }
 
 function mulberry32(seed) {
@@ -44,6 +102,26 @@ function sampleInterferencePosition(random, screenHalfWidth, L, dNorm, aNorm, la
     const I_val = intensity(theta, dNorm, aNorm, lambdaNorm);
     const I_max = 1.0;
     if (random() <= I_val / I_max) return z;
+  }
+  return (random() * 2 - 1) * screenHalfWidth;
+}
+
+/**
+ * Rejection sampling for intensityWithDecoherenceZ (same normalized units as sampleInterferencePosition).
+ * @param {() => number} random
+ * @param {number} gamma
+ * @param {VisibilityModel} visModel
+ */
+function sampleDecoherencePosition(random, screenHalfWidth, L, dNorm, aNorm, lambdaNorm, gamma, visModel) {
+  const g = Math.max(0, Math.min(1, gamma));
+  const I_max = intensityWithDecoherenceZ(0, L, dNorm, aNorm, lambdaNorm, g, visModel);
+  const top = I_max <= 1e-20 ? 1 : I_max;
+  let attempts = 0;
+  const maxAttempts = 8000;
+  while (attempts++ < maxAttempts) {
+    const z = (random() * 2 - 1) * screenHalfWidth;
+    const I_val = intensityWithDecoherenceZ(z, L, dNorm, aNorm, lambdaNorm, g, visModel);
+    if (random() <= I_val / top) return z;
   }
   return (random() * 2 - 1) * screenHalfWidth;
 }

@@ -56,7 +56,7 @@
   <link rel="icon" href="/favicon.png" type="image/png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/demo/demo.css?v=21">
+  <link rel="stylesheet" href="/demo/demo.css?v=22">
   <script type="application/ld+json">
   {"@context":"https://schema.org","@graph":[{"@type":"WebPage","@id":"https://doubleslitexperiment.app/demo/classic.html#webpage","name":"Double Slit Experiment — Classic demo (guided tour)","description":"Double Slit classic guided demo: step-through tour of the 3D double-slit experiment, wave interference, and observer effects.","url":"https://doubleslitexperiment.app/demo/classic.html","isPartOf":{"@type":"WebSite","name":"Double Slit Experiment","url":"https://doubleslitexperiment.app/"},"breadcrumb":{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://doubleslitexperiment.app/"},{"@type":"ListItem","position":2,"name":"Demo","item":"https://doubleslitexperiment.app/demo/"},{"@type":"ListItem","position":3,"name":"Classic guided demo","item":"https://doubleslitexperiment.app/demo/classic.html"}]}}]}
   </script>
@@ -151,11 +151,19 @@
         <button type="button" class="play-btn play-btn--playing" id="play" aria-label="Pause">❚❚</button>
         <span class="particle-count" id="particle-count">0 / 2000 particles</span>
       </div>
-      <div class="controls-row">
-        <button class="observe-btn" id="observe" aria-pressed="false">
-          <span>📷</span>
-          <span>Not observing</span>
-        </button>
+      <div class="controls-row controls-row--measurement">
+        <div class="measurement-block" id="measurement-block">
+          <div class="measurement-slider-row">
+            <span class="measurement-icon measurement-icon--wave" aria-hidden="true">〰</span>
+            <input type="range" id="measurement-slider" min="0" max="100" value="0" step="1" aria-labelledby="measurement-label" aria-valuetext="0%">
+            <span class="measurement-icon measurement-icon--particle" aria-hidden="true">●</span>
+          </div>
+          <div class="measurement-meta">
+            <span id="measurement-label" class="measurement-label">Measurement strength</span>
+            <span id="measurement-value-readout" class="measurement-readout">0%</span>
+          </div>
+          <p id="measurement-narrative" class="measurement-narrative"></p>
+        </div>
         <button class="observe-btn reset-btn" id="reset">
           ↺ Reset
         </button>
@@ -178,7 +186,7 @@
       <p class="demo-modal-lead">These controls mirror the main product: timeline, observer, camera, and experiment parameters.</p>
       <ul class="demo-modal-list">
         <li><strong>Timeline</strong> — Drag the slider to scrub through time, or use Play to watch hits accumulate on the detection screen. Reset jumps back to the start.</li>
-        <li><strong>Which-path / observer</strong> — Turn on to model knowing which slit the particle went through; the pattern moves toward two bands. Turn off to bring back interference.</li>
+        <li><strong>Measurement strength</strong> — Drag the slider from strong interference toward strong which-path information; the hit pattern updates continuously (SPEC-MEASUREMENT continuous decoherence model).</li>
         <li><strong>Camera</strong> — Drag to orbit, scroll or pinch to zoom, right-drag (or trackpad two-finger) to pan—full 3D around the bench.</li>
         <li><strong>Parameters &amp; Recompute</strong> — Slit width, separation, and wavelength (colour). After edits, <strong>Recompute</strong> regenerates the particle set.</li>
         <li><strong>Interpretations &amp; ℹ</strong> — Tabs switch the story and overlays. The <strong>ℹ</strong> panel explains the active view without changing the underlying simulation.</li>
@@ -189,6 +197,6 @@
   </div>
 
   <script src="/demo/help-modal.js?v=6" defer></script>
-  <script type="module" src="/demo/main.js?v=12"></script>
+  <script type="module" src="/demo/main.js?v=13"></script>
 </body>
 </html>

@@ -35,7 +35,7 @@
   })();
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="description" content="Run the Double Slit 3D demo: double-slit interference, observer toggle, quantum interpretations, and live parameters in your browser.">
+  <meta name="description" content="Run the Double Slit 3D demo: double-slit interference, measurement strength (continuous decoherence), quantum interpretations, and live parameters in your browser.">
   <meta name="keywords" content="double slit demo, quantum simulation, interactive physics, WebGL, wave interference">
   <meta name="author" content="Nocturnal Cloud">
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
@@ -45,20 +45,20 @@
   <meta property="og:url" content="https://doubleslitexperiment.app/demo/">
   <meta property="og:site_name" content="Double Slit Experiment">
   <meta property="og:title" content="Double Slit Experiment — Interactive 3D Demo">
-  <meta property="og:description" content="3D quantum double-slit demo: scrub the timeline, toggle the observer, switch interpretations, adjust slits and wavelength.">
+  <meta property="og:description" content="3D quantum double-slit demo: scrub the timeline, adjust measurement strength, switch interpretations, adjust slits and wavelength.">
   <meta property="og:image" content="https://doubleslitexperiment.app/img/double-slit-demo-image.png">
   <meta property="og:image:alt" content="Double Slit Experiment interactive 3D demo">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Double Slit Experiment — Interactive 3D Demo">
-  <meta name="twitter:description" content="3D quantum double-slit demo in the browser — timeline, observer, interpretations, parameters.">
+  <meta name="twitter:description" content="3D quantum double-slit demo in the browser — timeline, measurement strength, interpretations, parameters.">
   <meta name="twitter:image" content="https://doubleslitexperiment.app/img/double-slit-demo-image.png">
   <title>Double Slit Experiment — Interactive Demo</title>
   <link rel="icon" href="/favicon.png" type="image/png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/demo/demo.css?v=21">
+  <link rel="stylesheet" href="/demo/demo.css?v=22">
   <script type="application/ld+json">
-  {"@context":"https://schema.org","@graph":[{"@type":"WebPage","@id":"https://doubleslitexperiment.app/demo/#webpage","name":"Double Slit Experiment — Interactive Demo","description":"Run the Double Slit 3D demo: double-slit interference, observer toggle, quantum interpretations, and live parameters in your browser.","url":"https://doubleslitexperiment.app/demo/","isPartOf":{"@type":"WebSite","name":"Double Slit Experiment","url":"https://doubleslitexperiment.app/"},"breadcrumb":{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://doubleslitexperiment.app/"},{"@type":"ListItem","position":2,"name":"Demo","item":"https://doubleslitexperiment.app/demo/"}]}},{"@type":"SoftwareApplication","name":"Double Slit Experiment","applicationCategory":"EducationalApplication","operatingSystem":"Web","url":"https://doubleslitexperiment.app/demo/","description":"Interactive 3D double-slit experiment with timeline scrubber, observer toggle, interpretations, and adjustable experimental parameters.","author":{"@type":"Organization","name":"Nocturnal Cloud","url":"https://nocturnal.cloud"},"offers":{"@type":"Offer","price":"0","priceCurrency":"GBP","availability":"https://schema.org/InStock"}}]}
+  {"@context":"https://schema.org","@graph":[{"@type":"WebPage","@id":"https://doubleslitexperiment.app/demo/#webpage","name":"Double Slit Experiment — Interactive Demo","description":"Run the Double Slit 3D demo: double-slit interference, measurement strength (continuous decoherence), quantum interpretations, and live parameters in your browser.","url":"https://doubleslitexperiment.app/demo/","isPartOf":{"@type":"WebSite","name":"Double Slit Experiment","url":"https://doubleslitexperiment.app/"},"breadcrumb":{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://doubleslitexperiment.app/"},{"@type":"ListItem","position":2,"name":"Demo","item":"https://doubleslitexperiment.app/demo/"}]}},{"@type":"SoftwareApplication","name":"Double Slit Experiment","applicationCategory":"EducationalApplication","operatingSystem":"Web","url":"https://doubleslitexperiment.app/demo/","description":"Interactive 3D double-slit experiment with timeline scrubber, measurement-strength control, interpretations, and adjustable experimental parameters.","author":{"@type":"Organization","name":"Nocturnal Cloud","url":"https://nocturnal.cloud"},"offers":{"@type":"Offer","price":"0","priceCurrency":"GBP","availability":"https://schema.org/InStock"}}]}
   </script>
 </head>
 <body>
@@ -72,6 +72,7 @@
         <button type="button" class="help-features-btn" id="features-help-open" aria-haspopup="dialog" aria-controls="features-help-modal" aria-expanded="false">
           How it works
         </button>
+        <button type="button" class="hud-toggle-btn" id="complementarity-hud-toggle" aria-pressed="true" aria-label="Toggle complementarity diagram" title="Complementarity (D vs V)">D–V</button>
         <button class="theme-btn" id="theme-toggle" aria-label="Toggle light/dark mode" title="Toggle theme">
           <span class="theme-icon">☀</span>
           <span class="theme-label">Light</span>
@@ -130,6 +131,25 @@
 
     <div id="canvas"></div>
 
+    <div class="complementarity-hud" id="complementarity-hud" role="img" aria-label="Complementarity: which-path knowledge D versus fringe visibility V">
+      <div class="complementarity-hud-title">Complementarity</div>
+      <svg class="complementarity-hud-svg" viewBox="0 0 120 120" aria-hidden="true">
+        <path d="M 20 100 A 80 80 0 0 1 100 20" fill="none" stroke="currentColor" stroke-width="1.2" opacity="0.35" />
+        <line x1="20" y1="100" x2="100" y2="100" stroke="currentColor" stroke-width="0.8" opacity="0.25" />
+        <line x1="20" y1="100" x2="20" y2="20" stroke="currentColor" stroke-width="0.8" opacity="0.25" />
+        <text x="22" y="114" font-size="8" fill="currentColor" opacity="0.7">D</text>
+        <text x="4" y="28" font-size="8" fill="currentColor" opacity="0.7">V</text>
+        <circle id="complementarity-point" cx="20" cy="100" r="5" fill="url(#comp-grad)" />
+        <defs>
+          <linearGradient id="comp-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#38bdf8" />
+            <stop offset="100%" stop-color="#f59e0b" />
+          </linearGradient>
+        </defs>
+      </svg>
+      <div class="complementarity-hud-sum" id="complementarity-sum">D² + V² = 1.00</div>
+    </div>
+
     <div class="info-panel" id="info-panel">
       <button class="info-close" id="info-close" aria-label="Close">×</button>
       <div class="info-content" id="info-content"></div>
@@ -142,11 +162,19 @@
         <button type="button" class="play-btn play-btn--playing" id="play" aria-label="Pause">❚❚</button>
         <span class="particle-count" id="particle-count">0 / 2000 particles</span>
       </div>
-      <div class="controls-row">
-        <button class="observe-btn" id="observe" aria-pressed="false">
-          <span>📷</span>
-          <span>Not observing</span>
-        </button>
+      <div class="controls-row controls-row--measurement">
+        <div class="measurement-block" id="measurement-block">
+          <div class="measurement-slider-row">
+            <span class="measurement-icon measurement-icon--wave" aria-hidden="true">〰</span>
+            <input type="range" id="measurement-slider" min="0" max="100" value="0" step="1" aria-labelledby="measurement-label" aria-valuetext="0%" disabled>
+            <span class="measurement-icon measurement-icon--particle" aria-hidden="true">●</span>
+          </div>
+          <div class="measurement-meta">
+            <span id="measurement-label" class="measurement-label">Measurement strength</span>
+            <span id="measurement-value-readout" class="measurement-readout">0%</span>
+          </div>
+          <p id="measurement-narrative" class="measurement-narrative" hidden></p>
+        </div>
         <button class="observe-btn reset-btn" id="reset">
           ↺ Reset
         </button>
@@ -168,7 +196,7 @@
       <p class="demo-modal-lead">These controls mirror the main product: timeline, observer, camera, and experiment parameters.</p>
       <ul class="demo-modal-list">
         <li><strong>Timeline</strong> — Drag the slider to scrub through time, or use Play to watch hits accumulate on the detection screen. Reset jumps back to the start.</li>
-        <li><strong>Which-path / observer</strong> — Turn on to model knowing which slit the particle went through; the pattern moves toward two bands. Turn off to bring back interference.</li>
+        <li><strong>Measurement strength</strong> — Drag the slider from full interference (wave-like) toward strong which-path information; the pattern continuously moves from fringes toward a single-slit-like envelope. Interpretations relabel what the slider means in the story panel (ℹ).</li>
         <li><strong>Camera</strong> — Drag to orbit, scroll or pinch to zoom, right-drag (or trackpad two-finger) to pan—full 3D around the bench.</li>
         <li><strong>Parameters &amp; Recompute</strong> — Slit width, separation, and wavelength (colour). After edits, <strong>Recompute</strong> regenerates the particle set. Extended options in this build add mass-related behaviour for some interpretations.</li>
         <li><strong>Interpretations &amp; ℹ</strong> — Tabs switch the story and overlays (Copenhagen, pilot-wave, etc.). The <strong>ℹ</strong> panel explains the active view without changing the underlying simulation.</li>
@@ -179,6 +207,6 @@
   </div>
 
   <script src="/demo/help-modal.js?v=6" defer></script>
-  <script type="module" src="/demo/advanced-main.js?v=12"></script>
+  <script type="module" src="/demo/advanced-main.js?v=13"></script>
 </body>
 </html>

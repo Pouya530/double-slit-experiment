@@ -6,8 +6,9 @@
 import * as THREE from 'https://esm.sh/three@0.160.0';
 import { OrbitControls } from 'https://esm.sh/three@0.160.0/examples/jsm/controls/OrbitControls.js';
 import { createParticleBuffer } from './simulation.js';
-import { wavelengthToRGB } from './physics.js';
+import { wavelengthToRGB, fringeVisibility } from './physics.js';
 import { INTERPRETATIONS } from './interpretations.js';
+import { MEASUREMENT_CONFIGS, CLASSIC_INTERP_TO_CONFIG_KEY, narrativeForGamma } from './measurement-configs.js';
 
 function hexFromInterpBrand(def) {
   const c = def?.color;
@@ -32,10 +33,10 @@ function initSafariDetectionFastPathFlag() {
   safariDetectionFastPath = /Safari/i.test(ua);
 }
 
-function drawDetectionScreenWebKitFast(ctx, w, h, theme, positionBlend, collapseFlashActive) {
+function drawDetectionScreenWebKitFast(ctx, w, h, theme, _positionBlend, collapseFlashActive) {
   ctx.fillStyle = theme.screenBg;
   ctx.fillRect(0, 0, w, h);
-  const { birthTimes, interferencePositions, classicalPositions, wavelengths } = particleBuffer;
+  const { birthTimes, interferencePositions, wavelengths } = particleBuffer;
   const isDark = isDarkMode;
   ctx.globalCompositeOperation = isDark ? 'lighter' : 'source-over';
 
@@ -49,11 +50,9 @@ function drawDetectionScreenWebKitFast(ctx, w, h, theme, positionBlend, collapse
     const isNewHit = collapseFlashActive && ageSinceHit < 0.2;
 
     const iz = interferencePositions[i * 3 + 2];
-    const cz = classicalPositions[i * 3 + 2];
     const iy = interferencePositions[i * 3 + 1];
-    const cy = classicalPositions[i * 3 + 1];
-    const z = iz * (1 - positionBlend) + cz * positionBlend;
-    const y = iy * (1 - positionBlend) + cy * positionBlend;
+    const z = iz;
+    const y = iy;
 
     const u = (z + SCREEN_WIDTH / 2) / SCREEN_WIDTH;
     const v = (y + SCREEN_HEIGHT / 2) / SCREEN_HEIGHT;
@@ -101,27 +100,34 @@ function syncPlayButton() {
 function syncInterpretationUI() {
   document.querySelectorAll('.interp-tab').forEach((b) => b.classList.toggle('active', b.dataset.interp === activeInterpretation));
   if (showInfoPanel) renderInfoPanel(activeInterpretation);
-  const ob = document.querySelector('.observe-btn');
-  if (ob) {
-    ob.classList.toggle('active', isObserving);
-    const span = ob.querySelector('span:last-child');
-    if (span) span.textContent = isObserving ? 'Observing' : 'Not observing';
+  const ms = document.getElementById('measurement-slider');
+  if (ms) {
+    ms.value = String(Math.round(measurementStrength * 100));
+    ms.setAttribute('aria-valuetext', `${Math.round(measurementStrength * 100)}%`);
   }
+  const labelEl = document.getElementById('measurement-label');
+  const readout = document.getElementById('measurement-value-readout');
+  const narrative = document.getElementById('measurement-narrative');
+  const advKey = CLASSIC_INTERP_TO_CONFIG_KEY[activeInterpretation];
+  const cfg = advKey ? MEASUREMENT_CONFIGS[advKey] : null;
+  if (labelEl && cfg) labelEl.textContent = cfg.sliderLabel;
+  if (readout) readout.textContent = `${Math.round(measurementStrength * 100)}%`;
+  if (narrative && cfg) narrative.textContent = narrativeForGamma(measurementStrength, cfg);
   syncPlayButton();
   const interpMobile = document.getElementById('interp-select-mobile');
   if (interpMobile) interpMobile.value = activeInterpretation;
 }
 
 const TOUR_STEPS = [
-  { text: "Let's fire a photon.", action: () => { singleParticleMode = true; effectiveTMax = FLIGHT_TIME + 0.4; currentTime = 0; isPlaying = true; isObserving = false; observerTarget = 0; observerTransition = 0; syncInterpretationUI(); } },
+  { text: "Let's fire a photon.", action: () => { singleParticleMode = true; effectiveTMax = FLIGHT_TIME + 0.4; currentTime = 0; isPlaying = true; measurementStrength = 0; syncInterpretationUI(); scheduleClassicBufferRecompute(); } },
   { text: "Simple, right? Now let's do it a thousand times. Watch the pattern emerge.", action: () => { singleParticleMode = false; effectiveTMax = particleBuffer?.tMax ?? tMax; currentTime = 0; isPlaying = true; syncInterpretationUI(); } },
-  { text: "Here's where it gets weird. The observer is now on — watch the pattern change.", action: () => { observerTarget = 1; isObserving = true; observerTransition = 1; syncInterpretationUI(); } },
+  { text: "Here's where it gets weird. Crank measurement strength — watch the fringes fade.", action: () => { measurementStrength = 1; syncInterpretationUI(); scheduleClassicBufferRecompute(); } },
   { text: "Every physicist agrees on WHAT happens. They disagree on WHY.", action: () => { } },
-  { text: "Copenhagen says: The particle has no path until measured. The wave collapses at the screen.", action: () => { activeInterpretation = 'copenhagen'; observerTarget = 0; isObserving = false; observerTransition = 0; syncInterpretationUI(); } },
-  { text: "But Everett said: The wave never collapses. The universe branches — all outcomes happen.", action: () => { activeInterpretation = 'many-worlds'; syncInterpretationUI(); } },
-  { text: "Bohm had a different idea: A real particle surfing a real wave. Fully deterministic.", action: () => { activeInterpretation = 'pilot-wave'; syncInterpretationUI(); } },
-  { text: "Decoherence: Here's what's actually happening physically. Environment coupling destroys interference.", action: () => { activeInterpretation = 'decoherence'; syncInterpretationUI(); } },
-  { text: "QBism: Some say we're asking the wrong question. The wavefunction describes your beliefs, not reality.", action: () => { activeInterpretation = 'qbism'; syncInterpretationUI(); } },
+  { text: "Copenhagen says: The particle has no path until measured. The wave collapses at the screen.", action: () => { activeInterpretation = 'copenhagen'; measurementStrength = 0; syncInterpretationUI(); scheduleClassicBufferRecompute(); } },
+  { text: "But Everett said: The wave never collapses. The universe branches — all outcomes happen.", action: () => { activeInterpretation = 'many-worlds'; syncInterpretationUI(); scheduleClassicBufferRecompute(); } },
+  { text: "Bohm had a different idea: A real particle surfing a real wave. Fully deterministic.", action: () => { activeInterpretation = 'pilot-wave'; syncInterpretationUI(); scheduleClassicBufferRecompute(); } },
+  { text: "Decoherence: Here's what's actually happening physically. Environment coupling destroys interference.", action: () => { activeInterpretation = 'decoherence'; syncInterpretationUI(); scheduleClassicBufferRecompute(); } },
+  { text: "QBism: Some say we're asking the wrong question. The wavefunction describes your beliefs, not reality.", action: () => { activeInterpretation = 'qbism'; syncInterpretationUI(); scheduleClassicBufferRecompute(); } },
   { text: "In 2025, Nature surveyed 1,100+ physicists. 36% Copenhagen, 15% Many-Worlds, 47% said the wavefunction is 'simply a useful tool'.", action: () => { } },
   { text: "Only 24% were confident in their answer. This is the frontier. Maybe YOU will figure it out.", action: () => { syncInterpretationUI(); } },
 ];
@@ -136,11 +142,47 @@ const FLIGHT_TIME = 0.8;
 const SLIT_SEP = 0.22;
 const SLIT_WIDTH = 0.055;
 
+function getClassicVisibilityModel() {
+  const k = CLASSIC_INTERP_TO_CONFIG_KEY[activeInterpretation];
+  return MEASUREMENT_CONFIGS[k]?.preferredVisModel ?? 'quadratic';
+}
+
+function scheduleClassicBufferRecompute(immediate = false) {
+  clearTimeout(classicGammaTimer);
+  const run = () => {
+    const slitWidth = parseFloat(document.getElementById('slit-width')?.value || 100) * 1e-9;
+    const slitSeparation = parseFloat(document.getElementById('slit-sep')?.value || 500) * 1e-9;
+    const wavelength = parseFloat(document.getElementById('wavelength')?.value || 550) * 1e-9;
+    particleBuffer = createParticleBuffer(
+      {
+        slitWidth,
+        slitSeparation,
+        wavelength,
+        emissionRate: 60,
+        screenDistance: SCREEN_DISTANCE,
+        measurementGamma: measurementStrength,
+        visibilityModel: getClassicVisibilityModel(),
+      },
+      MAX_PARTICLES,
+      Date.now()
+    );
+    tMax = particleBuffer.tMax;
+    effectiveTMax = singleParticleMode ? FLIGHT_TIME + 0.4 : tMax;
+    classicGammaTimer = null;
+  };
+  if (immediate) {
+    run();
+    return;
+  }
+  classicGammaTimer = setTimeout(run, 200);
+}
+
 let scene, camera, renderer, controls;
 let particleMesh, detectionTexture, detectionCanvas;
 let particleBuffer, visibleCount = 0;
 let currentTime = 0, tMax = 30, effectiveTMax = 30, isPlaying = true, lastTime = performance.now();
-let isObserving = false, observerTransition = 0, observerTarget = 0;
+let measurementStrength = 0;
+let classicGammaTimer = null;
 let gridHelper, sourceMesh, sourceGlow, barrierLeft, barrierCenter, barrierRight, screenFrame;
 let waveOverlay, envParticles, qbismOverlay;
 let isDarkMode = false;
@@ -211,6 +253,8 @@ function init() {
     wavelength: 5.5e-7,
     emissionRate: 60,
     screenDistance: SCREEN_DISTANCE,
+    measurementGamma: measurementStrength,
+    visibilityModel: getClassicVisibilityModel(),
   };
   particleBuffer = createParticleBuffer(params, MAX_PARTICLES, 12345);
   tMax = particleBuffer.tMax;
@@ -220,6 +264,7 @@ function init() {
   setupUI();
   setupInterpretationUI();
   setupTourUI();
+  syncInterpretationUI();
   window.addEventListener('resize', onResize);
   animate();
 }
@@ -458,9 +503,8 @@ function addParticles() {
 
   particleMesh.userData.update = () => {
     if (!particleBuffer) return;
-    const { birthTimes, interferencePositions, classicalPositions, slitZ, slitY, wavelengths, screenDistance } = particleBuffer;
+    const { birthTimes, interferencePositions, slitZ, slitY, wavelengths, screenDistance } = particleBuffer;
     let count = 0;
-    const obsT = observerTransition;
 
     for (let i = 0; i < particleBuffer.count; i++) {
       if (singleParticleMode && i > 0) continue;
@@ -468,10 +512,8 @@ function addParticles() {
 
       const iy = interferencePositions[i * 3 + 1];
       const iz = interferencePositions[i * 3 + 2];
-      const cz = classicalPositions[i * 3 + 2];
-      const cy = classicalPositions[i * 3 + 1];
-      const screenZ = iz * (1 - obsT) + cz * obsT;
-      const screenY = iy * (1 - obsT) + cy * obsT;
+      const screenZ = iz;
+      const screenY = iy;
 
       const age = currentTime - birthTimes[i];
       const tFlight = Math.min(1, age / FLIGHT_TIME);
@@ -565,8 +607,13 @@ function addInterpretationOverlays() {
 
 function updateInterpretationOverlays() {
   const interp = INTERPRETATIONS[activeInterpretation];
-  const showWave = !isObserving && (activeInterpretation === 'copenhagen' || activeInterpretation === 'many-worlds' || activeInterpretation === 'pilot-wave');
-  const showEnv = isObserving && activeInterpretation === 'decoherence';
+  const V = fringeVisibility(measurementStrength, getClassicVisibilityModel());
+  const showWave =
+    V > 0.35 &&
+    (activeInterpretation === 'copenhagen' ||
+      activeInterpretation === 'many-worlds' ||
+      activeInterpretation === 'pilot-wave');
+  const showEnv = activeInterpretation === 'decoherence' && measurementStrength > 0.02;
   const showQbism = activeInterpretation === 'qbism';
 
   if (waveOverlay) {
@@ -578,7 +625,13 @@ function updateInterpretationOverlays() {
     }
     waveOverlay.material.opacity = 0.08 + 0.06 * Math.sin(currentTime * 2) ** 2;
   }
-  if (envParticles) envParticles.visible = showEnv;
+  if (envParticles) {
+    envParticles.visible = showEnv;
+    if (showEnv) {
+      const n = Math.max(1, Math.min(80, Math.ceil(measurementStrength * 80)));
+      envParticles.count = n;
+    }
+  }
 
   if (qbismOverlay) {
     qbismOverlay.visible = showQbism;
@@ -586,7 +639,7 @@ function updateInterpretationOverlays() {
       const cloudHex =
         interp?.cloudColor ?? hexFromInterpBrand(interp) ?? 0xba68c8;
       qbismOverlay.material.color.setHex(cloudHex);
-      const classical = isObserving;
+      const classical = V < 0.55;
       const pulse = 0.14 + 0.08 * Math.sin(currentTime * 1.5) ** 2;
       const classicalPulse =
         0.1 + 0.06 * Math.sin(currentTime * 1.2) ** 2;
@@ -596,14 +649,21 @@ function updateInterpretationOverlays() {
 }
 
 function getWhatsHappening(interpId) {
-  const obs = isObserving;
+  const g = measurementStrength;
+  const V = fringeVisibility(g, getClassicVisibilityModel());
   switch (interpId) {
-    case 'copenhagen': return obs ? 'Wave collapsed at slit — particle path definite' : 'Probability wave between source and screen';
-    case 'many-worlds': return obs ? 'Universe branched at slit — you see one branch' : 'Wave extends through both slits in all branches';
-    case 'pilot-wave': return obs ? 'Pilot wave disrupted — trajectory straight' : 'Particle surfing pilot wave through slits';
-    case 'decoherence': return obs ? 'Environment coupling — information leaking to surroundings' : 'Coherent wave in vacuum';
-    case 'qbism': return obs ? 'Belief updated — narrower prediction' : 'Cloud of possibilities (your uncertainty)';
-    default: return '';
+    case 'copenhagen':
+      return V < 0.45 ? 'Strong which-path — low fringe visibility' : 'Weak measurement — interference visible';
+    case 'many-worlds':
+      return V < 0.45 ? 'Branch entanglement — illustrative classical-like stats' : 'High coherence — fringes';
+    case 'pilot-wave':
+      return V < 0.45 ? 'Guiding field disrupted in this illustration' : 'Pilot-wave steering — interference';
+    case 'decoherence':
+      return `Coupling ${(g * 100).toFixed(0)}% — fringe visibility ${(V * 100).toFixed(0)}%`;
+    case 'qbism':
+      return V < 0.55 ? 'Strong belief update — classical-like expectations' : 'Interference from uncertainty';
+    default:
+      return '';
   }
 }
 
@@ -640,6 +700,8 @@ function setupInterpretationUI() {
       document.querySelectorAll('.interp-tab').forEach(b => b.classList.toggle('active', b.dataset.interp === activeInterpretation));
       const interpMobile = document.getElementById('interp-select-mobile');
       if (interpMobile) interpMobile.value = activeInterpretation;
+      syncInterpretationUI();
+      scheduleClassicBufferRecompute();
       renderInfoPanel(activeInterpretation);
       if (showInfoPanel) document.getElementById('info-panel').classList.add('open');
     });
@@ -648,6 +710,8 @@ function setupInterpretationUI() {
   document.getElementById('interp-select-mobile')?.addEventListener('change', (e) => {
     activeInterpretation = e.target.value;
     document.querySelectorAll('.interp-tab').forEach((b) => b.classList.toggle('active', b.dataset.interp === activeInterpretation));
+    syncInterpretationUI();
+    scheduleClassicBufferRecompute();
     renderInfoPanel(activeInterpretation);
     if (showInfoPanel) document.getElementById('info-panel').classList.add('open');
   });
@@ -716,11 +780,10 @@ function drawDetectionScreen() {
   const w = detectionCanvas.width;
   const h = detectionCanvas.height;
   const theme = THEMES[isDarkMode ? 'dark' : 'light'];
-  const obsT = observerTransition;
-  const collapseFlashActive = activeInterpretation === 'copenhagen' && !isObserving;
+  const collapseFlashActive = activeInterpretation === 'copenhagen' && measurementStrength < 0.25;
 
   if (safariDetectionFastPath) {
-    drawDetectionScreenWebKitFast(ctx, w, h, theme, obsT, collapseFlashActive);
+    drawDetectionScreenWebKitFast(ctx, w, h, theme, 0, collapseFlashActive);
     detectionTexture.needsUpdate = true;
     return;
   }
@@ -728,7 +791,7 @@ function drawDetectionScreen() {
   ctx.fillStyle = theme.screenBg;
   ctx.fillRect(0, 0, w, h);
 
-  const { birthTimes, interferencePositions, classicalPositions, wavelengths } = particleBuffer;
+  const { birthTimes, interferencePositions, wavelengths } = particleBuffer;
 
   for (let i = 0; i < particleBuffer.count; i++) {
     if (singleParticleMode && i > 0) continue;
@@ -740,11 +803,9 @@ function drawDetectionScreen() {
     const isNewHit = collapseFlashActive && ageSinceHit < 0.2;
 
     const iz = interferencePositions[i * 3 + 2];
-    const cz = classicalPositions[i * 3 + 2];
     const iy = interferencePositions[i * 3 + 1];
-    const cy = classicalPositions[i * 3 + 1];
-    const z = iz * (1 - obsT) + cz * obsT;
-    const y = iy * (1 - obsT) + cy * obsT;
+    const z = iz;
+    const y = iy;
 
     const u = (z + SCREEN_WIDTH / 2) / SCREEN_WIDTH;
     const v = (y + SCREEN_HEIGHT / 2) / SCREEN_HEIGHT;
@@ -793,8 +854,6 @@ function setupUI() {
   const timelineEl = document.getElementById('timeline');
   const playBtn = document.getElementById('play');
   const countEl = document.getElementById('particle-count');
-  const observeBtn = document.getElementById('observe');
-
   timelineEl.min = 0;
   timelineEl.max = 100;
   timelineEl.value = 0;
@@ -828,11 +887,30 @@ function setupUI() {
     syncPlayButton();
   });
 
-  observeBtn.addEventListener('click', () => {
-    isObserving = !isObserving;
-    observerTarget = isObserving ? 1 : 0;
-    observeBtn.classList.toggle('active', isObserving);
-    observeBtn.querySelector('span:last-child').textContent = isObserving ? 'Observing' : 'Not observing';
+  const msEl = document.getElementById('measurement-slider');
+  msEl?.addEventListener('input', () => {
+    measurementStrength = Math.max(0, Math.min(1, Number(msEl.value) / 100));
+    syncInterpretationUI();
+    if (showInfoPanel) renderInfoPanel(activeInterpretation);
+    scheduleClassicBufferRecompute();
+  });
+  msEl?.addEventListener('dblclick', () => {
+    const v = Number(msEl.value) / 100;
+    const snaps = [0, 0.5, 1];
+    let nearest = snaps[0];
+    let best = Math.abs(v - snaps[0]);
+    for (const s of snaps) {
+      const d = Math.abs(v - s);
+      if (d < best) {
+        best = d;
+        nearest = s;
+      }
+    }
+    measurementStrength = nearest;
+    syncInterpretationUI();
+    clearTimeout(classicGammaTimer);
+    classicGammaTimer = null;
+    scheduleClassicBufferRecompute(true);
     if (showInfoPanel) renderInfoPanel(activeInterpretation);
   });
 
@@ -843,6 +921,8 @@ function setupUI() {
       wavelength: parseFloat(document.getElementById('wavelength')?.value || 550) * 1e-9,
       emissionRate: 60,
       screenDistance: SCREEN_DISTANCE,
+      measurementGamma: measurementStrength,
+      visibilityModel: getClassicVisibilityModel(),
     };
     particleBuffer = createParticleBuffer(params, MAX_PARTICLES, Date.now());
     tMax = particleBuffer.tMax;
@@ -903,8 +983,6 @@ function animate(now = 0) {
     const tl = document.getElementById('timeline');
     if (tl) tl.value = (currentTime / effectiveTMax) * 100;
   }
-
-  observerTransition += (observerTarget - observerTransition) * Math.min(1, dt * 5);
 
   if (particleMesh?.userData?.update) particleMesh.userData.update();
   updateInterpretationOverlays();

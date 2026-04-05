@@ -2,6 +2,8 @@
  * Interpretation-engine physics helpers — SPEC-INTERPRETATIONS.md §3
  */
 
+import { fringeVisibility } from './physics.js';
+
 /**
  * CSL-style spontaneous collapse suppression vs mass (simplified).
  * @param {number} massAmu - atomic mass units
@@ -14,13 +16,13 @@ export function collapseSuppressionFactor(massAmu) {
 }
 
 /**
- * Interference visibility from environment coupling.
+ * Fringe visibility from environment coupling (exponential model — SPEC-MEASUREMENT §1.3).
  * @param {number} envCoupling 0..1
  * @returns {number} visibility 0..1
  */
 export function decoherenceVisibility(envCoupling) {
   const c = Math.max(0, Math.min(1, envCoupling));
-  return (1 - c) ** 2;
+  return fringeVisibility(c, 'exponential');
 }
 
 /**

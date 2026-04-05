@@ -6,8 +6,9 @@
 import * as THREE from 'https://esm.sh/three@0.160.0';
 import { OrbitControls } from 'https://esm.sh/three@0.160.0/examples/jsm/controls/OrbitControls.js';
 import { createParticleBuffer } from './simulation.js';
-import { wavelengthToRGB } from './physics.js';
+import { wavelengthToRGB, fringeVisibility, getComplementarity } from './physics.js';
 import { INTERPRETATIONS_ADV, INTERPRETATION_IDS_ADV } from './interpretations-advanced.js';
+import { MEASUREMENT_CONFIGS, narrativeForGamma } from './measurement-configs.js';
 import {
   collapseSuppressionFactor,
   decoherenceVisibility,
@@ -40,10 +41,10 @@ function initSafariDetectionFastPathFlag() {
 }
 
 /** Lighter-weight hit splats: solid arcs + optional additive blend (dark theme). */
-function drawDetectionScreenWebKitFast(ctx, w, h, theme, positionBlend, collapseFlashActive) {
+function drawDetectionScreenWebKitFast(ctx, w, h, theme, _positionBlend, collapseFlashActive) {
   ctx.fillStyle = theme.screenBg;
   ctx.fillRect(0, 0, w, h);
-  const { birthTimes, interferencePositions, classicalPositions, wavelengths } = particleBuffer;
+  const { birthTimes, interferencePositions, wavelengths } = particleBuffer;
   const isDark = isDarkMode;
   ctx.globalCompositeOperation = isDark ? 'lighter' : 'source-over';
 
@@ -57,11 +58,9 @@ function drawDetectionScreenWebKitFast(ctx, w, h, theme, positionBlend, collapse
     const isNewHit = collapseFlashActive && ageSinceHit < 0.2;
 
     const iz = interferencePositions[i * 3 + 2];
-    const cz = classicalPositions[i * 3 + 2];
     const iy = interferencePositions[i * 3 + 1];
-    const cy = classicalPositions[i * 3 + 1];
-    const z = iz * (1 - positionBlend) + cz * positionBlend;
-    const y = iy * (1 - positionBlend) + cy * positionBlend;
+    const z = iz;
+    const y = iy;
 
     const u = (z + SCREEN_WIDTH / 2) / SCREEN_WIDTH;
     const v = (y + SCREEN_HEIGHT / 2) / SCREEN_HEIGHT;
@@ -130,7 +129,8 @@ let scene, camera, renderer, controls;
 let particleMesh, detectionTexture, detectionCanvas;
 let particleBuffer, visibleCount = 0;
 let currentTime = 0, tMax = 30, effectiveTMax = 30, isPlaying = true, lastTime = performance.now();
-let isObserving = false, observerTransition = 0, observerTarget = 0;
+/** Continuous measurement strength γ ∈ [0,1] for interpretations with a binary-style control. */
+let measurementStrength = 0;
 let gridHelper, sourceMesh, sourceGlow, barrierLeft, barrierCenter, barrierRight, screenFrame;
 let waveOverlay, envParticles, qbismOverlay;
 let isDarkMode = false;
@@ -140,11 +140,12 @@ let singleParticleMode = false;
 let particleMassAmu = 0.00055;
 let envCoupling = 0;
 let perspective = 'external';
-let physicsBlend = 0;
+let showComplementarityHud = true;
+let gammaRecomputeTimer = null;
 
 /** Per-interpretation persisted knobs (slit λ / geometry stay global on the form). */
 const DEFAULT_ELECTRON_AMU = 0.00055;
-/** @type {Record<string, { particleMassAmu: number; envCoupling: number; perspective: string; isObserving: boolean }>} */
+/** @type {Record<string, { particleMassAmu: number; envCoupling: number; perspective: string; measurementStrength: number; isObserving?: boolean }>} */
 let interpParamSnapshots = {};
 
 function createDefaultInterpParams() {
@@ -152,16 +153,20 @@ function createDefaultInterpParams() {
     particleMassAmu: DEFAULT_ELECTRON_AMU,
     envCoupling: 0,
     perspective: 'external',
-    isObserving: false,
+    measurementStrength: 0,
   };
 }
 
 function cloneInterpParams(p) {
+  let ms = p.measurementStrength;
+  if (typeof ms !== 'number' || Number.isNaN(ms)) {
+    ms = p.isObserving ? 1 : 0;
+  }
   return {
     particleMassAmu: p.particleMassAmu,
     envCoupling: p.envCoupling,
     perspective: p.perspective,
-    isObserving: p.isObserving,
+    measurementStrength: Math.max(0, Math.min(1, ms)),
   };
 }
 
@@ -170,7 +175,7 @@ function captureParamsFromGlobals() {
     particleMassAmu,
     envCoupling,
     perspective,
-    isObserving,
+    measurementStrength,
   });
 }
 
@@ -195,11 +200,9 @@ function syncAdvancedControlsFromGlobals() {
   });
 }
 
-/** Snap blend/observers so switching tabs does not leave seconds of “wrong” interpolation. */
 function snapPhysicsStateImmediate() {
-  observerTarget = isObserving ? 1 : 0;
-  observerTransition = observerTarget;
-  physicsBlend = computePhysicsBlendTarget();
+  clearTimeout(gammaRecomputeTimer);
+  gammaRecomputeTimer = null;
 }
 
 /**
@@ -213,7 +216,7 @@ function switchInterpretation(nextId) {
   particleMassAmu = snap.particleMassAmu;
   envCoupling = snap.envCoupling;
   perspective = snap.perspective;
-  isObserving = snap.isObserving;
+  measurementStrength = cloneInterpParams(snap).measurementStrength;
   syncAdvancedControlsFromGlobals();
   updateObserveAndAdvancedControls();
   snapPhysicsStateImmediate();
@@ -250,20 +253,42 @@ function getInterpDef() {
   return INTERPRETATIONS_ADV[activeInterpretation];
 }
 
-function computePhysicsBlendTarget() {
+function getActiveVisibilityModel() {
+  return MEASUREMENT_CONFIGS[activeInterpretation]?.preferredVisModel ?? 'quadratic';
+}
+
+/** Effective measurement strength γ for the active interpretation (SPEC-MEASUREMENT). */
+function computeMeasurementGamma() {
   const id = activeInterpretation;
-  if (id === 'objectiveCollapse' || id === 'orchOR') {
-    return 1 - collapseSuppressionFactor(particleMassAmu);
-  }
-  if (id === 'decoherence') {
-    return 1 - decoherenceVisibility(envCoupling);
-  }
-  if (id === 'rqm') {
+  const def = getInterpDef();
+  const mode = def?.observerToggleMode ?? 'binary';
+  if (mode === 'slider') return Math.max(0, Math.min(1, envCoupling));
+  if (mode === 'disabled') return Math.max(0, Math.min(1, 1 - collapseSuppressionFactor(particleMassAmu)));
+  if (mode === 'perspective') {
     if (perspective === 'external') return 0;
     if (perspective === 'detector') return 1;
     return 0.45;
   }
-  return observerTarget;
+  return Math.max(0, Math.min(1, measurementStrength));
+}
+
+function scheduleGammaRecompute(immediate = false) {
+  clearTimeout(gammaRecomputeTimer);
+  const run = () => {
+    rebuildParticleBuffer(Date.now());
+    gammaRecomputeTimer = null;
+  };
+  if (immediate) {
+    run();
+    return;
+  }
+  gammaRecomputeTimer = setTimeout(run, 200);
+}
+
+/** Fringe visibility V(γ) for overlay / HUD copy. */
+function currentFringeVisibility() {
+  const g = computeMeasurementGamma();
+  return fringeVisibility(g, getActiveVisibilityModel());
 }
 
 function massSliderToAmu(t) {
@@ -295,6 +320,8 @@ function rebuildParticleBuffer(seed) {
   const slitSeparation = parseFloat(document.getElementById('slit-sep')?.value || 500) * 1e-9;
   const userLambda = parseFloat(document.getElementById('wavelength')?.value || 550) * 1e-9;
   const lambdaEff = effectiveWavelength(particleMassAmu, userLambda);
+  const gamma = computeMeasurementGamma();
+  const visibilityModel = getActiveVisibilityModel();
   particleBuffer = createParticleBuffer(
     {
       slitWidth,
@@ -302,6 +329,8 @@ function rebuildParticleBuffer(seed) {
       wavelength: lambdaEff,
       emissionRate: 60,
       screenDistance: SCREEN_DISTANCE,
+      measurementGamma: gamma,
+      visibilityModel,
     },
     MAX_PARTICLES,
     seed
@@ -310,9 +339,65 @@ function rebuildParticleBuffer(seed) {
   effectiveTMax = singleParticleMode ? FLIGHT_TIME + 0.4 : tMax;
 }
 
+function updateComplementarityHudDisplay() {
+  const hud = document.getElementById('complementarity-hud');
+  const sumEl = document.getElementById('complementarity-sum');
+  const pt = document.getElementById('complementarity-point');
+  if (!hud || !sumEl || !pt) return;
+  hud.hidden = !showComplementarityHud;
+  const g = computeMeasurementGamma();
+  const model = getActiveVisibilityModel();
+  const { distinguishability: D, visibility: V, complementarityCheck } = getComplementarity(g, model);
+  sumEl.textContent = `D² + V² = ${complementarityCheck.toFixed(2)}`;
+  const cx = 20 + D * 80;
+  const cy = 100 - V * 80;
+  pt.setAttribute('cx', String(cx));
+  pt.setAttribute('cy', String(cy));
+}
+
+function updateMeasurementChrome() {
+  const def = getInterpDef();
+  const mode = def?.observerToggleMode ?? 'binary';
+  const slider = document.getElementById('measurement-slider');
+  const labelEl = document.getElementById('measurement-label');
+  const readout = document.getElementById('measurement-value-readout');
+  const narrative = document.getElementById('measurement-narrative');
+  const config = MEASUREMENT_CONFIGS[activeInterpretation];
+  const gUi = mode === 'binary' ? measurementStrength : computeMeasurementGamma();
+
+  if (labelEl && config) {
+    if (mode === 'binary') labelEl.textContent = config.sliderLabel;
+    else if (mode === 'slider') labelEl.textContent = 'Use environment coupling (above)';
+    else if (mode === 'perspective') labelEl.textContent = 'Use RQM perspective control';
+    else labelEl.textContent = 'Use particle mass control';
+  }
+
+  if (slider) {
+    const show = mode === 'binary';
+    slider.disabled = !show;
+    if (show) {
+      slider.value = String(Math.round(measurementStrength * 100));
+      slider.setAttribute('aria-valuetext', `${Math.round(measurementStrength * 100)}%`);
+    } else {
+      slider.value = String(Math.round(gUi * 100));
+      slider.setAttribute('aria-valuetext', `${Math.round(gUi * 100)}% (read‑only)`);
+    }
+  }
+
+  if (readout) {
+    readout.textContent = `${Math.round(gUi * 100)}%`;
+  }
+
+  if (narrative && config) {
+    narrative.textContent = narrativeForGamma(gUi, config);
+    narrative.hidden = false;
+  }
+
+  updateComplementarityHudDisplay();
+}
+
 function updateObserveAndAdvancedControls() {
   const def = getInterpDef();
-  const ob = document.getElementById('observe');
   const envRow = document.getElementById('adv-env-row');
   const perspRow = document.getElementById('adv-perspective-row');
   const massRow = document.getElementById('adv-mass-row');
@@ -333,23 +418,7 @@ function updateObserveAndAdvancedControls() {
     massReadout.textContent = label;
   }
 
-  if (!ob) return;
-  const mode = def?.observerToggleMode ?? 'binary';
-  const disabled = mode === 'disabled' || mode === 'slider' || mode === 'perspective';
-  ob.disabled = disabled;
-  ob.setAttribute('aria-disabled', disabled ? 'true' : 'false');
-  ob.classList.toggle('active', isObserving && !disabled);
-
-  const span = ob.querySelector('span:last-child');
-  if (mode === 'slider' && span) {
-    span.textContent = 'Use environment slider';
-  } else if (mode === 'perspective' && span) {
-    span.textContent = 'Use perspective control';
-  } else if (mode === 'disabled' && span) {
-    span.textContent = 'Observer N/A — use mass';
-  } else if (span) {
-    span.textContent = isObserving ? 'Observing' : 'Not observing';
-  }
+  updateMeasurementChrome();
 }
 
 function init() {
@@ -629,9 +698,8 @@ function addParticles() {
 
   particleMesh.userData.update = () => {
     if (!particleBuffer) return;
-    const { birthTimes, interferencePositions, classicalPositions, slitZ, slitY, wavelengths, screenDistance } = particleBuffer;
+    const { birthTimes, interferencePositions, slitZ, slitY, wavelengths, screenDistance } = particleBuffer;
     let count = 0;
-    const blend = physicsBlend;
 
     for (let i = 0; i < particleBuffer.count; i++) {
       if (singleParticleMode && i > 0) continue;
@@ -639,10 +707,8 @@ function addParticles() {
 
       const iy = interferencePositions[i * 3 + 1];
       const iz = interferencePositions[i * 3 + 2];
-      const cz = classicalPositions[i * 3 + 2];
-      const cy = classicalPositions[i * 3 + 1];
-      const screenZ = iz * (1 - blend) + cz * blend;
-      const screenY = iy * (1 - blend) + cy * blend;
+      const screenZ = iz;
+      const screenY = iy;
 
       const age = currentTime - birthTimes[i];
       const tFlight = Math.min(1, age / FLIGHT_TIME);
@@ -736,13 +802,16 @@ function addInterpretationOverlays() {
 
 function updateInterpretationOverlays() {
   const interp = INTERPRETATIONS_ADV[activeInterpretation];
-  const lowBlend = physicsBlend < 0.35;
+  const V = currentFringeVisibility();
+  const gamma = computeMeasurementGamma();
   const showWave =
-    lowBlend &&
+    V > 0.35 &&
     (activeInterpretation === 'copenhagen' ||
       activeInterpretation === 'manyWorlds' ||
       activeInterpretation === 'bohmian');
-  const showEnv = activeInterpretation === 'decoherence' && envCoupling > 0.02;
+  const decoCfg = MEASUREMENT_CONFIGS.decoherence;
+  const showEnv =
+    activeInterpretation === 'decoherence' && decoCfg?.showEnvironmentParticles && gamma > 0.02;
   const showQbism = activeInterpretation === 'qbism' || activeInterpretation === 'hoffman';
 
   if (waveOverlay) {
@@ -754,7 +823,13 @@ function updateInterpretationOverlays() {
     }
     waveOverlay.material.opacity = 0.08 + 0.06 * Math.sin(currentTime * 2) ** 2;
   }
-  if (envParticles) envParticles.visible = showEnv;
+  if (envParticles) {
+    envParticles.visible = showEnv;
+    if (showEnv) {
+      const n = Math.max(1, Math.min(80, Math.ceil(gamma * 80)));
+      envParticles.count = n;
+    }
+  }
 
   if (qbismOverlay) {
     qbismOverlay.visible = showQbism;
@@ -762,7 +837,7 @@ function updateInterpretationOverlays() {
       const cloudHex =
         interp?.cloudColor ?? hexFromInterpBrand(interp) ?? 0xba68c8;
       qbismOverlay.material.color.setHex(cloudHex);
-      const classical = physicsBlend > 0.45;
+      const classical = V < 0.55;
       const pulse =
         0.14 + 0.08 * Math.sin(currentTime * 1.5) ** 2;
       const classicalPulse =
@@ -773,30 +848,31 @@ function updateInterpretationOverlays() {
 }
 
 function getWhatsHappening(interpId) {
-  const b = physicsBlend;
-  const classical = b > 0.55;
+  const g = computeMeasurementGamma();
+  const V = currentFringeVisibility();
+  const classical = V < 0.45;
   switch (interpId) {
     case 'copenhagen':
-      return classical ? 'Macroscopic record / which-path — two-band distribution' : 'Probability amplitude between source and screen';
+      return classical ? 'Strong which-path information — fringe visibility reduced' : 'High fringe visibility — wave-like statistics on the screen';
     case 'manyWorlds':
-      return classical ? 'Branch-relative definite slit; global state still entangled' : 'No collapse — coherence across branches (illustrative)';
+      return classical ? 'Entanglement with detector — branch-relative definite statistics (illustrative)' : 'High coherence within branch — interference visible';
     case 'bohmian':
-      return classical ? 'Which-path disturbs guiding wave — trajectories separate' : 'Particle guided by pilot wave through both openings';
+      return classical ? 'Detector disturbs guiding configuration — pattern washes toward envelope' : 'Pilot-wave steering — interference in arrival positions';
     case 'decoherence':
       return `Environment coupling ${(envCoupling * 100).toFixed(0)}% — fringe visibility ${(decoherenceVisibility(envCoupling) * 100).toFixed(0)}%`;
     case 'qbism':
-      return classical ? 'Agent updates betting odds after new information' : ' ψ encodes expectations, not a mind-independent object';
+      return classical ? 'Strong information update — expectations resemble classical mixture' : 'ψ encodes expectations — interference from uncertainty';
     case 'rqm':
       if (perspective === 'external') return 'Relative to you outside: lab can remain in superposition';
       if (perspective === 'detector') return 'Relative to detector: definite click after correlation';
       return 'Hybrid perspective (illustrative)';
     case 'objectiveCollapse':
     case 'orchOR':
-      return `Mass ${particleMassAmu.toExponential(2)} amu — spontaneous locality weight ~${(100 * (1 - collapseSuppressionFactor(particleMassAmu))).toFixed(1)}% classical`;
+      return `Mass ${particleMassAmu.toExponential(2)} amu — effective measurement strength γ ≈ ${(100 * g).toFixed(0)}%`;
     case 'vonNeumannWigner':
-      return classical ? '(Historical framing) collapse tied to conscious record — fringe view' : 'Superposed until “mind” — not mainstream QM';
+      return classical ? '(Historical framing) strong record — low fringe visibility' : 'Weak record — interference persists';
     case 'hoffman':
-      return classical ? 'Interface shows definite “icons” given which-path info' : 'ψ as agent-side description — same statistics';
+      return classical ? 'Interface fully resolves path metaphor — low fringe visibility' : 'Interface open — interference-style statistics';
     default:
       return '';
   }
@@ -890,11 +966,11 @@ function drawDetectionScreen() {
   const w = detectionCanvas.width;
   const h = detectionCanvas.height;
   const theme = THEMES[isDarkMode ? 'dark' : 'light'];
-  const blend = physicsBlend;
-  const collapseFlashActive = activeInterpretation === 'copenhagen' && blend < 0.25;
+  const collapseFlashActive =
+    activeInterpretation === 'copenhagen' && computeMeasurementGamma() < 0.25;
 
   if (safariDetectionFastPath) {
-    drawDetectionScreenWebKitFast(ctx, w, h, theme, blend, collapseFlashActive);
+    drawDetectionScreenWebKitFast(ctx, w, h, theme, 0, collapseFlashActive);
     detectionTexture.needsUpdate = true;
     return;
   }
@@ -902,7 +978,7 @@ function drawDetectionScreen() {
   ctx.fillStyle = theme.screenBg;
   ctx.fillRect(0, 0, w, h);
 
-  const { birthTimes, interferencePositions, classicalPositions, wavelengths } = particleBuffer;
+  const { birthTimes, interferencePositions, wavelengths } = particleBuffer;
 
   for (let i = 0; i < particleBuffer.count; i++) {
     if (singleParticleMode && i > 0) continue;
@@ -914,11 +990,9 @@ function drawDetectionScreen() {
     const isNewHit = collapseFlashActive && ageSinceHit < 0.2;
 
     const iz = interferencePositions[i * 3 + 2];
-    const cz = classicalPositions[i * 3 + 2];
     const iy = interferencePositions[i * 3 + 1];
-    const cy = classicalPositions[i * 3 + 1];
-    const z = iz * (1 - blend) + cz * blend;
-    const y = iy * (1 - blend) + cy * blend;
+    const z = iz;
+    const y = iy;
 
     const u = (z + SCREEN_WIDTH / 2) / SCREEN_WIDTH;
     const v = (y + SCREEN_HEIGHT / 2) / SCREEN_HEIGHT;
@@ -967,8 +1041,6 @@ function setupUI() {
   const timelineEl = document.getElementById('timeline');
   const playBtn = document.getElementById('play');
   const countEl = document.getElementById('particle-count');
-  const observeBtn = document.getElementById('observe');
-
   timelineEl.min = 0;
   timelineEl.max = 100;
   timelineEl.value = 0;
@@ -1002,15 +1074,49 @@ function setupUI() {
     syncPlayButton();
   });
 
-  observeBtn.addEventListener('click', () => {
-    isObserving = !isObserving;
-    observerTarget = isObserving ? 1 : 0;
-    observeBtn.classList.toggle('active', isObserving);
-    observeBtn.querySelector('span:last-child').textContent = isObserving ? 'Observing' : 'Not observing';
+  const msEl = document.getElementById('measurement-slider');
+  msEl?.addEventListener('input', () => {
+    if (msEl.disabled) return;
+    measurementStrength = Math.max(0, Math.min(1, Number(msEl.value) / 100));
+    updateMeasurementChrome();
+    if (showInfoPanel) renderInfoPanel(activeInterpretation);
+    scheduleGammaRecompute();
+  });
+  msEl?.addEventListener('dblclick', () => {
+    if (msEl.disabled) return;
+    const v = Number(msEl.value) / 100;
+    const snaps = [0, 0.5, 1];
+    let nearest = snaps[0];
+    let best = Math.abs(v - snaps[0]);
+    for (const s of snaps) {
+      const d = Math.abs(v - s);
+      if (d < best) {
+        best = d;
+        nearest = s;
+      }
+    }
+    measurementStrength = nearest;
+    updateMeasurementChrome();
+    clearTimeout(gammaRecomputeTimer);
+    gammaRecomputeTimer = null;
+    rebuildParticleBuffer(Date.now());
     if (showInfoPanel) renderInfoPanel(activeInterpretation);
   });
 
+  const hudPref = localStorage.getItem('doubleSlitComplementarityHud');
+  if (hudPref === '0') showComplementarityHud = false;
+  const hudBtn = document.getElementById('complementarity-hud-toggle');
+  hudBtn?.setAttribute('aria-pressed', showComplementarityHud ? 'true' : 'false');
+  hudBtn?.addEventListener('click', () => {
+    showComplementarityHud = !showComplementarityHud;
+    hudBtn.setAttribute('aria-pressed', showComplementarityHud ? 'true' : 'false');
+    localStorage.setItem('doubleSlitComplementarityHud', showComplementarityHud ? '1' : '0');
+    updateComplementarityHudDisplay();
+  });
+
   document.getElementById('recompute')?.addEventListener('click', () => {
+    clearTimeout(gammaRecomputeTimer);
+    gammaRecomputeTimer = null;
     rebuildParticleBuffer(Date.now());
     currentTime = 0;
     timelineEl.value = 0;
@@ -1057,14 +1163,18 @@ function setupUI() {
   if (envEl) {
     envEl.addEventListener('input', () => {
       envCoupling = Number(envEl.value) / 100;
+      updateMeasurementChrome();
       if (showInfoPanel) renderInfoPanel(activeInterpretation);
+      scheduleGammaRecompute();
     });
   }
 
   document.querySelectorAll('input[name="perspective"]').forEach((radio) => {
     radio.addEventListener('change', () => {
       if (radio.checked) perspective = radio.value;
+      updateMeasurementChrome();
       if (showInfoPanel) renderInfoPanel(activeInterpretation);
+      scheduleGammaRecompute();
     });
   });
 }
@@ -1094,10 +1204,6 @@ function animate(now = 0) {
     const tl = document.getElementById('timeline');
     if (tl) tl.value = (currentTime / effectiveTMax) * 100;
   }
-
-  observerTransition += (observerTarget - observerTransition) * Math.min(1, dt * 5);
-  const targetBlend = computePhysicsBlendTarget();
-  physicsBlend += (targetBlend - physicsBlend) * Math.min(1, dt * 5);
 
   if (particleMesh?.userData?.update) particleMesh.userData.update();
   updateInterpretationOverlays();
