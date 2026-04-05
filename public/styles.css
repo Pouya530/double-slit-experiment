@@ -94,7 +94,11 @@ body.nav-mobile-open {
   display: block;
 }
 
-/* Homepage only (index): stacked wordmark — line 2 half size, centred under line 1 */
+/* Homepage only (index): stacked wordmark — text 50% of site logo scale; line 2 half of line 1; icon 10% smaller */
+body.page-home .logo--home-wordmark .logo-mark {
+  height: 1.8em;
+}
+
 body.page-home .logo--home-wordmark .logo-wordmark-stack {
   display: flex;
   flex-direction: column;
@@ -102,6 +106,7 @@ body.page-home .logo--home-wordmark .logo-wordmark-stack {
   text-align: center;
   line-height: 1.12;
   min-width: 0;
+  font-size: 50%;
 }
 
 body.page-home .logo--home-wordmark .logo-wordmark-line1 {
