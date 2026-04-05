@@ -5,7 +5,7 @@
 
 import * as THREE from 'https://esm.sh/three@0.160.0';
 import { OrbitControls } from 'https://esm.sh/three@0.160.0/examples/jsm/controls/OrbitControls.js';
-import { createParticleBuffer } from './simulation.js';
+import { createParticleBuffer } from './simulation.js?v=15';
 import { wavelengthToRGB, fringeVisibility } from './physics.js';
 import { INTERPRETATIONS } from './interpretations.js';
 import { MEASUREMENT_CONFIGS, CLASSIC_INTERP_TO_CONFIG_KEY, narrativeForGamma } from './measurement-configs.js';
@@ -160,6 +160,8 @@ function scheduleClassicBufferRecompute(immediate = false) {
         wavelength,
         emissionRate: 60,
         screenDistance: SCREEN_DISTANCE,
+        sourceX: SOURCE_X,
+        barrierX: BARRIER_X,
         measurementGamma: measurementStrength,
         visibilityModel: getClassicVisibilityModel(),
       },
@@ -253,6 +255,8 @@ function init() {
     wavelength: 5.5e-7,
     emissionRate: 60,
     screenDistance: SCREEN_DISTANCE,
+    sourceX: SOURCE_X,
+    barrierX: BARRIER_X,
     measurementGamma: measurementStrength,
     visibilityModel: getClassicVisibilityModel(),
   };
@@ -921,6 +925,8 @@ function setupUI() {
       wavelength: parseFloat(document.getElementById('wavelength')?.value || 550) * 1e-9,
       emissionRate: 60,
       screenDistance: SCREEN_DISTANCE,
+      sourceX: SOURCE_X,
+      barrierX: BARRIER_X,
       measurementGamma: measurementStrength,
       visibilityModel: getClassicVisibilityModel(),
     };

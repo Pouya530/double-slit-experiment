@@ -5,7 +5,7 @@
 
 import * as THREE from 'https://esm.sh/three@0.160.0';
 import { OrbitControls } from 'https://esm.sh/three@0.160.0/examples/jsm/controls/OrbitControls.js';
-import { createParticleBuffer } from './simulation.js';
+import { createParticleBuffer } from './simulation.js?v=15';
 import { wavelengthToRGB, fringeVisibility, getComplementarity } from './physics.js';
 import { INTERPRETATIONS_ADV, INTERPRETATION_IDS_ADV } from './interpretations-advanced.js';
 import { MEASUREMENT_CONFIGS, narrativeForGamma } from './measurement-configs.js';
@@ -229,9 +229,9 @@ function switchInterpretation(nextId) {
   envCoupling = snap.envCoupling;
   perspective = snap.perspective;
   measurementStrength = hydrated.measurementStrength;
-  isObserving = hydrated.isObserving;
-  observerTarget = isObserving ? 1 : 0;
-  observerTransition = measurementStrength;
+  isObserving = hydrated.measurementStrength >= 0.5;
+  observerTarget = hydrated.measurementStrength;
+  observerTransition = hydrated.measurementStrength;
   syncAdvancedControlsFromGlobals();
   updateObserveAndAdvancedControls();
   snapPhysicsStateImmediate();
@@ -350,6 +350,8 @@ function rebuildParticleBuffer(seed) {
       wavelength: lambdaEff,
       emissionRate: 60,
       screenDistance: SCREEN_DISTANCE,
+      sourceX: SOURCE_X,
+      barrierX: BARRIER_X,
       measurementGamma: gamma,
       visibilityModel,
     },
@@ -1149,8 +1151,8 @@ function setupUI() {
     const g = Math.max(0, Math.min(1, Number(exEl.value) / 100));
     measurementStrength = g;
     observerTransition = g;
-    observerTarget = g > 0.5 ? 1 : 0;
-    isObserving = observerTarget === 1;
+    observerTarget = g;
+    isObserving = g >= 0.5;
     const ob = document.getElementById('observe');
     if (ob) {
       ob.classList.toggle('active', isObserving);
@@ -1178,8 +1180,8 @@ function setupUI() {
     }
     measurementStrength = nearest;
     observerTransition = nearest;
-    observerTarget = nearest > 0.5 ? 1 : 0;
-    isObserving = observerTarget === 1;
+    observerTarget = nearest;
+    isObserving = nearest >= 0.5;
     const ob = document.getElementById('observe');
     if (ob) {
       ob.classList.toggle('active', isObserving);

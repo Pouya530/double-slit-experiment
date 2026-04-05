@@ -10,16 +10,28 @@ import {
   sampleClassicalPosition,
 } from './physics.js';
 
+/** Smooth hermite edge blend (0 outside [e0,e1]). */
+function smoothstep(edge0, edge1, x) {
+  const t = Math.max(0, Math.min(1, (x - edge0) / (edge1 - edge0)));
+  return t * t * (3 - 2 * t);
+}
+
 /**
  * @param {object} params
  * @param {number} [params.measurementGamma] 0..1
  * @param {'linear'|'quadratic'|'exponential'} [params.visibilityModel]
+ * @param {number} [params.sourceX] Ray origin (scene x); default matches demo.
+ * @param {number} [params.barrierX] Barrier plane x; default matches demo.
  */
 export function createParticleBuffer(params, maxParticles, seed) {
   const random = mulberry32(seed);
   const measurementGamma = Math.max(0, Math.min(1, params.measurementGamma ?? 0));
   const visibilityModel = params.visibilityModel ?? 'quadratic';
   const screenDistance = params.screenDistance ?? 2;
+  const sourceX = params.sourceX ?? -1.8;
+  const barrierX = params.barrierX ?? 0;
+  /** Geometric magnification of slit z onto screen (point source → slit → screen). */
+  const zScale = (screenDistance - sourceX) / (barrierX - sourceX);
   const screenHalfWidth = 2;
   const screenHalfHeight = 1.4;
   const L = 1.5;
@@ -54,7 +66,14 @@ export function createParticleBuffer(params, maxParticles, seed) {
     birthTimes[i] = i / PARTICLES_PER_SECOND;
     wavelengths[i] = lambdaNm;
 
-    const iz = sampleDecoherencePosition(
+    const cz = sampleClassicalPosition(random, slitSepScene, slitWidthScene);
+    slitIndices[i] = cz < 0 ? 0 : 1;
+    slitZ[i] = cz;
+    slitY[i] = Math.max(-slitHalfHeight, Math.min(slitHalfHeight, gaussian(random) * (slitHalfHeight * 0.55)));
+
+    const iy = (random() * 2 - 1) * screenHalfHeight * 0.3;
+
+    const zQ = sampleDecoherencePosition(
       random,
       screenHalfWidth,
       L,
@@ -64,15 +83,16 @@ export function createParticleBuffer(params, maxParticles, seed) {
       measurementGamma,
       visibilityModel
     );
-    const iy = (random() * 2 - 1) * screenHalfHeight * 0.3;
+    /** Which-path / classical limit: two lumps from geometric projection of each slit (γ → 1). */
+    const sigmaZ = Math.max(0.024, slitWidthScene * zScale * 0.72 + (lambdaNm / 550) * 0.012);
+    const zClass = cz * zScale + gaussian(random) * sigmaZ;
+    const classicalMix = smoothstep(0.9, 1, measurementGamma);
+    const iz = zQ * (1 - classicalMix) + zClass * classicalMix;
+
     interferencePositions[i * 3] = screenDistance;
     interferencePositions[i * 3 + 1] = iy;
     interferencePositions[i * 3 + 2] = iz;
 
-    const cz = sampleClassicalPosition(random, slitSepScene, slitWidthScene);
-    slitIndices[i] = cz < 0 ? 0 : 1;
-    slitZ[i] = cz;
-    slitY[i] = Math.max(-slitHalfHeight, Math.min(slitHalfHeight, gaussian(random) * (slitHalfHeight * 0.55)));
     classicalPositions[i * 3] = screenDistance;
     classicalPositions[i * 3 + 1] = interferencePositions[i * 3 + 1];
     classicalPositions[i * 3 + 2] = iz;
