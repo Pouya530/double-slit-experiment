@@ -435,8 +435,8 @@ body {
 
   .demo-ui {
     padding: 18px 16px;
-    /* Safe home-indicator + typical Safari bottom bar (~48px) so timeline isn’t covered */
-    padding-bottom: max(28px, calc(env(safe-area-inset-bottom, 0px) + 52px));
+    /* Snug above Safari home indicator / gesture bar — avoid stacking a second ~52px gap */
+    padding-bottom: max(8px, calc(env(safe-area-inset-bottom, 0px) + 10px));
   }
 
   .tour-overlay {
