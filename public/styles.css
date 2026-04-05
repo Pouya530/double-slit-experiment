@@ -191,22 +191,22 @@ body.nav-mobile-open {
     }
     50% {
       border-color: rgba(255, 255, 255, 1);
-      box-shadow: 0 0 14px 2px rgba(233, 30, 206, 0.45);
+      box-shadow: 0 0 12.5px 1.8px rgba(233, 30, 206, 0.45);
     }
   }
 
   .nav-how-btn {
     display: inline-flex;
     align-items: center;
-    font-size: 12px;
+    font-size: 10.8px;
     font-weight: 600;
-    letter-spacing: 2.4px;
+    letter-spacing: 2.16px;
     text-transform: uppercase;
     color: rgba(255, 255, 255, 0.95);
     text-decoration: none;
-    padding: 11px 20px;
+    padding: 10px 18px;
     border: 1px solid rgba(255, 255, 255, 0.85);
-    border-radius: 10px;
+    border-radius: 9px;
     background: rgba(255, 255, 255, 0.07);
     transition:
       color 0.25s ease,
@@ -218,7 +218,7 @@ body.nav-mobile-open {
 
   .nav-how-btn::after {
     content: '→';
-    margin-left: 8px;
+    margin-left: 7.2px;
     font-weight: 600;
   }
 
@@ -230,17 +230,17 @@ body.nav-mobile-open {
     text-decoration-thickness: 1px;
     text-decoration-color: currentColor;
     animation: none;
-    box-shadow: 0 0 18px rgba(233, 30, 206, 0.35);
+    box-shadow: 0 0 16px rgba(233, 30, 206, 0.35);
   }
 
   .nav-how-btn:focus-visible {
     outline: 2px solid #5dd4c4;
-    outline-offset: 4px;
+    outline-offset: 3px;
   }
 
   @media (hover: hover) {
     .nav-how-btn:hover::after {
-      margin-left: 14px;
+      margin-left: 12.5px;
       transition: margin-left 0.3s ease-in-out;
     }
   }
@@ -249,7 +249,7 @@ body.nav-mobile-open {
 @media (min-width: 800px) and (prefers-reduced-motion: reduce) {
   .nav-how-btn {
     animation: none;
-    box-shadow: 0 0 12px rgba(233, 30, 206, 0.25);
+    box-shadow: 0 0 11px rgba(233, 30, 206, 0.25);
   }
 }
 
