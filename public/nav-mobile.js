@@ -1,13 +1,24 @@
 /**
  * Full-screen nav: burger + overlay. Narrow viewports always; desktop only on homepage (.site-header--home).
+ * Open state uses .nav-mobile-overlay--open (not [hidden]) so CSS transitions can run.
  */
 const MQ = '(max-width: 799px)';
+
+function isOverlayOpen(overlay) {
+  return overlay.classList.contains('nav-mobile-overlay--open');
+}
 
 function initMobileNav() {
   const burger = document.getElementById('nav-burger');
   const overlay = document.getElementById('nav-mobile-overlay');
   const header = document.getElementById('site-header');
   if (!burger || !overlay) return;
+
+  overlay.removeAttribute('hidden');
+  if (!overlay.hasAttribute('aria-hidden')) {
+    overlay.setAttribute('aria-hidden', 'true');
+  }
+  overlay.setAttribute('inert', '');
 
   const mq = window.matchMedia(MQ);
 
@@ -20,26 +31,58 @@ function initMobileNav() {
   }
 
   function open() {
-    overlay.hidden = false;
+    overlay.removeAttribute('inert');
+    overlay.classList.add('nav-mobile-overlay--open');
+    overlay.setAttribute('aria-hidden', 'false');
     burger.setAttribute('aria-expanded', 'true');
     burger.setAttribute('aria-label', 'Close menu');
     document.body.classList.add('nav-mobile-open');
     header?.classList.add('site-header--menu-open');
-    /* Focus dialog shell so the first link does not show :focus-visible on open */
     overlay.focus({ preventScroll: true });
   }
 
   function close() {
-    overlay.hidden = true;
+    if (!isOverlayOpen(overlay)) return;
+
+    overlay.classList.remove('nav-mobile-overlay--open');
+    overlay.setAttribute('aria-hidden', 'true');
+    overlay.setAttribute('inert', '');
     burger.setAttribute('aria-expanded', 'false');
     burger.setAttribute('aria-label', 'Open menu');
-    document.body.classList.remove('nav-mobile-open');
-    header?.classList.remove('site-header--menu-open');
-    burger.focus({ preventScroll: true });
+
+    const finish = () => {
+      document.body.classList.remove('nav-mobile-open');
+      header?.classList.remove('site-header--menu-open');
+      burger.focus({ preventScroll: true });
+    };
+
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduced) {
+      finish();
+      return;
+    }
+
+    let done = false;
+    const complete = () => {
+      if (done) return;
+      done = true;
+      overlay.removeEventListener('transitionend', onEnd);
+      clearTimeout(fallback);
+      finish();
+    };
+
+    const onEnd = (e) => {
+      if (e.target !== overlay) return;
+      if (e.propertyName !== 'transform' && e.propertyName !== 'opacity') return;
+      complete();
+    };
+
+    overlay.addEventListener('transitionend', onEnd);
+    const fallback = window.setTimeout(complete, 400);
   }
 
   function toggle() {
-    if (overlay.hidden) open();
+    if (!isOverlayOpen(overlay)) open();
     else close();
   }
 
@@ -53,7 +96,7 @@ function initMobileNav() {
   });
 
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && !overlay.hidden) {
+    if (e.key === 'Escape' && isOverlayOpen(overlay)) {
       close();
     }
   });
@@ -65,7 +108,9 @@ function initMobileNav() {
   });
 
   mq.addEventListener('change', (ev) => {
-    if (!ev.matches && !header?.classList.contains('site-header--home') && !overlay.hidden) close();
+    if (!ev.matches && !header?.classList.contains('site-header--home') && isOverlayOpen(overlay)) {
+      close();
+    }
   });
 }
 
