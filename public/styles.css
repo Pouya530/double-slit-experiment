@@ -345,6 +345,12 @@ body.nav-mobile-open {
   transition: opacity 0.2s ease-in-out, padding-left 0.2s ease-in-out;
 }
 
+@media (max-width: 799px) {
+  .nav-mobile-main a {
+    font-size: clamp(60px, 15vw, 132px);
+  }
+}
+
 .nav-mobile-secondary {
   display: flex;
   flex-wrap: wrap;
