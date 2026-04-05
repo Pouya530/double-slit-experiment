@@ -5,8 +5,8 @@
 
 import * as THREE from 'https://esm.sh/three@0.160.0';
 import { OrbitControls } from 'https://esm.sh/three@0.160.0/examples/jsm/controls/OrbitControls.js';
-import { createParticleBuffer } from './simulation.js?v=16';
-import { wavelengthToRGB, fringeVisibility } from './physics.js?v=16';
+import { createParticleBuffer } from './simulation.js?v=17';
+import { wavelengthToRGB, fringeVisibility } from './physics.js?v=17';
 import { INTERPRETATIONS } from './interpretations.js';
 import { MEASUREMENT_CONFIGS, CLASSIC_INTERP_TO_CONFIG_KEY, narrativeForGamma } from './measurement-configs.js';
 
@@ -58,8 +58,9 @@ function drawDetectionScreenWebKitFast(ctx, w, h, theme, _positionBlend, collaps
 
     const u = (z + SCREEN_WIDTH / 2) / SCREEN_WIDTH;
     const v = (y + SCREEN_HEIGHT / 2) / SCREEN_HEIGHT;
-    const px = Math.max(0, Math.min(w - 1, u * w));
-    const py = Math.max(0, Math.min(h - 1, (1 - v) * h));
+    let px = Math.max(0, Math.min(w - 1, u * w));
+    let py = Math.max(0, Math.min(h - 1, (1 - v) * h));
+    if (!Number.isFinite(px) || !Number.isFinite(py)) continue;
     const [r, g, b] = wavelengthToRGB(wavelengths[i]);
     const br = theme.hitBrightness;
     const R = Math.min(255, r * 255 * br);
@@ -68,11 +69,13 @@ function drawDetectionScreenWebKitFast(ctx, w, h, theme, _positionBlend, collaps
 
     if (isNewHit) {
       const flashDecay = 1 - ageSinceHit / 0.2;
+      let flashExtra = (thinStripHits ? 6 : 10) * (1 - flashDecay);
+      if (!Number.isFinite(flashExtra)) flashExtra = 0;
       ctx.fillStyle = isDark
         ? `rgba(255,255,255,${0.42 * flashDecay})`
         : `rgba(255,255,255,${0.5 * flashDecay})`;
       ctx.beginPath();
-      ctx.arc(px, py, r0 + (thinStripHits ? 6 : 10) * (1 - flashDecay), 0, Math.PI * 2);
+      ctx.arc(px, py, r0 + flashExtra, 0, Math.PI * 2);
       ctx.fill();
     }
 
@@ -816,8 +819,9 @@ function drawDetectionScreen() {
 
     const u = (z + SCREEN_WIDTH / 2) / SCREEN_WIDTH;
     const v = (y + SCREEN_HEIGHT / 2) / SCREEN_HEIGHT;
-    const px = Math.max(0, Math.min(w - 1, u * w));
-    const py = Math.max(0, Math.min(h - 1, (1 - v) * h));
+    let px = Math.max(0, Math.min(w - 1, u * w));
+    let py = Math.max(0, Math.min(h - 1, (1 - v) * h));
+    if (!Number.isFinite(px) || !Number.isFinite(py)) continue;
     const [r, g, b] = wavelengthToRGB(wavelengths[i]);
     const br = theme.hitBrightness;
     const R = Math.min(255, r * 255 * br);
@@ -828,7 +832,8 @@ function drawDetectionScreen() {
 
     if (isNewHit) {
       const flashDecay = 1 - ageSinceHit / 0.2;
-      const flashRadius = thinStripHits ? 5 + 9 * (1 - flashDecay) : 8 + 16 * (1 - flashDecay);
+      let flashRadius = thinStripHits ? 5 + 9 * (1 - flashDecay) : 8 + 16 * (1 - flashDecay);
+      if (!Number.isFinite(flashRadius) || flashRadius <= 0) flashRadius = thinStripHits ? 5 : 8;
       const flashAlpha = 0.6 * flashDecay;
       const flashGrad = ctx.createRadialGradient(px, py, 0, px, py, flashRadius);
       flashGrad.addColorStop(0, `rgba(255,255,255,${flashAlpha})`);
@@ -840,7 +845,8 @@ function drawDetectionScreen() {
       ctx.fill();
     }
 
-    const glowR = thinStripHits ? 7 : 12;
+    let glowR = thinStripHits ? 7 : 12;
+    if (!Number.isFinite(glowR) || glowR <= 0) glowR = 8;
     const grad = ctx.createRadialGradient(px, py, 0, px, py, glowR);
     grad.addColorStop(0, `rgba(${R},${G},${B},${alpha})`);
     grad.addColorStop(0.4, `rgba(${R},${G},${B},${alphaOuter})`);
@@ -850,9 +856,10 @@ function drawDetectionScreen() {
     ctx.arc(px, py, glowR, 0, Math.PI * 2);
     ctx.fill();
 
+    const coreR = thinStripHits ? 2 : 3;
     ctx.fillStyle = `rgba(${R},${G},${B},${isDarkMode ? 0.8 : 0.9})`;
     ctx.beginPath();
-    ctx.arc(px, py, thinStripHits ? 2 : 3, 0, Math.PI * 2);
+    ctx.arc(px, py, coreR, 0, Math.PI * 2);
     ctx.fill();
   }
   detectionTexture.needsUpdate = true;

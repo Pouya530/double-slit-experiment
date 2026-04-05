@@ -8,7 +8,7 @@ import {
   gaussian,
   sampleDecoherencePosition,
   sampleClassicalPosition,
-} from './physics.js?v=16';
+} from './physics.js?v=17';
 
 /** Smooth hermite edge blend (0 outside [e0,e1]). */
 function smoothstep(edge0, edge1, x) {
@@ -31,7 +31,10 @@ export function createParticleBuffer(params, maxParticles, seed) {
   const sourceX = params.sourceX ?? -1.8;
   const barrierX = params.barrierX ?? 0;
   /** Geometric magnification of slit z onto screen (point source → slit → screen). */
-  const zScale = (screenDistance - sourceX) / (barrierX - sourceX);
+  const dxBarrier = barrierX - sourceX;
+  let zScale =
+    Math.abs(dxBarrier) > 1e-9 ? (screenDistance - sourceX) / dxBarrier : (screenDistance - barrierX) / 1.8;
+  if (!Number.isFinite(zScale) || zScale <= 0) zScale = 3.8 / 1.8;
   const screenHalfWidth = 2;
   const screenHalfHeight = 1.4;
   const L = 1.5;
@@ -102,8 +105,12 @@ export function createParticleBuffer(params, maxParticles, seed) {
     const zClass = zGeom + gaussian(random) * diffractionZ;
     const iyClass = yGeom + gaussian(random) * diffractionY;
     const classicalMix = smoothstep(0.9, 1, measurementGamma);
-    const iz = zQ * (1 - classicalMix) + zClass * classicalMix;
-    const iy = iyQ * (1 - classicalMix) + iyClass * classicalMix;
+    let iz = zQ * (1 - classicalMix) + zClass * classicalMix;
+    let iy = iyQ * (1 - classicalMix) + iyClass * classicalMix;
+    if (!Number.isFinite(iz)) iz = zQ;
+    if (!Number.isFinite(iy)) iy = iyQ;
+    iz = Math.max(-screenHalfWidth, Math.min(screenHalfWidth, iz));
+    iy = Math.max(-screenHalfHeight, Math.min(screenHalfHeight, iy));
 
     interferencePositions[i * 3] = screenDistance;
     interferencePositions[i * 3 + 1] = iy;

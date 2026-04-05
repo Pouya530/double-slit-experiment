@@ -57,12 +57,13 @@ function sinThetaFromZ(z, L) {
  * At γ=0: standard cos²(β)·sinc²; at γ=1: pure diffraction envelope (no fringes).
  */
 function intensityWithDecoherenceZ(z, L, d, a, lambda, gamma, visModel) {
+  const lam = typeof lambda === 'number' && lambda > 1e-30 && Number.isFinite(lambda) ? lambda : 1e-20;
   const sinTheta = sinThetaFromZ(z, L);
-  const alpha = (Math.PI * a * sinTheta) / lambda;
+  const alpha = (Math.PI * a * sinTheta) / lam;
   const sinc = alpha === 0 ? 1 : Math.sin(alpha) / alpha;
   const envelope = sinc * sinc;
-  const beta = (Math.PI * d * sinTheta) / lambda;
-  const V = fringeVisibility(gamma, visModel);
+  const beta = (Math.PI * d * sinTheta) / lam;
+  const V = fringeVisibility(Number.isFinite(gamma) ? gamma : 0, visModel);
   const interference = 1 + V * Math.cos(2 * beta);
   return 0.5 * envelope * interference;
 }
@@ -89,7 +90,7 @@ function mulberry32(seed) {
 }
 
 function gaussian(random) {
-  const u1 = random();
+  const u1 = Math.max(random(), Number.EPSILON);
   const u2 = random();
   return Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
 }
