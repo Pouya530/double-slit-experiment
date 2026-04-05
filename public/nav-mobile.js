@@ -25,8 +25,8 @@ function initMobileNav() {
     burger.setAttribute('aria-label', 'Close menu');
     document.body.classList.add('nav-mobile-open');
     header?.classList.add('site-header--menu-open');
-    const first = overlay.querySelector('.nav-mobile-main a');
-    if (first) first.focus({ preventScroll: true });
+    /* Focus dialog shell so the first link does not show :focus-visible on open */
+    overlay.focus({ preventScroll: true });
   }
 
   function close() {

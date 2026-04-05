@@ -313,6 +313,12 @@ body.nav-mobile-open {
   display: none !important;
 }
 
+/* Initial open focus lands here — avoid browser / link focus chrome */
+.nav-mobile-overlay:focus,
+.nav-mobile-overlay:focus-visible {
+  outline: none;
+}
+
 .nav-mobile {
   width: 100%;
   max-width: 100%;
@@ -438,9 +444,13 @@ body.nav-mobile-open {
 }
 
 .nav-mobile-main a:focus-visible,
-.nav-mobile-secondary a:focus-visible {
-  outline: 2px solid #5dd4c4;
-  outline-offset: 4px;
+.nav-mobile-secondary a:focus-visible,
+.nav-mobile-credits a:focus-visible {
+  outline: none;
+  text-decoration: underline;
+  text-decoration-thickness: 0.07em;
+  text-underline-offset: 0.2em;
+  text-decoration-color: rgba(255, 255, 255, 0.82);
 }
 
 /* Mobile + OS dark mode: keep full-screen nav dark (some UAs auto-invert or light-theme the overlay). */
