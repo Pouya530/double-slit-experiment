@@ -751,7 +751,7 @@ body.nav-mobile-open {
   height: 1px;
   width: 40px;
   background: white;
-  transition: width 0.3s ease-in-out;
+  transition: width 0.3s ease-in-out, background 0.3s ease-in-out;
 }
 
 .mainbutton::after {
@@ -764,11 +764,17 @@ body.nav-mobile-open {
   text-decoration: underline;
   text-underline-offset: 3px;
   text-decoration-thickness: 1px;
-  text-decoration-color: var(--accent-secondary);
+  text-decoration-color: currentColor;
 }
 
 .mainbutton:hover::before {
   width: 120px;
+  background: var(--accent-secondary);
+}
+
+/* About preview panel sets dark ::before; keep bar magenta on hover like other pages */
+.page-about__panel .mainbutton:hover::before {
+  background: var(--accent-secondary);
 }
 
 @media (min-width: 800px) {
