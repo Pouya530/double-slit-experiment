@@ -181,6 +181,78 @@ body.nav-mobile-open {
   }
 }
 
+/* Desktop only: “How it works” — matches .mainbutton typography + bordered pulse CTA */
+@media (min-width: 800px) {
+  @keyframes nav-how-pulse {
+    0%,
+    100% {
+      border-color: rgba(255, 255, 255, 0.82);
+      box-shadow: 0 0 0 0 rgba(233, 30, 206, 0.2);
+    }
+    50% {
+      border-color: rgba(255, 255, 255, 1);
+      box-shadow: 0 0 14px 2px rgba(233, 30, 206, 0.45);
+    }
+  }
+
+  .nav-how-btn {
+    display: inline-flex;
+    align-items: center;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 2.4px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.95);
+    text-decoration: none;
+    padding: 11px 20px;
+    border: 1px solid rgba(255, 255, 255, 0.85);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.07);
+    transition:
+      color 0.25s ease,
+      opacity 0.2s ease-in-out,
+      border-color 0.25s ease,
+      box-shadow 0.3s ease;
+    animation: nav-how-pulse 2.5s ease-in-out infinite;
+  }
+
+  .nav-how-btn::after {
+    content: '→';
+    margin-left: 8px;
+    font-weight: 600;
+  }
+
+  .nav-how-btn:hover {
+    color: var(--accent-secondary);
+    border-color: rgba(233, 30, 206, 0.85);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1px;
+    text-decoration-color: currentColor;
+    animation: none;
+    box-shadow: 0 0 18px rgba(233, 30, 206, 0.35);
+  }
+
+  .nav-how-btn:focus-visible {
+    outline: 2px solid #5dd4c4;
+    outline-offset: 4px;
+  }
+
+  @media (hover: hover) {
+    .nav-how-btn:hover::after {
+      margin-left: 14px;
+      transition: margin-left 0.3s ease-in-out;
+    }
+  }
+}
+
+@media (min-width: 800px) and (prefers-reduced-motion: reduce) {
+  .nav-how-btn {
+    animation: none;
+    box-shadow: 0 0 12px rgba(233, 30, 206, 0.25);
+  }
+}
+
 .nav-mobile-overlay {
   position: fixed;
   inset: 0;
@@ -666,7 +738,7 @@ body.nav-mobile-open {
   text-transform: uppercase;
   color: white;
   text-decoration: none;
-  padding: 14px 0;
+  padding: 14px 0 17px 0;
   position: relative;
   transition: color 0.3s ease-in-out;
 }
@@ -674,7 +746,7 @@ body.nav-mobile-open {
 .mainbutton::before {
   content: '';
   position: absolute;
-  bottom: 14px;
+  bottom: 17px;
   left: 0;
   height: 1px;
   width: 40px;
@@ -689,6 +761,10 @@ body.nav-mobile-open {
 
 .mainbutton:hover {
   color: var(--accent-secondary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--accent-secondary);
 }
 
 .mainbutton:hover::before {
