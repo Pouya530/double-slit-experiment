@@ -805,6 +805,64 @@ details.explore-deeper[open] > .explore-deeper-summary::before {
   flex: 1;
   min-width: 200px;
 }
+
+.explore-deeper-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+
+.explore-pause-btn {
+  min-width: 32px;
+  height: 28px;
+  padding: 0 8px;
+  font-size: 12px;
+  line-height: 1;
+  border-radius: 6px;
+  border: 1px solid var(--panel-border);
+  background: var(--theme-btn-bg);
+  color: var(--text);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.explore-pause-btn:hover {
+  background: var(--theme-btn-hover, var(--panel-bg));
+}
+
+.explore-pause-btn.play-btn--paused {
+  opacity: 0.92;
+}
+
+.explore-full-measure-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #fff;
+  background: var(--observe-active);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.explore-full-measure-indicator[hidden] {
+  display: none !important;
+}
+
+.explore-full-measure-icon {
+  font-size: 13px;
+  line-height: 1;
+  opacity: 0.95;
+}
+
 .measurement-slider-row--explore {
   margin-top: 4px;
 }

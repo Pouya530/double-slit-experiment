@@ -5,15 +5,15 @@
 
 import * as THREE from 'https://esm.sh/three@0.160.0';
 import { OrbitControls } from 'https://esm.sh/three@0.160.0/examples/jsm/controls/OrbitControls.js';
-import { createParticleBuffer } from './simulation.js?v=17';
-import { wavelengthToRGB, fringeVisibility, getComplementarity } from './physics.js?v=17';
+import { createParticleBuffer } from './simulation.js?v=18';
+import { wavelengthToRGB, fringeVisibility, getComplementarity } from './physics.js?v=18';
 import { INTERPRETATIONS_ADV, INTERPRETATION_IDS_ADV } from './interpretations-advanced.js';
 import { MEASUREMENT_CONFIGS, narrativeForGamma } from './measurement-configs.js';
 import {
   collapseSuppressionFactor,
   decoherenceVisibility,
   effectiveWavelength,
-} from './physics-interpretations.js?v=17';
+} from './physics-interpretations.js?v=18';
 
 /** Map interpretation UI accent (#RRGGBB) to Three.js hex for overlays. */
 function hexFromInterpBrand(def) {
@@ -101,19 +101,28 @@ function drawDetectionScreenWebKitFast(ctx, w, h, theme, _positionBlend, collaps
 }
 
 function syncPlayButton() {
+  const label = isPlaying ? 'Pause' : 'Play';
+  const glyph = isPlaying ? '❚❚' : '▶';
   const playBtn = document.getElementById('play');
-  if (!playBtn) return;
-  playBtn.textContent = isPlaying ? '❚❚' : '▶';
-  playBtn.classList.toggle('play-btn--paused', !isPlaying);
-  playBtn.classList.toggle('play-btn--playing', isPlaying);
-  playBtn.setAttribute('aria-label', isPlaying ? 'Pause' : 'Play');
+  if (playBtn) {
+    playBtn.textContent = glyph;
+    playBtn.classList.toggle('play-btn--paused', !isPlaying);
+    playBtn.classList.toggle('play-btn--playing', isPlaying);
+    playBtn.setAttribute('aria-label', label);
+  }
+  const explorePause = document.getElementById('explore-pause');
+  if (explorePause) {
+    explorePause.textContent = glyph;
+    explorePause.classList.toggle('play-btn--paused', !isPlaying);
+    explorePause.classList.toggle('play-btn--playing', isPlaying);
+    explorePause.setAttribute('aria-label', label);
+  }
 }
 
 function syncInterpretationUI() {
   document.querySelectorAll('.interp-tab').forEach((b) => b.classList.toggle('active', b.dataset.interp === activeInterpretation));
   if (showInfoPanel) renderInfoPanel(activeInterpretation);
   updateObserveAndAdvancedControls();
-  syncObserveAria();
   syncPlayButton();
   const interpMobile = document.getElementById('interp-select-mobile');
   if (interpMobile) interpMobile.value = activeInterpretation;
@@ -413,6 +422,15 @@ function updateExploreSection() {
   }
 
   if (mode === 'binary') updateExploreComplementarityHud();
+
+  const fullInd = document.getElementById('explore-full-measure-indicator');
+  if (fullInd && mode === 'binary') {
+    const full = gUi >= 0.999;
+    fullInd.hidden = !full;
+    fullInd.setAttribute('aria-label', full ? 'Full measurement strength, gamma 100 percent' : '');
+  } else if (fullInd) {
+    fullInd.hidden = true;
+  }
 }
 
 function updateObserveAndAdvancedControls() {
@@ -437,34 +455,7 @@ function updateObserveAndAdvancedControls() {
     massReadout.textContent = label;
   }
 
-  const ob = document.getElementById('observe');
-  if (!ob) {
-    updateExploreSection();
-    return;
-  }
-  const mode = def?.observerToggleMode ?? 'binary';
-  const disabled = mode === 'disabled' || mode === 'slider' || mode === 'perspective';
-  ob.disabled = disabled;
-  ob.setAttribute('aria-disabled', disabled ? 'true' : 'false');
-  ob.classList.toggle('active', isObserving && !disabled);
-
-  const span = ob.querySelector('span:last-child');
-  if (mode === 'slider' && span) {
-    span.textContent = 'Use environment slider';
-  } else if (mode === 'perspective' && span) {
-    span.textContent = 'Use perspective control';
-  } else if (mode === 'disabled' && span) {
-    span.textContent = 'Observer N/A — use mass';
-  } else if (span) {
-    span.textContent = isObserving ? 'Observing' : 'Not observing';
-  }
-
   updateExploreSection();
-}
-
-function syncObserveAria() {
-  const ob = document.getElementById('observe');
-  if (ob && !ob.disabled) ob.setAttribute('aria-pressed', isObserving ? 'true' : 'false');
 }
 
 function init() {
@@ -1119,27 +1110,9 @@ function setupUI() {
   document.querySelector('.theme-icon').textContent = isDarkMode ? '☀' : '🌙';
   document.querySelector('.theme-label').textContent = isDarkMode ? 'Light' : 'Dark';
 
-  document.getElementById('reset')?.addEventListener('click', () => {
-    currentTime = 0;
-    timelineEl.value = 0;
-    isPlaying = true;
+  document.getElementById('explore-pause')?.addEventListener('click', () => {
+    isPlaying = !isPlaying;
     syncPlayButton();
-  });
-
-  const observeBtn = document.getElementById('observe');
-  observeBtn?.addEventListener('click', () => {
-    if (observeBtn.disabled) return;
-    isObserving = !isObserving;
-    observerTarget = isObserving ? 1 : 0;
-    observeBtn.classList.toggle('active', isObserving);
-    const span = observeBtn.querySelector('span:last-child');
-    if (span && !observeBtn.disabled) {
-      const mode = getInterpDef()?.observerToggleMode ?? 'binary';
-      if (mode === 'binary') span.textContent = isObserving ? 'Observing' : 'Not observing';
-    }
-    syncObserveAria();
-    if (showInfoPanel) renderInfoPanel(activeInterpretation);
-    lastToggleAnimRebuild = 0;
   });
 
   const exEl = document.getElementById('measurement-slider-explore');
@@ -1164,13 +1137,6 @@ function setupUI() {
     observerTransition = g;
     observerTarget = g;
     isObserving = g >= 0.5;
-    const ob = document.getElementById('observe');
-    if (ob) {
-      ob.classList.toggle('active', isObserving);
-      const span = ob.querySelector('span:last-child');
-      if (span) span.textContent = isObserving ? 'Observing' : 'Not observing';
-    }
-    syncObserveAria();
     updateExploreSection();
     if (showInfoPanel) renderInfoPanel(activeInterpretation);
     scheduleGammaRecompute();
@@ -1193,13 +1159,6 @@ function setupUI() {
     observerTransition = nearest;
     observerTarget = nearest;
     isObserving = nearest >= 0.5;
-    const ob = document.getElementById('observe');
-    if (ob) {
-      ob.classList.toggle('active', isObserving);
-      const span = ob.querySelector('span:last-child');
-      if (span) span.textContent = isObserving ? 'Observing' : 'Not observing';
-    }
-    syncObserveAria();
     updateExploreSection();
     clearTimeout(gammaRecomputeTimer);
     gammaRecomputeTimer = null;

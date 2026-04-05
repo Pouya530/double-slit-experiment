@@ -8,7 +8,7 @@ import {
   gaussian,
   sampleDecoherencePosition,
   sampleClassicalPosition,
-} from './physics.js?v=17';
+} from './physics.js?v=18';
 
 /** Smooth hermite edge blend (0 outside [e0,e1]). */
 function smoothstep(edge0, edge1, x) {

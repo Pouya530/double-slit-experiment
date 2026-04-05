@@ -5,8 +5,8 @@
 
 import * as THREE from 'https://esm.sh/three@0.160.0';
 import { OrbitControls } from 'https://esm.sh/three@0.160.0/examples/jsm/controls/OrbitControls.js';
-import { createParticleBuffer } from './simulation.js?v=17';
-import { wavelengthToRGB, fringeVisibility } from './physics.js?v=17';
+import { createParticleBuffer } from './simulation.js?v=18';
+import { wavelengthToRGB, fringeVisibility } from './physics.js?v=18';
 import { INTERPRETATIONS } from './interpretations.js';
 import { MEASUREMENT_CONFIGS, CLASSIC_INTERP_TO_CONFIG_KEY, narrativeForGamma } from './measurement-configs.js';
 
