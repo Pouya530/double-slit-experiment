@@ -78,7 +78,11 @@ function initMobileNav() {
     };
 
     overlay.addEventListener('transitionend', onEnd);
-    const fallback = window.setTimeout(complete, 400);
+    const homeDesktop =
+      document.body.classList.contains('page-home') &&
+      window.matchMedia('(min-width: 800px)').matches;
+    const fallbackMs = homeDesktop ? 560 : 400;
+    const fallback = window.setTimeout(complete, fallbackMs);
   }
 
   function toggle() {
