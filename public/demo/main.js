@@ -344,6 +344,15 @@ function applyInitialCameraAndControls() {
       off.multiplyScalar(1.4);
       off.applyAxisAngle(new THREE.Vector3(0, 1, 0), (11 * Math.PI) / 180);
     }
+    if (typeof window !== 'undefined' && window.innerWidth <= 768) {
+      off.multiplyScalar(0.87);
+      const dirN = off.clone().normalize();
+      const rightN = new THREE.Vector3().crossVectors(new THREE.Vector3(0, 1, 0), dirN);
+      if (rightN.lengthSq() > 1e-10) {
+        rightN.normalize();
+        off.applyAxisAngle(rightN, (8 * Math.PI) / 180);
+      }
+    }
     camera.position.copy(tgt).add(off);
     controls.target.copy(tgt);
     controls.minDistance = 5.4;
