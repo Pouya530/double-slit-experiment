@@ -161,7 +161,7 @@
               />
               <div class="preview-placeholder__overlay">
                 <span class="preview-placeholder__label">▶ Try the interactive demo</span>
-                <small>Timeline • Observer • 360° camera</small>
+                <small>Timeline • Measurement γ • 360° camera</small>
               </div>
             </a>
           </div>
@@ -173,7 +173,7 @@
     <section id="faq" class="section section-dark faq-section" aria-labelledby="faq-heading">
       <div class="innerspacer">
         <h2 id="faq-heading" class="section-title">FAQ</h2>
-        <p class="faq-intro lead">Answers for students, teachers, and anyone new to the simulation—drawn from how the experiment, demo, and classroom constraints are defined for this project.</p>
+        <p class="faq-intro lead">Answers for students, teachers, and anyone new to the simulation—matching the behaviour of the public demo today and how we expect it to be used in classrooms.</p>
         <div class="faq-list">
           <details class="faq-item">
             <summary class="faq-question">What is the double-slit experiment?</summary>
@@ -184,31 +184,37 @@
           <details class="faq-item">
             <summary class="faq-question">What is wave–particle duality?</summary>
             <div class="faq-answer">
-              <p>The same physical description can exhibit <strong>particle-like</strong> detection (discrete hits) and <strong>wave-like</strong> statistics (interference), depending on the experimental arrangement—including whether which-path information is available. The double-slit setup is the standard introduction to that idea at A-level.</p>
+              <p>The same physical description can exhibit <strong>particle-like</strong> detection (discrete hits) and <strong>wave-like</strong> statistics (interference), depending on the experimental arrangement—including how much <strong>which-path</strong> information is available. The double-slit setup is the standard introduction to that idea at A-level.</p>
             </div>
           </details>
           <details class="faq-item">
-            <summary class="faq-question">What does the observer toggle do in the demo?</summary>
+            <summary class="faq-question">What does measurement strength (γ) do?</summary>
             <div class="faq-answer">
-              <p>With observation emphasised, the pattern moves toward <strong>two lumped bands</strong> behind the slits—an intuitive stand-in for classical which-path behaviour. With observation off, the distribution returns toward an <strong>interference-like</strong> pattern. It is a teaching visualisation, not a full quantum measurement model.</p>
+              <p><strong>γ</strong> (gamma) is a dial from “weak measurement / strong interference” toward “strong which-path / weak fringes.” The interactive demo uses a <strong>continuous decoherence-style intensity</strong> so fringe visibility and contrast change smoothly—not only a hard on/off. On the <strong>full demo</strong>, open <strong>Explore deeper</strong> to drag γ from 0% to 100%; at full strength the screen builds toward <strong>two slit-aligned bands</strong>, and a small <strong>◎ 100%</strong> badge shows when γ is maximal. You can also pause playback from that section. The <strong>classic guided demo</strong> uses one measurement slider with the same idea. This is a teaching visualisation, not a full lab instrument model.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary class="faq-question">What are the interpretation tabs?</summary>
+            <div class="faq-answer">
+              <p>They switch <strong>narrative copy</strong>, short “what’s happening” hints, and light <strong>visual overlays</strong> (e.g. wave metaphor, environment icons) around the <strong>same underlying simulation statistics</strong>. They are different ways physicists talk about the same maths—not alternate physics engines you can “vote” between in the model.</p>
             </div>
           </details>
           <details class="faq-item">
             <summary class="faq-question">How does the timeline scrubber work?</summary>
             <div class="faq-answer">
-              <p>Impacts are <strong>pre-computed</strong> into a buffer. The timeline changes <code class="faq-code">current time</code>: only particles whose emission time is on or before that instant are shown. Scrubbing left “rewinds” the pattern; scrubbing right builds it up again—without recomputing everything until you change physical parameters.</p>
+              <p>Impacts are <strong>pre-computed</strong> into a buffer. The timeline changes <code class="faq-code">current time</code>: only particles whose emission time is on or before that instant are shown. Scrubbing left “rewinds” the pattern; scrubbing right builds it up again. Changing slit dimensions, wavelength, mass (where available), or γ triggers a <strong>recompute</strong> of the buffer; scrubbing alone does not.</p>
             </div>
           </details>
           <details class="faq-item">
-            <summary class="faq-question">Which parameters can I usually change?</summary>
+            <summary class="faq-question">Which parameters can I change in the demo?</summary>
             <div class="faq-answer">
-              <p>Typical controls include <strong>slit width</strong>, <strong>slit separation</strong>, <strong>wavelength</strong> (often tied to colour), <strong>emission rate</strong>, and <strong>distance to the screen</strong>. Together they link geometry and λ to fringe spacing—exactly what many exam specs ask students to reason about.</p>
+              <p>Use the <strong>Parameters</strong> panel (gear on mobile). Everyone can edit <strong>slit width</strong>, <strong>slit separation</strong>, and <strong>wavelength</strong> (colour), then press <strong>Recompute</strong>. The full demo adds interpretation-specific controls when relevant—e.g. <strong>particle mass</strong> for collapse-style stories, <strong>environment coupling</strong> for decoherence mode, or <strong>perspective</strong> for relational QM. Scene distances and emission rate are tuned for the 3D view rather than exposed as separate sliders in the public build.</p>
             </div>
           </details>
           <details class="faq-item">
             <summary class="faq-question">Is the physics in the demo “exact”?</summary>
             <div class="faq-answer">
-              <p>The teaching model uses the standard <strong>double-slit intensity</strong> form: an interference term multiplied by a <strong>single-slit diffraction</strong> (sinc²) envelope. With observation on, a <strong>classical mixture</strong> (e.g. Gaussians behind each slit) replaces fringe structure. That matches how interference and diffraction are introduced in school—not a complete quantum measurement or decoherence simulation.</p>
+              <p>Arrival positions are sampled from a standard <strong>Fraunhofer-style double-slit intensity</strong> with a <strong>single-slit sinc² envelope</strong>, extended with a <strong>fringe visibility V(γ)</strong> so interference fades as measurement strength increases (Englert-type complementarity in the default quadratic model). At high γ the demo <strong>blends in geometric projection</strong> from each slit so hits form <strong>two narrow stripes</strong> on the screen—pedagogically clearer than envelope-only washout alone. That matches school-level interference and diffraction expectations; it is not a full open-system decoherence or detector simulation.</p>
             </div>
           </details>
           <details class="faq-item">
@@ -220,19 +226,19 @@
           <details class="faq-item">
             <summary class="faq-question">Will it run on classroom Chromebooks?</summary>
             <div class="faq-answer">
-              <p>UK schools often use modest Chromebooks (e.g. Intel Celeron class, 4&nbsp;GB RAM, integrated graphics). The product roadmap includes <strong>adaptive quality</strong>: fewer particles, simpler materials, and no heavy post-processing on low tiers so the demo stays usable at ~30&nbsp;fps on that class of hardware.</p>
+              <p>UK schools often use modest Chromebooks (e.g. Intel Celeron class, 4&nbsp;GB RAM, integrated graphics). The live demo uses <strong>WebGL</strong> (Three.js) with a bounded particle count and a lighter <strong>detection canvas</strong> path on Safari. A future <strong>adaptive quality</strong> tier can reduce particles and effects further so the experience stays smooth on the lowest common hardware.</p>
             </div>
           </details>
           <details class="faq-item">
             <summary class="faq-question">How is this different from PhET or other sims?</summary>
             <div class="faq-answer">
-              <p><strong>PhET</strong> has huge reach and excellent 2D wave labs. This project adds a <strong>3D bench</strong>, <strong>timeline scrubber</strong>, <strong>observer-style toggle</strong>, and <strong>orbital camera</strong> so the experiment reads as a spatial apparatus—not only a flat interference plot.</p>
+              <p><strong>PhET</strong> has huge reach and excellent 2D wave labs. This project adds a <strong>3D bench</strong>, <strong>timeline scrubber</strong>, <strong>continuous measurement strength (γ)</strong>, optional <strong>interpretation narratives</strong>, and an <strong>orbital camera</strong> so the apparatus feels spatial—not only a flat plot.</p>
             </div>
           </details>
           <details class="faq-item">
-            <summary class="faq-question">WebGPU vs WebGL—what should I expect?</summary>
+            <summary class="faq-question">WebGPU vs WebGL—what runs today?</summary>
             <div class="faq-answer">
-              <p>Where supported, <strong>WebGPU</strong> enables higher particle counts and compute-oriented paths; otherwise the app falls back to <strong>WebGL 2</strong> with lower caps. You do not choose manually—the runtime picks a safe path for the device.</p>
+              <p>The public demo is built on <strong>WebGL 2</strong> through Three.js and does not require WebGPU. In the longer term, <strong>WebGPU</strong> may help with heavier particle or compute workloads on supported browsers; any fallback would stay on WebGL so schools are not left behind.</p>
             </div>
           </details>
           <details class="faq-item">
@@ -250,7 +256,7 @@
           <details class="faq-item">
             <summary class="faq-question">Can teachers share one exact setup?</summary>
             <div class="faq-answer">
-              <p>Yes—state can be encoded in the URL so you can pass a link with specific parameters (slits, wavelength, etc.) to a class, aligned with “shareable experiment state” in the product plan.</p>
+              <p>The roadmap includes encoding experiment state in the <strong>URL</strong> so classes can open the same slit and wavelength settings from one link. As that lands, docs and the demo will call it out explicitly; for now, share the demo link and set parameters live or from screenshots.</p>
             </div>
           </details>
         </div>
