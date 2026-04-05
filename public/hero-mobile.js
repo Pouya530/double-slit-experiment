@@ -1,5 +1,5 @@
 /**
- * Mobile hero: crossfade slideshow over full-bleed base image (see index.html + styles.css).
+ * Mobile hero: crossfade between /img/1.png and /img/2.png only (see index.html + styles.css).
  * 3s between slide changes; disabled when prefers-reduced-motion or viewport > 799px.
  */
 (function () {

@@ -882,19 +882,9 @@ body:is(.page-home, .page-marketing) .nav-mobile-overlay--open .nav-mobile-credi
   max-width: 600px;
 }
 
-/* Mobile hero: full-bleed base + fading slides (see hero-mobile.js); desktop hidden */
+/* Mobile hero: full-bleed crossfading slides — 1.png / 2.png only (see hero-mobile.js); desktop hidden */
 .hero-mobile-fullbleed {
   display: none;
-}
-
-.hero-mobile-base {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  display: block;
 }
 
 .hero-mobile-slides {
