@@ -1015,58 +1015,58 @@ body:is(.page-home, .page-marketing) .nav-mobile-overlay--open .nav-mobile-credi
   margin: 0 0 40px 0;
 }
 
-/* Buttons */
+/* Buttons — text | extending shaft | fixed arrow (no underline, no hover colour shift) */
 .mainbutton {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: nowrap;
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 2.4px;
   text-transform: uppercase;
   color: white;
   text-decoration: none;
-  padding: 14px 0 17px 0;
+  padding: 14px 0;
   position: relative;
-  transition: color 0.3s ease-in-out;
 }
 
 .mainbutton::before {
   content: '';
-  position: absolute;
-  bottom: 17px;
-  left: 0;
+  order: 2;
+  flex-shrink: 0;
+  width: 36px;
   height: 1px;
-  width: 40px;
-  background: white;
-  transition: width 0.3s ease-in-out, background 0.3s ease-in-out;
+  margin: 0 8px;
+  background: currentColor;
+  align-self: center;
+  transition: width 0.4s cubic-bezier(0.33, 1, 0.36, 1);
+}
+
+.mainbutton:hover::before {
+  width: 96px;
 }
 
 .mainbutton::after {
   content: '→';
-  margin-left: 8px;
+  order: 3;
+  flex-shrink: 0;
+  margin-left: 0;
+  font-weight: 400;
+  line-height: 1;
 }
 
-.mainbutton:hover {
-  color: var(--accent-secondary);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  text-decoration-thickness: 1px;
-  text-decoration-color: currentColor;
+.mainbutton:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 4px;
 }
 
-.mainbutton:hover::before {
-  width: 120px;
-  background: var(--accent-secondary);
-}
+@media (prefers-reduced-motion: reduce) {
+  .mainbutton::before {
+    transition: none;
+  }
 
-/* About preview panel sets dark ::before; keep bar magenta on hover like other pages */
-.page-about__panel .mainbutton:hover::before {
-  background: var(--accent-secondary);
-}
-
-@media (min-width: 800px) {
-  .mainbutton:hover::after {
-    margin-left: 40px;
-    transition: margin-left 0.3s ease-in-out;
+  .mainbutton:hover::before {
+    width: 36px;
   }
 }
 
@@ -1688,7 +1688,7 @@ body:is(.page-home, .page-marketing) .nav-mobile-overlay--open .nav-mobile-credi
 }
 
 .features-timeline-cta .mainbutton {
-  display: inline-block;
+  display: inline-flex;
 }
 
 .features-list {
