@@ -392,6 +392,16 @@ function mobileViewport() {
   return typeof window !== 'undefined' && window.innerWidth <= 768;
 }
 
+/** Samsung Internet / Galaxy-style UA — mobile demo only; used for default camera framing. */
+function samsungMobileDemoViewport() {
+  if (typeof navigator === 'undefined' || !mobileViewport()) return false;
+  const ua = navigator.userAgent || '';
+  if (/\bSamsungBrowser\b/i.test(ua)) return true;
+  if (/Android/i.test(ua) && /Samsung/i.test(ua)) return true;
+  if (/Android/i.test(ua) && /SM-[A-Z0-9]+/i.test(ua)) return true;
+  return false;
+}
+
 function tabletViewport() {
   const w = typeof window !== 'undefined' ? window.innerWidth : 1200;
   return w > 768 && w <= 1024;
@@ -415,6 +425,17 @@ function applyInitialCameraAndControls() {
     const rx = off.x * c + off.z * s;
     const rz = -off.x * s + off.z * c;
     off.set(rx, off.y, rz).multiplyScalar(1.5 * 1.7 * 1.2);
+    if (samsungMobileDemoViewport()) {
+      off.multiplyScalar(1 / 1.4);
+      const tilt = (20 * Math.PI) / 180;
+      off.applyAxisAngle(new THREE.Vector3(0, 1, 0), tilt);
+      const dir = off.clone().normalize();
+      const right = new THREE.Vector3().crossVectors(new THREE.Vector3(0, 1, 0), dir);
+      if (right.lengthSq() > 1e-10) {
+        right.normalize();
+        off.applyAxisAngle(right, tilt);
+      }
+    }
     camera.position.copy(tgt).add(off);
     controls.target.copy(tgt);
     controls.minDistance = 5.4;

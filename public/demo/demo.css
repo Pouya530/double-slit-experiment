@@ -305,29 +305,33 @@ body {
     width: 100%;
     max-width: none;
     border-radius: 14px;
-    padding: 10px 12px;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
+    padding: 8px 10px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
     align-items: center;
-    column-gap: 8px;
-    row-gap: 8px;
+    gap: 8px;
   }
   .interp-mobile-label {
     display: block;
-    grid-column: 1 / -1;
+    flex: 0 0 auto;
     width: auto;
+    margin: 0;
+    white-space: nowrap;
   }
   .interp-select-mobile {
     display: block;
-    grid-column: 1;
-    grid-row: 2;
+    flex: 1 1 auto;
     min-width: 0;
-    width: 100%;
+    width: auto;
+    min-height: 40px;
+    padding: 8px 10px;
+    padding-right: 32px;
+    font-size: 15px;
   }
   .interp-tabs-pills { display: none; }
   .interp-toolbar-actions {
-    grid-column: 2;
-    grid-row: 2;
+    flex: 0 0 auto;
     justify-content: flex-end;
     align-self: center;
     gap: 6px;
