@@ -56,7 +56,7 @@
   <link rel="icon" href="/favicon.png" type="image/png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/demo/demo.css?v=19">
+  <link rel="stylesheet" href="/demo/demo.css?v=20">
   <script type="application/ld+json">
   {"@context":"https://schema.org","@graph":[{"@type":"WebPage","@id":"https://doubleslitexperiment.app/demo/#webpage","name":"Double Slit Experiment — Interactive Demo","description":"Run the Double Slit 3D demo: double-slit interference, observer toggle, quantum interpretations, and live parameters in your browser.","url":"https://doubleslitexperiment.app/demo/","isPartOf":{"@type":"WebSite","name":"Double Slit Experiment","url":"https://doubleslitexperiment.app/"},"breadcrumb":{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://doubleslitexperiment.app/"},{"@type":"ListItem","position":2,"name":"Demo","item":"https://doubleslitexperiment.app/demo/"}]}},{"@type":"SoftwareApplication","name":"Double Slit Experiment","applicationCategory":"EducationalApplication","operatingSystem":"Web","url":"https://doubleslitexperiment.app/demo/","description":"Interactive 3D double-slit experiment with timeline scrubber, observer toggle, interpretations, and adjustable experimental parameters.","author":{"@type":"Organization","name":"Nocturnal Cloud","url":"https://nocturnal.cloud"},"offers":{"@type":"Offer","price":"0","priceCurrency":"GBP","availability":"https://schema.org/InStock"}}]}
   </script>
@@ -139,7 +139,7 @@
       <div class="timeline-row">
         <label>Timeline</label>
         <input type="range" id="timeline" class="timeline-slider" aria-label="Timeline" aria-valuetext="0%">
-        <button class="play-btn" id="play" aria-label="Play / Pause">❚❚</button>
+        <button type="button" class="play-btn play-btn--playing" id="play" aria-label="Pause">❚❚</button>
         <span class="particle-count" id="particle-count">0 / 2000 particles</span>
       </div>
       <div class="controls-row">
@@ -179,6 +179,6 @@
   </div>
 
   <script src="/demo/help-modal.js?v=6" defer></script>
-  <script type="module" src="/demo/advanced-main.js?v=10"></script>
+  <script type="module" src="/demo/advanced-main.js?v=11"></script>
 </body>
 </html>

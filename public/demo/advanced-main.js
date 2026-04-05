@@ -96,12 +96,20 @@ function drawDetectionScreenWebKitFast(ctx, w, h, theme, positionBlend, collapse
   ctx.globalCompositeOperation = 'source-over';
 }
 
+function syncPlayButton() {
+  const playBtn = document.getElementById('play');
+  if (!playBtn) return;
+  playBtn.textContent = isPlaying ? '❚❚' : '▶';
+  playBtn.classList.toggle('play-btn--paused', !isPlaying);
+  playBtn.classList.toggle('play-btn--playing', isPlaying);
+  playBtn.setAttribute('aria-label', isPlaying ? 'Pause' : 'Play');
+}
+
 function syncInterpretationUI() {
   document.querySelectorAll('.interp-tab').forEach((b) => b.classList.toggle('active', b.dataset.interp === activeInterpretation));
   if (showInfoPanel) renderInfoPanel(activeInterpretation);
   updateObserveAndAdvancedControls();
-  const playBtn = document.getElementById('play');
-  if (playBtn) playBtn.textContent = isPlaying ? '❚❚' : '▶';
+  syncPlayButton();
   const interpMobile = document.getElementById('interp-select-mobile');
   if (interpMobile) interpMobile.value = activeInterpretation;
 }
@@ -951,12 +959,12 @@ function setupUI() {
   timelineEl.addEventListener('input', () => {
     currentTime = (timelineEl.value / 100) * effectiveTMax;
     isPlaying = false;
-    playBtn.textContent = '▶';
+    syncPlayButton();
   });
 
   playBtn.addEventListener('click', () => {
     isPlaying = !isPlaying;
-    playBtn.textContent = isPlaying ? '❚❚' : '▶';
+    syncPlayButton();
   });
 
   document.getElementById('theme-toggle')?.addEventListener('click', () => {
@@ -974,7 +982,7 @@ function setupUI() {
     currentTime = 0;
     timelineEl.value = 0;
     isPlaying = true;
-    playBtn.textContent = '❚❚';
+    syncPlayButton();
   });
 
   observeBtn.addEventListener('click', () => {
@@ -1010,6 +1018,8 @@ function setupUI() {
     paramsToggleBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
   });
   window.addEventListener('resize', closeMobileParamsIfDesktop);
+
+  syncPlayButton();
 
   setInterval(() => {
     countEl.textContent = `${visibleCount} / ${particleBuffer.count} particles`;
@@ -1059,8 +1069,7 @@ function animate(now = 0) {
       if (singleParticleMode) {
         currentTime = effectiveTMax;
         isPlaying = false;
-        const pb = document.getElementById('play');
-        if (pb) pb.textContent = '▶';
+        syncPlayButton();
       } else {
         currentTime = currentTime % effectiveTMax;
       }

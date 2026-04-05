@@ -88,6 +88,16 @@ function drawDetectionScreenWebKitFast(ctx, w, h, theme, positionBlend, collapse
   ctx.globalCompositeOperation = 'source-over';
 }
 
+/** Play/pause control: glyph, a11y label, and CSS hooks for circle + animations */
+function syncPlayButton() {
+  const playBtn = document.getElementById('play');
+  if (!playBtn) return;
+  playBtn.textContent = isPlaying ? '❚❚' : '▶';
+  playBtn.classList.toggle('play-btn--paused', !isPlaying);
+  playBtn.classList.toggle('play-btn--playing', isPlaying);
+  playBtn.setAttribute('aria-label', isPlaying ? 'Pause' : 'Play');
+}
+
 function syncInterpretationUI() {
   document.querySelectorAll('.interp-tab').forEach((b) => b.classList.toggle('active', b.dataset.interp === activeInterpretation));
   if (showInfoPanel) renderInfoPanel(activeInterpretation);
@@ -97,8 +107,7 @@ function syncInterpretationUI() {
     const span = ob.querySelector('span:last-child');
     if (span) span.textContent = isObserving ? 'Observing' : 'Not observing';
   }
-  const playBtn = document.getElementById('play');
-  if (playBtn) playBtn.textContent = isPlaying ? '❚❚' : '▶';
+  syncPlayButton();
   const interpMobile = document.getElementById('interp-select-mobile');
   if (interpMobile) interpMobile.value = activeInterpretation;
 }
@@ -662,8 +671,7 @@ function setupTourUI() {
       singleParticleMode = false;
       effectiveTMax = particleBuffer?.tMax ?? tMax;
       isPlaying = false;
-      const playBtn = document.getElementById('play');
-      if (playBtn) playBtn.textContent = '▶';
+      syncPlayButton();
       textEl.textContent = TOUR_STEPS[0].text;
       progressEl.textContent = `1 / ${TOUR_STEPS.length}`;
     }
@@ -776,12 +784,12 @@ function setupUI() {
   timelineEl.addEventListener('input', () => {
     currentTime = (timelineEl.value / 100) * effectiveTMax;
     isPlaying = false;
-    playBtn.textContent = '▶';
+    syncPlayButton();
   });
 
   playBtn.addEventListener('click', () => {
     isPlaying = !isPlaying;
-    playBtn.textContent = isPlaying ? '❚❚' : '▶';
+    syncPlayButton();
   });
 
   document.getElementById('theme-toggle')?.addEventListener('click', () => {
@@ -799,7 +807,7 @@ function setupUI() {
     currentTime = 0;
     timelineEl.value = 0;
     isPlaying = true;
-    playBtn.textContent = '❚❚';
+    syncPlayButton();
   });
 
   observeBtn.addEventListener('click', () => {
@@ -845,6 +853,8 @@ function setupUI() {
   });
   window.addEventListener('resize', closeMobileParamsIfDesktop);
 
+  syncPlayButton();
+
   setInterval(() => {
     countEl.textContent = `${visibleCount} / ${particleBuffer.count} particles`;
   }, 200);
@@ -867,8 +877,7 @@ function animate(now = 0) {
       if (singleParticleMode) {
         currentTime = effectiveTMax;
         isPlaying = false;
-        const pb = document.getElementById('play');
-        if (pb) pb.textContent = '▶';
+        syncPlayButton();
       } else {
         currentTime = currentTime % effectiveTMax;
       }
