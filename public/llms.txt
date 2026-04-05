@@ -11,7 +11,7 @@ Double Slit Experiment lets students and teachers explore wave–particle dualit
 - [Homepage](https://doubleslitexperiment.app/): Product overview, hero, and links to the live demo
 - [Interactive demo](https://doubleslitexperiment.app/demo/): Full 3D simulation with interpretations and parameters
 - [Classic guided demo](https://doubleslitexperiment.app/demo/classic.html): Guided tour style demo
-- [What it is](https://doubleslitexperiment.app/preview/what.html): Short description of the application
+- [About](https://doubleslitexperiment.app/preview/about.html): Short description of the application
 - [Who it's for](https://doubleslitexperiment.app/preview/who.html): Audiences (A-level, teachers, museums, etc.)
 - [Features](https://doubleslitexperiment.app/preview/features.html): Timeline scrubber, observer, camera, parameters
 - [Benefits](https://doubleslitexperiment.app/preview/benefits.html): Classroom fit, accessibility, shareable states

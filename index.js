@@ -69,7 +69,14 @@ app.get(['/demo/advanced', '/demo/advanced/'], (req, res) => {
 });
 
 // Preview pages — standalone pages for each section
-app.get('/preview/what', (req, res) => res.sendFile(path.join(__dirname, 'public', 'preview', 'what.html')));
+app.get(['/preview/what', '/preview/what.html'], (req, res) => {
+  const i = req.url.indexOf('?');
+  const qs = i >= 0 ? req.url.slice(i) : '';
+  res.redirect(308, `/preview/about${qs}`);
+});
+app.get(['/preview/about', '/preview/about/'], (req, res) =>
+  res.sendFile(path.join(__dirname, 'public', 'preview', 'about.html')),
+);
 app.get('/preview/who', (req, res) => res.sendFile(path.join(__dirname, 'public', 'preview', 'who.html')));
 app.get('/preview/benefits', (req, res) => res.sendFile(path.join(__dirname, 'public', 'preview', 'benefits.html')));
 app.get('/preview/features', (req, res) => res.sendFile(path.join(__dirname, 'public', 'preview', 'features.html')));

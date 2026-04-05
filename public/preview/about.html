@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-2VCD17SKEG"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-2VCD17SKEG');
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="About Double Slit Experiment: an interactive 3D web application that visualises the quantum double-slit experiment for physics education.">
+  <meta name="keywords" content="double slit experiment, about, quantum visualisation, physics education, wave-particle duality">
+  <meta name="author" content="Nocturnal Cloud">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+  <link rel="canonical" href="https://doubleslitexperiment.app/preview/about.html">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="en_GB">
+  <meta property="og:url" content="https://doubleslitexperiment.app/preview/about.html">
+  <meta property="og:site_name" content="Double Slit Experiment">
+  <meta property="og:title" content="About — Double Slit Experiment">
+  <meta property="og:description" content="Learn about the Double Slit 3D web app: timeline scrubber, observer toggle, orbital camera, and adjustable experiment parameters.">
+  <meta property="og:image" content="https://doubleslitexperiment.app/img/double-slit-demo-image.png">
+  <meta property="og:image:alt" content="Double Slit Experiment — quantum double-slit visualisation">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="About — Double Slit Experiment">
+  <meta name="twitter:description" content="Interactive 3D web app for the quantum double-slit experiment — built for students and teachers.">
+  <meta name="twitter:image" content="https://doubleslitexperiment.app/img/double-slit-demo-image.png">
+  <title>About — Double Slit Experiment</title>
+  <link rel="icon" href="/favicon.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles.css?v=about-bg-1">
+  <style>
+    .page-about {
+      margin: 0;
+      min-height: 100vh;
+    }
+
+    .page-about__bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background-image: url('/images/benefit-1.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      transform: scale(1);
+      transform-origin: center center;
+      will-change: transform;
+      animation: page-about-kenburns 28s ease-in-out infinite alternate;
+    }
+
+    .page-about__bg::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        145deg,
+        rgba(255, 255, 255, 0.93) 0%,
+        rgba(248, 250, 252, 0.88) 45%,
+        rgba(255, 255, 255, 0.91) 100%
+      );
+      pointer-events: none;
+    }
+
+    @keyframes page-about-kenburns {
+      from {
+        transform: scale(1);
+      }
+      to {
+        transform: scale(1.07);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .page-about__bg {
+        animation: none;
+      }
+    }
+
+    .page-about__main {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-top: 48px;
+      padding-bottom: 48px;
+    }
+
+    .page-about__back {
+      margin-bottom: 32px;
+    }
+
+    .page-about__back a {
+      color: var(--linkgrey);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .page-about__back a:hover {
+      color: var(--maintext);
+    }
+
+    .page-about__panel {
+      max-width: 720px;
+      background: rgba(255, 255, 255, 0.72);
+      border-radius: 14px;
+      padding: 28px 32px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+      border: 1px solid rgba(0, 0, 0, 0.06);
+    }
+
+    @media (max-width: 640px) {
+      .page-about__panel {
+        padding: 20px 18px;
+      }
+    }
+
+    /* CTA inherits global .mainbutton motion but needs dark ink on the light panel */
+    .page-about__panel .mainbutton {
+      color: var(--maintext);
+    }
+
+    .page-about__panel .mainbutton::before {
+      background: var(--maintext);
+    }
+  </style>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@graph":[{"@type":"WebPage","@id":"https://doubleslitexperiment.app/preview/about.html#webpage","name":"About — Double Slit Experiment","description":"An interactive 3D web application that visualises the quantum double-slit experiment.","url":"https://doubleslitexperiment.app/preview/about.html","isPartOf":{"@type":"WebSite","name":"Double Slit Experiment","url":"https://doubleslitexperiment.app/"},"breadcrumb":{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://doubleslitexperiment.app/"},{"@type":"ListItem","position":2,"name":"About","item":"https://doubleslitexperiment.app/preview/about.html"}]}}]}
+  </script>
+</head>
+<body class="page-about">
+  <div class="page-about__bg" role="presentation" aria-hidden="true"></div>
+  <main class="page-about__main innerspacer">
+    <p class="page-about__back">
+      <a href="/">← Back to Double Slit</a>
+    </p>
+    <h1 class="section-title">About</h1>
+    <div class="page-about__panel">
+      <div class="content-block">
+        <p class="lead">An interactive 3D web application that visualises the quantum double-slit experiment.</p>
+        <p>Users fire photons or electrons at a barrier with two slits and watch an interference pattern build on a detection screen.</p>
+        <p>The double-slit experiment sends quantum particles through two narrow openings; when they are not measured at the slits, they behave like waves and produce bright and dark bands on a screen from interference. When which-path information is introduced, the pattern shifts toward two lumped bands—classic evidence of wave–particle duality.</p>
+        <p>This app’s objective is to make those ideas tangible: explore the bench in three dimensions, scrub time to see hits accumulate, toggle observer-style measurements, and adjust slit geometry and wavelength so the physics is clear for students and teachers.</p>
+        <p><strong>Key capabilities</strong> in the demo:</p>
+        <ul style="font-size: 18px; font-weight: 300; line-height: 1.8; margin: 24px 0;">
+          <li><strong>Timeline Scrubber</strong> — Drag through time to watch particles accumulate dot by dot.</li>
+          <li><strong>Observer Toggle</strong> — See wave function collapse when observing which slit.</li>
+          <li><strong>360° Orbital Camera</strong> — Explore like a physics bench.</li>
+          <li><strong>Adjustable Parameters</strong> — Slit width, separation, wavelength, emission rate.</li>
+        </ul>
+        <div class="scene-diagram">
+          <code>[Particle Source] —→ [Barrier with 2 Slits] —→ [Detection Screen]</code>
+        </div>
+        <p style="margin-top: 24px;"><a href="/demo/" class="mainbutton">Try the demo</a></p>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

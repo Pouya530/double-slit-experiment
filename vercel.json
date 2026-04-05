@@ -78,10 +78,21 @@
       "source": "/demo/advanced/",
       "destination": "/demo/",
       "permanent": false
+    },
+    {
+      "source": "/preview/what",
+      "destination": "/preview/about",
+      "permanent": true
+    },
+    {
+      "source": "/preview/what.html",
+      "destination": "/preview/about",
+      "permanent": true
     }
   ],
   "rewrites": [
-    { "source": "/preview/what", "destination": "/preview/what.html" },
+    { "source": "/preview/about", "destination": "/preview/about.html" },
+    { "source": "/preview/about/", "destination": "/preview/about.html" },
     { "source": "/preview/who", "destination": "/preview/who.html" },
     { "source": "/preview/benefits", "destination": "/preview/benefits.html" },
     { "source": "/preview/features", "destination": "/preview/features.html" }
