@@ -121,7 +121,19 @@ body {
   object-fit: contain;
   display: block;
 }
-.header-right { display: flex; align-items: center; gap: 16px; }
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Logo left, controls + mobile menu grouped on the right */
+.demo-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
 .demo-header .back { font-size: 14px; color: var(--text-muted); text-decoration: none; }
 .demo-header .back:hover { color: var(--text); }
 
@@ -351,7 +363,13 @@ body {
     flex-wrap: nowrap;
     align-items: center;
     gap: 6px;
+    justify-content: space-between;
   }
+
+  .demo-header-actions {
+    gap: 4px;
+  }
+
   /* Logo + nav on one line: text ellipsizes; icon stays fixed at 1em */
   .demo-header .logo {
     flex: 1 1 auto;
@@ -375,6 +393,7 @@ body {
     flex-wrap: nowrap;
     flex-shrink: 0;
     align-items: center;
+    justify-content: flex-end;
     gap: 4px;
   }
   .demo-header .theme-label {
