@@ -460,6 +460,20 @@ function updateObserveAndAdvancedControls() {
   updateExploreSection();
 }
 
+/** Size the WebGL buffer to the `#canvas` element or full window. */
+function getCanvasHostSize() {
+  const el = document.getElementById('canvas');
+  if (!el) {
+    return {
+      w: Math.max(1, window.innerWidth),
+      h: Math.max(1, window.innerHeight),
+    };
+  }
+  const w = Math.max(1, Math.round(el.clientWidth));
+  const h = Math.max(1, Math.round(el.clientHeight));
+  return { w, h };
+}
+
 function init() {
   initSafariDetectionFastPathFlag();
 
@@ -471,10 +485,11 @@ function init() {
 
   scene = new THREE.Scene();
 
-  camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 120);
+  const { w: cw, h: ch } = getCanvasHostSize();
+  camera = new THREE.PerspectiveCamera(45, cw / ch, 0.1, 120);
 
   renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
-  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setSize(cw, ch);
   renderer.setPixelRatio(Math.min(safariDetectionFastPath ? 1.5 : 2, window.devicePixelRatio));
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.2;
@@ -502,6 +517,7 @@ function init() {
   syncInterpretationUI();
   setupFocusViewMode();
   window.addEventListener('resize', onResize);
+  queueMicrotask(() => onResize());
   animate();
 }
 
@@ -1279,9 +1295,10 @@ function setupExploreDeeperDesktopAlwaysOpen() {
 }
 
 function onResize() {
-  camera.aspect = window.innerWidth / window.innerHeight;
+  const { w, h } = getCanvasHostSize();
+  camera.aspect = w / h;
   camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setSize(w, h);
 }
 
 /**
