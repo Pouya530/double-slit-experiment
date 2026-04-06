@@ -1473,7 +1473,8 @@ details.explore-deeper[open] > .explore-deeper-summary::before {
   display: block;
   position: fixed;
   inset: 0;
-  z-index: 190;
+  /* Above interpretation UI (198), info panel (200), timeline (196); below modal (500) */
+  z-index: 240;
   pointer-events: none;
 }
 
@@ -1553,6 +1554,13 @@ details.explore-deeper[open] > .explore-deeper-summary::before {
   background: rgba(0, 0, 0, 0.12);
 }
 
+.demo-layout-advanced.demo-layout--focus .focus-rail-dock {
+  z-index: 241;
+}
+.demo-layout-advanced.demo-layout--focus .focus-rail-backdrop {
+  z-index: 242;
+}
+
 .demo-layout-advanced.demo-layout--focus .focus-rail-panel {
   pointer-events: auto;
   position: fixed;
@@ -1566,7 +1574,7 @@ details.explore-deeper[open] > .explore-deeper-summary::before {
   padding-top: env(safe-area-inset-top, 0px);
   padding-bottom: env(safe-area-inset-bottom, 0px);
   box-sizing: border-box;
-  z-index: 193;
+  z-index: 243;
   display: flex;
   flex-direction: column;
   background: var(--panel-bg);
@@ -1811,7 +1819,7 @@ details.explore-deeper[open] > .explore-deeper-summary::before {
   pointer-events: auto;
 }
 
-/* Desktop / wide: centred pill bar under safe area (above focus sheet z-193) */
+/* Desktop / wide: centred pill bar (below focus sheet z-243) */
 .demo-layout-advanced.demo-layout--focus #interpretation-tabs {
   position: absolute;
   z-index: 198;
