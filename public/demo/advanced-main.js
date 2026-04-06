@@ -1504,8 +1504,8 @@ function updateWavelengthSwatch() {
   const wEl = document.getElementById('wavelength');
   const sw = document.getElementById('wavelength-swatch');
   if (!wEl || !sw) return;
-  const lam = parseFloat(wEl.value) || 550;
-  const [r, g, b] = wavelengthToRGB(lam * 1e-9);
+  const lamNm = parseFloat(wEl.value) || 550;
+  const [r, g, b] = wavelengthToRGB(lamNm);
   sw.style.backgroundColor = `rgb(${Math.round(r * 255)},${Math.round(g * 255)},${Math.round(b * 255)})`;
 }
 
