@@ -1259,6 +1259,7 @@ function setupFocusViewMode() {
   const helpRail = document.getElementById('focus-rail-help');
   const closeRail = document.getElementById('focus-rail-close');
   const dockRail = document.getElementById('focus-rail-dock');
+  const backdropRail = document.getElementById('focus-rail-backdrop');
   const accExplore = document.getElementById('focus-acc-3');
   const cluster = document.getElementById('demo-toolbar-cluster');
   const interp = document.getElementById('interpretation-tabs');
@@ -1302,16 +1303,26 @@ function setupFocusViewMode() {
     if (accExplore.open && explore) explore.setAttribute('open', '');
   });
 
-  function syncFocusRailDock() {
-    if (!dockRail) return;
+  function syncFocusRailUi() {
     if (!active) {
-      dockRail.hidden = true;
+      if (dockRail) dockRail.hidden = true;
+      backdropRail?.setAttribute('hidden', '');
+      backdropRail?.setAttribute('aria-hidden', 'true');
       return;
     }
+    if (!dockRail) return;
+    dockRail.hidden = false;
     const collapsed = layout.classList.contains('demo-focus-rail-collapsed');
-    dockRail.hidden = !collapsed;
-    dockRail.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
-    closeRail?.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+    const open = !collapsed;
+    dockRail.setAttribute('aria-expanded', open ? 'true' : 'false');
+    closeRail?.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (collapsed) {
+      backdropRail?.setAttribute('hidden', '');
+      backdropRail?.setAttribute('aria-hidden', 'true');
+    } else {
+      backdropRail?.removeAttribute('hidden');
+      backdropRail?.setAttribute('aria-hidden', 'false');
+    }
   }
 
   function mark(node) {
@@ -1342,7 +1353,7 @@ function setupFocusViewMode() {
 
     layout.classList.add('demo-layout--focus');
     rail.hidden = false;
-    syncFocusRailDock();
+    syncFocusRailUi();
     const reduceMotion =
       typeof window.matchMedia === 'function' &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -1373,19 +1384,24 @@ function setupFocusViewMode() {
     layout.classList.remove('demo-focus-rail-collapsed');
     layout.classList.remove('demo-layout--focus');
     rail.hidden = true;
-    syncFocusRailDock();
+    syncFocusRailUi();
     window.dispatchEvent(new Event('resize'));
   }
 
   enter.addEventListener('click', enterFocus);
   closeRail?.addEventListener('click', () => {
     layout.classList.add('demo-focus-rail-collapsed');
-    syncFocusRailDock();
+    syncFocusRailUi();
     window.dispatchEvent(new Event('resize'));
   });
   dockRail?.addEventListener('click', () => {
     layout.classList.remove('demo-focus-rail-collapsed');
-    syncFocusRailDock();
+    syncFocusRailUi();
+    window.dispatchEvent(new Event('resize'));
+  });
+  backdropRail?.addEventListener('click', () => {
+    layout.classList.add('demo-focus-rail-collapsed');
+    syncFocusRailUi();
     window.dispatchEvent(new Event('resize'));
   });
   helpRail?.addEventListener('click', () => {
@@ -1406,7 +1422,7 @@ function setupFocusViewMode() {
     e.preventDefault();
     if (!layout.classList.contains('demo-focus-rail-collapsed')) {
       layout.classList.add('demo-focus-rail-collapsed');
-      syncFocusRailDock();
+      syncFocusRailUi();
       window.dispatchEvent(new Event('resize'));
     } else {
       leaveFocus();

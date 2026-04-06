@@ -56,7 +56,7 @@
   <link rel="icon" href="/favicon.png" type="image/png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/demo/demo.css?v=28">
+  <link rel="stylesheet" href="/demo/demo.css?v=29">
   <script type="application/ld+json">
   {"@context":"https://schema.org","@graph":[{"@type":"WebPage","@id":"https://doubleslitexperiment.app/demo/#webpage","name":"Double Slit Experiment — Interactive Demo","description":"Run the Double Slit 3D demo: double-slit interference, measurement strength (continuous decoherence), quantum interpretations, and live parameters in your browser.","url":"https://doubleslitexperiment.app/demo/","isPartOf":{"@type":"WebSite","name":"Double Slit Experiment","url":"https://doubleslitexperiment.app/"},"breadcrumb":{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://doubleslitexperiment.app/"},{"@type":"ListItem","position":2,"name":"Demo","item":"https://doubleslitexperiment.app/demo/"}]}},{"@type":"SoftwareApplication","name":"Double Slit Experiment","applicationCategory":"EducationalApplication","operatingSystem":"Web","url":"https://doubleslitexperiment.app/demo/","description":"Interactive 3D double-slit experiment with timeline scrubber, measurement-strength control, interpretations, and adjustable experimental parameters.","author":{"@type":"Organization","name":"Nocturnal Cloud","url":"https://nocturnal.cloud"},"offers":{"@type":"Offer","price":"0","priceCurrency":"GBP","availability":"https://schema.org/InStock"}}]}
   </script>
@@ -149,6 +149,12 @@
         <span class="focus-rail-dock-icon" aria-hidden="true">☰</span>
         <span class="focus-rail-dock-label">Controls</span>
       </button>
+      <div
+        class="focus-rail-backdrop"
+        id="focus-rail-backdrop"
+        hidden
+        aria-hidden="true"
+      ></div>
       <div class="focus-rail-panel" id="focus-rail-panel">
         <div class="focus-rail-head">
           <span class="focus-rail-brand">Controls</span>
@@ -296,13 +302,13 @@
         <li><strong>Parameters &amp; Recompute</strong> — Slit width, separation, and wavelength (colour). After edits, <strong>Recompute</strong> regenerates the particle set. Extended options in this build add mass-related behaviour for some interpretations.</li>
         <li><strong>Interpretations &amp; ℹ</strong> — Tabs switch the story and overlays (Copenhagen, pilot-wave, etc.). The <strong>ℹ</strong> panel explains the active view without changing the underlying simulation.</li>
         <li><strong>Theme</strong> — Use the sun/moon control in the header for light or dark UI.</li>
-        <li><strong>Focus view</strong> — Use <strong>Focus</strong> in the header for a clean canvas. Tap <strong>Controls</strong> on the left to open the side panel (interpretation, parameters, Explore deeper); use <strong>×</strong> to close it. The timeline stays at the bottom. Press <strong>Esc</strong> once to close the panel, again to return to the standard header layout.</li>
+        <li><strong>Focus view</strong> — Use <strong>Focus</strong> in the header for a clean canvas. Tap <strong>Controls</strong> to open a full-height side sheet (it slides over the button until you close it). Close with <strong>×</strong>, by clicking the dimmed area beside the sheet, or <strong>Esc</strong> (close sheet, then exit focus). The timeline stays usable at the bottom.</li>
       </ul>
       <p id="features-help-tour-note" class="demo-modal-note" hidden><strong>Tour</strong> — On the classic demo, use ▶ Tour next to ℹ for a guided walkthrough.</p>
     </div>
   </div>
 
   <script src="/demo/help-modal.js?v=6" defer></script>
-  <script type="module" src="/demo/advanced-main.js?v=22"></script>
+  <script type="module" src="/demo/advanced-main.js?v=23"></script>
 </body>
 </html>

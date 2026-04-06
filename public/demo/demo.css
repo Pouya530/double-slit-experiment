@@ -1434,26 +1434,26 @@ details.explore-deeper[open] > .explore-deeper-summary::before {
   display: none !important;
 }
 
+/* Panel width: shared by sheet + backdrop offset (keeps timeline strip mostly clear of dimmer) */
+.demo-layout-advanced.demo-layout--focus {
+  --focus-rail-panel-w: min(336px, calc(100vw - 20px - env(safe-area-inset-left, 0px)));
+}
+
 .demo-layout-advanced.demo-layout--focus .demo-focus-rail:not([hidden]) {
   display: block;
   position: fixed;
+  inset: 0;
   z-index: 190;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  padding-top: max(10px, env(safe-area-inset-top, 0px));
-  padding-bottom: max(10px, env(safe-area-inset-bottom, 0px));
-  padding-left: max(10px, env(safe-area-inset-left, 0px));
   pointer-events: none;
 }
 
-/* Mid-left dock: opens panel when the rail is collapsed (hidden while panel is open) */
+/* Mid-left dock: stays in the stack; full-height panel (higher z-index) covers it while open */
 .focus-rail-dock {
   position: fixed;
   left: max(6px, env(safe-area-inset-left, 0px));
   top: 50%;
   transform: translateY(-50%);
-  z-index: 192;
+  z-index: 191;
   min-height: 48px;
   padding: 10px 14px 10px 11px;
   margin: 0;
@@ -1503,11 +1503,40 @@ details.explore-deeper[open] > .explore-deeper-summary::before {
   max-width: 8em;
 }
 
+/* Dimmer to the right of the sheet; click closes the panel */
+.focus-rail-backdrop {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: var(--focus-rail-panel-w);
+  z-index: 192;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: rgba(0, 0, 0, 0.24);
+  cursor: default;
+  pointer-events: auto;
+  transition: opacity 0.28s ease;
+}
+[data-theme="light"] .focus-rail-backdrop {
+  background: rgba(0, 0, 0, 0.12);
+}
+
 .demo-layout-advanced.demo-layout--focus .focus-rail-panel {
   pointer-events: auto;
-  height: 100%;
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: var(--focus-rail-panel-w);
+  height: 100vh;
+  height: 100dvh;
   max-height: 100dvh;
-  width: min(336px, calc(100vw - 20px - env(safe-area-inset-left, 0px)));
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  box-sizing: border-box;
+  z-index: 193;
   display: flex;
   flex-direction: column;
   background: var(--panel-bg);
@@ -1822,11 +1851,17 @@ details.explore-deeper[open] > .explore-deeper-summary::before {
   padding-bottom: 4px;
 }
 
+/* Timeline strip stays operable above the backdrop while the sheet is open */
+.demo-layout-advanced.demo-layout--focus .demo-bottom-chrome {
+  z-index: 196;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .demo-layout-advanced.demo-layout--focus .focus-rail-panel,
   .focus-acc-panel,
   .focus-acc-chev,
-  .focus-rail-dock {
+  .focus-rail-dock,
+  .focus-rail-backdrop {
     transition: none !important;
   }
   .demo-layout-advanced.demo-layout--focus .focus-rail-panel {
