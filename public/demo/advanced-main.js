@@ -1256,9 +1256,8 @@ function setupFocusViewMode() {
   const layout = document.querySelector('.demo-layout-advanced');
   const rail = document.getElementById('demo-focus-rail');
   const enter = document.getElementById('focus-view-enter');
-  const exit = document.getElementById('focus-view-exit');
   const helpRail = document.getElementById('focus-rail-help');
-  const collapseRail = document.getElementById('focus-rail-collapse');
+  const closeRail = document.getElementById('focus-rail-close');
   const dockRail = document.getElementById('focus-rail-dock');
   const accExplore = document.getElementById('focus-acc-3');
   const cluster = document.getElementById('demo-toolbar-cluster');
@@ -1274,7 +1273,6 @@ function setupFocusViewMode() {
     !layout ||
     !rail ||
     !enter ||
-    !exit ||
     !cluster ||
     !interp ||
     !paramsToggle ||
@@ -1313,7 +1311,7 @@ function setupFocusViewMode() {
     const collapsed = layout.classList.contains('demo-focus-rail-collapsed');
     dockRail.hidden = !collapsed;
     dockRail.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
-    collapseRail?.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+    closeRail?.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
   }
 
   function mark(node) {
@@ -1340,7 +1338,7 @@ function setupFocusViewMode() {
     bodyExplore.appendChild(explore);
 
     explore.setAttribute('open', '');
-    layout.classList.remove('demo-focus-rail-collapsed');
+    layout.classList.add('demo-focus-rail-collapsed');
 
     layout.classList.add('demo-layout--focus');
     rail.hidden = false;
@@ -1380,8 +1378,7 @@ function setupFocusViewMode() {
   }
 
   enter.addEventListener('click', enterFocus);
-  exit.addEventListener('click', leaveFocus);
-  collapseRail?.addEventListener('click', () => {
+  closeRail?.addEventListener('click', () => {
     layout.classList.add('demo-focus-rail-collapsed');
     syncFocusRailDock();
     window.dispatchEvent(new Event('resize'));
@@ -1393,6 +1390,27 @@ function setupFocusViewMode() {
   });
   helpRail?.addEventListener('click', () => {
     document.getElementById('features-help-open')?.click();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (!active || e.key !== 'Escape') return;
+    const helpModal = document.getElementById('features-help-modal');
+    if (helpModal && !helpModal.hasAttribute('hidden')) return;
+    const infoPanel = document.getElementById('info-panel');
+    if (infoPanel?.classList.contains('open')) {
+      e.preventDefault();
+      infoPanel.classList.remove('open');
+      showInfoPanel = false;
+      return;
+    }
+    e.preventDefault();
+    if (!layout.classList.contains('demo-focus-rail-collapsed')) {
+      layout.classList.add('demo-focus-rail-collapsed');
+      syncFocusRailDock();
+      window.dispatchEvent(new Event('resize'));
+    } else {
+      leaveFocus();
+    }
   });
 }
 

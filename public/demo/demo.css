@@ -1447,18 +1447,15 @@ details.explore-deeper[open] > .explore-deeper-summary::before {
   pointer-events: none;
 }
 
-/* Mid-left dock: opens panel when the rail is collapsed */
+/* Mid-left dock: opens panel when the rail is collapsed (hidden while panel is open) */
 .focus-rail-dock {
   position: fixed;
   left: max(6px, env(safe-area-inset-left, 0px));
   top: 50%;
   transform: translateY(-50%);
   z-index: 192;
-  width: 48px;
-  height: 48px;
-  min-width: 48px;
   min-height: 48px;
-  padding: 0;
+  padding: 10px 14px 10px 11px;
   margin: 0;
   border-radius: 0 14px 14px 0;
   border: 1px solid var(--panel-border);
@@ -1470,8 +1467,10 @@ details.explore-deeper[open] > .explore-deeper-summary::before {
     0 0 0 1px rgba(255, 255, 255, 0.05) inset;
   cursor: pointer;
   display: inline-flex;
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+  gap: 8px;
   font-size: 19px;
   line-height: 1;
   font-family: inherit;
@@ -1491,7 +1490,17 @@ details.explore-deeper[open] > .explore-deeper-summary::before {
 
 .focus-rail-dock-icon {
   display: block;
+  flex-shrink: 0;
   transform: translateX(1px);
+}
+
+.focus-rail-dock-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  line-height: 1.15;
+  max-width: 8em;
 }
 
 .demo-layout-advanced.demo-layout--focus .focus-rail-panel {
@@ -1527,14 +1536,22 @@ details.explore-deeper[open] > .explore-deeper-summary::before {
   pointer-events: none !important;
 }
 
-.focus-rail-head-left {
+.focus-rail-head {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 14px 10px 10px 14px;
+  border-bottom: 1px solid var(--panel-border);
+  background: linear-gradient(180deg, var(--input-bg), transparent);
+}
+
+.focus-rail-head .focus-rail-brand {
   min-width: 0;
 }
 
-.focus-rail-collapse {
+.focus-rail-close {
   flex-shrink: 0;
   width: 40px;
   height: 40px;
@@ -1548,28 +1565,17 @@ details.explore-deeper[open] > .explore-deeper-summary::before {
   border-radius: 10px;
   background: var(--theme-btn-bg);
   color: var(--text);
-  font-size: 18px;
+  font-size: 22px;
   line-height: 1;
   cursor: pointer;
   font-family: inherit;
 }
-.focus-rail-collapse:hover {
+.focus-rail-close:hover {
   background: var(--input-bg);
 }
-.focus-rail-collapse:focus-visible {
+.focus-rail-close:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
-}
-
-.focus-rail-head {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 14px 14px 10px;
-  border-bottom: 1px solid var(--panel-border);
-  background: linear-gradient(180deg, var(--input-bg), transparent);
 }
 
 .focus-rail-head-actions {
@@ -1602,21 +1608,6 @@ details.explore-deeper[open] > .explore-deeper-summary::before {
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--text-dim);
-}
-
-.focus-rail-exit {
-  padding: 8px 12px;
-  border: 1px solid var(--panel-border);
-  border-radius: 8px;
-  background: var(--theme-btn-bg);
-  color: var(--text);
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  font-family: inherit;
-}
-.focus-rail-exit:hover {
-  background: var(--input-bg);
 }
 
 .focus-accordion {
