@@ -19,6 +19,9 @@ const COMP_PAD = 12;
 const COMP_SCALE = 76;
 const PANEL_W_STORAGE = 'doubleSlitDemoPanelWidth';
 const SHEET_SNAP_STORAGE = 'doubleSlitDemoSheetSnap';
+/** Base vertical FOV (deg); widened slightly when canvas is narrow so the scene doesn’t feel “squished”. */
+const BASE_CAMERA_FOV = 45;
+const CAMERA_FOV_NUDGE_MAX = 6;
 
 /** Map interpretation UI accent (#RRGGBB) to Three.js hex for overlays. */
 function hexFromInterpBrand(def) {
@@ -623,7 +626,7 @@ function init() {
   scene = new THREE.Scene();
 
   const { w: cw, h: ch } = getCanvasHostSize();
-  camera = new THREE.PerspectiveCamera(45, cw / ch, 0.1, 120);
+  camera = new THREE.PerspectiveCamera(BASE_CAMERA_FOV, cw / ch, 0.1, 120);
 
   renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
   renderer.setSize(cw, ch);
@@ -653,6 +656,10 @@ function init() {
   setupInterpretationUI();
   syncInterpretationUI();
   window.addEventListener('resize', onResize);
+  const canvasHost = document.getElementById('canvas');
+  if (typeof ResizeObserver !== 'undefined' && canvasHost) {
+    new ResizeObserver(() => onResize()).observe(canvasHost);
+  }
   queueMicrotask(() => onResize());
   animate();
 }
@@ -1282,6 +1289,7 @@ function setupUI() {
     applySceneTheme();
   };
   document.getElementById('theme-toggle')?.addEventListener('click', onThemeToggle);
+  document.getElementById('theme-toggle-panel')?.addEventListener('click', onThemeToggle);
   syncThemeToggleLabels();
 
   document.getElementById('transport-speed')?.addEventListener('click', () => {
@@ -1718,7 +1726,11 @@ function setupComplementarityInteraction() {
 
 function onResize() {
   const { w, h } = getCanvasHostSize();
-  camera.aspect = w / h;
+  const aspect = w / Math.max(1, h);
+  camera.aspect = aspect;
+  // Narrower canvas (side panel open): gently widen FOV so framing feels like a small zoom-out, not lateral squish.
+  const narrow01 = Math.max(0, Math.min(1, (1.38 - aspect) / 0.6));
+  camera.fov = BASE_CAMERA_FOV + narrow01 * CAMERA_FOV_NUDGE_MAX;
   camera.updateProjectionMatrix();
   renderer.setSize(w, h);
 }

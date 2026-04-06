@@ -56,7 +56,7 @@
   <link rel="icon" href="/favicon.png" type="image/png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/demo/demo.css?v=48">
+  <link rel="stylesheet" href="/demo/demo.css?v=49">
   <script type="application/ld+json">
   {"@context":"https://schema.org","@graph":[{"@type":"WebPage","@id":"https://doubleslitexperiment.app/demo/#webpage","name":"Double Slit Experiment — Interactive Demo","description":"Run the Double Slit 3D demo: double-slit interference, measurement strength (continuous decoherence), quantum interpretations, and live parameters in your browser.","url":"https://doubleslitexperiment.app/demo/","isPartOf":{"@type":"WebSite","name":"Double Slit Experiment","url":"https://doubleslitexperiment.app/"},"breadcrumb":{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://doubleslitexperiment.app/"},{"@type":"ListItem","position":2,"name":"Demo","item":"https://doubleslitexperiment.app/demo/"}]}},{"@type":"SoftwareApplication","name":"Double Slit Experiment","applicationCategory":"EducationalApplication","operatingSystem":"Web","url":"https://doubleslitexperiment.app/demo/","description":"Interactive 3D double-slit experiment with timeline scrubber, measurement-strength control, interpretations, and adjustable experimental parameters.","author":{"@type":"Organization","name":"Nocturnal Cloud","url":"https://nocturnal.cloud"},"offers":{"@type":"Offer","price":"0","priceCurrency":"GBP","availability":"https://schema.org/InStock"}}]}
   </script>
@@ -76,9 +76,9 @@
           <span class="focus-view-header-icon" aria-hidden="true">◧</span>
           <span class="focus-view-header-label">Focus</span>
         </button>
-        <button class="theme-btn" id="theme-toggle" aria-label="Toggle light/dark mode" title="Toggle theme">
-          <span class="theme-icon">☀</span>
-          <span class="theme-label">Light</span>
+        <button type="button" class="theme-btn" id="theme-toggle" aria-label="Toggle light/dark mode" title="Toggle theme">
+          <span class="theme-icon">🌙</span>
+          <span class="theme-label">Dark</span>
         </button>
         <a href="/" class="back">← Home</a>
       </div>
@@ -141,6 +141,13 @@
           <span class="bottom-sheet-handle-bar"></span>
         </div>
         <div class="demo-right-panel-inner" id="demo-right-panel-inner">
+          <div class="panel-appearance-row">
+            <span class="panel-appearance-label" id="panel-appearance-label">Appearance</span>
+            <button type="button" class="theme-btn theme-btn--panel" id="theme-toggle-panel" aria-label="Toggle light or dark mode" title="Light / dark mode">
+              <span class="theme-icon">🌙</span>
+              <span class="theme-label">Dark</span>
+            </button>
+          </div>
           <details class="panel-section" id="panel-section-measure" open>
             <summary class="panel-section-summary">Measurement</summary>
             <div class="panel-section-body">
@@ -289,6 +296,6 @@
   </div>
 
   <script src="/demo/help-modal.js?v=6" defer></script>
-  <script type="module" src="/demo/advanced-main.js?v=33"></script>
+  <script type="module" src="/demo/advanced-main.js?v=34"></script>
 </body>
 </html>

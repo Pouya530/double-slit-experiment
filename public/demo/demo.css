@@ -1,6 +1,7 @@
 * { box-sizing: border-box; }
 
 :root {
+  color-scheme: dark;
   --bg: #050510;
   --bg-overlay: rgba(0,0,0,0.9);
   --bg-overlay-top: rgba(0,0,0,0.6);
@@ -19,6 +20,7 @@
 }
 
 [data-theme="light"] {
+  color-scheme: light;
   --bg: #e8edf5;
   --bg-overlay: rgba(255,255,255,0.85);
   --bg-overlay-top: rgba(255,255,255,0.7);
@@ -2160,8 +2162,16 @@ a.help-features-btn {
 .demo-layout-advanced .canvas-stack {
   flex: 1 1 auto;
   min-width: 0;
+  min-height: 0;
   position: relative;
   z-index: 1;
+  transition: flex-grow 0.32s ease, min-width 0.32s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .demo-layout-advanced .canvas-stack {
+    transition: none;
+  }
 }
 
 .demo-layout-advanced .canvas-stack #canvas {
@@ -2455,12 +2465,77 @@ a.help-features-btn {
   font-style: italic;
 }
 
+/* Advanced demo: parameters live inside right panel — cancel global floating card */
+.demo-layout-advanced .demo-right-panel .params-panel,
+.demo-layout-advanced .demo-right-panel .params-panel.params-panel-advanced {
+  position: static !important;
+  top: auto !important;
+  right: auto !important;
+  left: auto !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
 .params-panel.params-panel-advanced {
   background: transparent;
   border: none;
   padding: 0;
   margin: 0;
   box-shadow: none;
+}
+
+.demo-layout-advanced .panel-section-body {
+  overflow-x: hidden;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.demo-layout-advanced .param-row input[type='number'],
+.demo-layout-advanced .param-row input[type='text'] {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.demo-layout-advanced .param-fieldset {
+  min-width: 0;
+}
+.demo-layout-advanced .param-fieldset .radio-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 12px;
+  flex-wrap: wrap;
+}
+
+.panel-appearance-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--panel-border);
+}
+.panel-appearance-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.theme-btn--panel {
+  flex-shrink: 0;
+  padding: 8px 12px;
+  font-size: 13px;
+}
+.theme-btn--panel .theme-label {
+  display: inline;
+}
+@media (max-width: 320px) {
+  .theme-btn--panel .theme-label {
+    display: none;
+  }
 }
 .param-row--swatch {
   display: grid;
