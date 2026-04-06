@@ -1896,7 +1896,7 @@ details.explore-deeper[open] > .explore-deeper-summary::before {
   pointer-events: auto;
 }
 
-/* Desktop / wide: pill bar below focus sheet z-243 (<1025 centred; 1025+ top-left like main layout) */
+/* Desktop / wide: pill bar below focus sheet z-243 (centred on viewport) */
 .demo-layout-advanced.demo-layout--focus #interpretation-tabs {
   position: absolute;
   z-index: 198;
@@ -1920,19 +1920,8 @@ details.explore-deeper[open] > .explore-deeper-summary::before {
   }
 }
 
-/* Focus-only: advanced lab single-row bar — roomier than default compact strip + align with main desktop bar */
+/* Focus-only: advanced lab single-row bar — roomier than default compact strip */
 @media (min-width: 1025px) {
-  .demo-layout-advanced.demo-layout--focus #interpretation-tabs {
-    left: max(32px, env(safe-area-inset-left, 0px));
-    transform: none;
-    right: auto;
-    max-width: min(
-      1720px,
-      calc(
-        100vw - max(32px, env(safe-area-inset-left, 0px)) - max(32px, env(safe-area-inset-right, 0px)) - 400px
-      )
-    );
-  }
   .demo-layout-advanced.demo-layout--focus #interpretation-tabs.interpretation-tabs-many {
     padding: 14px 18px 14px 20px;
   }
