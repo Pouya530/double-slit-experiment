@@ -138,12 +138,6 @@ body {
 .demo-header .back { font-size: 14px; color: var(--text-muted); text-decoration: none; }
 .demo-header .back:hover { color: var(--text); }
 
-@media (min-width: 769px) {
-  .demo-header .logo-text {
-    display: none;
-  }
-}
-
 .theme-btn {
   display: flex;
   align-items: center;
@@ -285,22 +279,6 @@ body {
   color: #fff;
 }
 
-/* Logo mark inside interpretation bar — visible only large desktop (see 1025px block) */
-.interp-bar-logo {
-  display: none;
-  align-items: center;
-  margin-right: 6px;
-  text-decoration: none;
-  color: inherit;
-  flex-shrink: 0;
-}
-.interp-bar-logo-mark {
-  height: 2em;
-  width: auto;
-  display: block;
-  object-fit: contain;
-}
-
 .info-toggle {
   width: 44px;
   height: 44px;
@@ -341,37 +319,6 @@ body {
   .info-toggle {
     animation: none;
     box-shadow: 0 0 12px color-mix(in srgb, var(--interp-accent, var(--accent)) 40%, transparent);
-  }
-}
-
-/* Large desktop: interpretation bar top-left (aligned with header); logo icon only, inside bar */
-@media (min-width: 1025px) {
-  .demo-header .logo {
-    display: none;
-  }
-  .demo-header {
-    justify-content: flex-end;
-  }
-  .interp-bar-logo {
-    display: inline-flex;
-  }
-  .interpretation-tabs {
-    left: max(32px, env(safe-area-inset-left, 0px));
-    right: auto;
-    transform: none;
-    top: max(20px, env(safe-area-inset-top, 0px));
-    justify-content: flex-start;
-    max-width: min(
-      1720px,
-      calc(
-        100vw - max(32px, env(safe-area-inset-left, 0px)) - max(32px, env(safe-area-inset-right, 0px)) - 400px
-      )
-    );
-  }
-  .interp-tabs-pills {
-    justify-content: flex-start;
-    flex: 1 1 auto;
-    min-width: 0;
   }
 }
 
@@ -1191,12 +1138,7 @@ details.explore-deeper[open] > .explore-deeper-summary::before {
 /* Advanced lab: single-row interpretation bar on large desktop */
 @media (min-width: 1025px) {
   .demo-layout-advanced .interpretation-tabs-many {
-    max-width: min(
-      1720px,
-      calc(
-        100vw - max(32px, env(safe-area-inset-left, 0px)) - max(32px, env(safe-area-inset-right, 0px)) - 400px
-      )
-    );
+    max-width: min(99vw, 1720px);
     flex-wrap: nowrap;
     padding: 4px 8px 4px 10px;
     gap: 6px;
@@ -1238,24 +1180,6 @@ details.explore-deeper[open] > .explore-deeper-summary::before {
     width: 36px;
     height: 36px;
     font-size: 16px;
-  }
-}
-
-/* Non-focus large desktop only: roomier interpretation bar (+5px shell, slightly larger tab type) */
-@media (min-width: 1025px) {
-  .demo-layout:not(.demo-layout--focus) .interpretation-tabs,
-  .demo-layout-advanced:not(.demo-layout--focus) .interpretation-tabs {
-    padding: 11px 17px;
-  }
-  .demo-layout:not(.demo-layout--focus) .interpretation-tabs .interp-tab,
-  .demo-layout-advanced:not(.demo-layout--focus) .interpretation-tabs .interp-tab {
-    font-size: 14px;
-  }
-  .demo-layout-advanced:not(.demo-layout--focus) .interpretation-tabs-many {
-    padding: 9px 13px 9px 15px;
-  }
-  .demo-layout-advanced:not(.demo-layout--focus) .interpretation-tabs-many .interp-tab {
-    font-size: 12px;
   }
 }
 
