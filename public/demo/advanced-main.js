@@ -1252,6 +1252,30 @@ function setupUI() {
       scheduleGammaRecompute();
     });
   });
+
+  setupExploreDeeperDesktopAlwaysOpen();
+}
+
+/** Keep Explore deeper expanded on wide non-focus layout (summary hidden in CSS). */
+function setupExploreDeeperDesktopAlwaysOpen() {
+  const layout = document.querySelector('.demo-layout-advanced');
+  const explore = document.getElementById('explore-deeper');
+  if (!layout || !explore) return;
+  const mq = window.matchMedia('(min-width: 1025px)');
+  function apply() {
+    if (layout.classList.contains('demo-layout--focus')) return;
+    if (mq.matches) explore.setAttribute('open', '');
+    else explore.removeAttribute('open');
+  }
+  explore.addEventListener('toggle', () => {
+    if (layout.classList.contains('demo-layout--focus') || !mq.matches) return;
+    queueMicrotask(() => {
+      if (!explore.open) explore.open = true;
+    });
+  });
+  mq.addEventListener('change', apply);
+  window.addEventListener('resize', apply);
+  apply();
 }
 
 function onResize() {

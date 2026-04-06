@@ -856,6 +856,16 @@ body {
 details.explore-deeper[open] > .explore-deeper-summary::before {
   content: '▾ ';
 }
+.explore-deeper-static-title {
+  display: none;
+  margin: 0;
+  padding: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  line-height: 1.3;
+  font-family: inherit;
+}
 .explore-deeper-body {
   display: flex;
   flex-wrap: wrap;
@@ -865,6 +875,46 @@ details.explore-deeper[open] > .explore-deeper-summary::before {
   padding-top: 12px;
   border-top: 1px solid var(--panel-border);
 }
+
+/* Advanced main demo desktop: Explore deeper always open, under timeline (no summary toggle) */
+@media (min-width: 1025px) {
+  .demo-layout-advanced:not(.demo-layout--focus) .demo-ui.demo-ui-timeline-only {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .demo-layout-advanced:not(.demo-layout--focus) #explore-deeper {
+    position: relative;
+    margin-top: 16px;
+    max-width: none;
+    width: 100%;
+  }
+  .demo-layout-advanced:not(.demo-layout--focus) #explore-deeper .explore-deeper-summary {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+  .demo-layout-advanced:not(.demo-layout--focus) #explore-deeper .explore-deeper-summary::before {
+    content: none;
+  }
+  .demo-layout-advanced:not(.demo-layout--focus) .explore-deeper-static-title {
+    display: block;
+    margin-bottom: 10px;
+  }
+  .demo-layout-advanced:not(.demo-layout--focus) #explore-deeper .explore-deeper-body {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+  }
+}
+
 .explore-deeper-controls {
   flex: 1;
   min-width: 200px;
@@ -2033,6 +2083,10 @@ details.explore-deeper[open] > .explore-deeper-summary::before {
   margin-top: 0;
   padding-top: 0;
   border-top: none;
+}
+
+.demo-layout-advanced.demo-layout--focus #explore-deeper .explore-deeper-static-title {
+  display: none !important;
 }
 
 /* Timeline strip stays operable above the backdrop while the sheet is open */
