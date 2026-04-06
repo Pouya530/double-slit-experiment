@@ -105,6 +105,8 @@ function syncPlayButton() {
 function syncInterpretationUI() {
   document.querySelectorAll('.interp-tab').forEach((b) => b.classList.toggle('active', b.dataset.interp === activeInterpretation));
   if (showInfoPanel) renderInfoPanel(activeInterpretation);
+  const infoAccent = INTERPRETATIONS[activeInterpretation]?.color || '#129079';
+  document.getElementById('info-toggle')?.style.setProperty('--interp-accent', infoAccent);
   const ms = document.getElementById('measurement-slider');
   if (ms) {
     ms.value = String(Math.round(measurementStrength * 100));

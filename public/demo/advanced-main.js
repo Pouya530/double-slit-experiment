@@ -126,6 +126,8 @@ function syncInterpretationUI() {
   syncPlayButton();
   const interpMobile = document.getElementById('interp-select-mobile');
   if (interpMobile) interpMobile.value = activeInterpretation;
+  const infoAccent = INTERPRETATIONS_ADV[activeInterpretation]?.color || '#129079';
+  document.getElementById('info-toggle')?.style.setProperty('--interp-accent', infoAccent);
 }
 
 let massRecomputeTimer = null;

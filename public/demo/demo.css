@@ -288,8 +288,38 @@ body {
   font-size: 18px;
   cursor: pointer;
   flex-shrink: 0;
+  /* --interp-accent set from JS to match active interpretation */
+  --interp-accent: var(--accent);
 }
 .info-toggle:hover { background: var(--input-bg); }
+
+/* Desktop / tablet landscape: pulsating glow in the active interpretation colour */
+@media (min-width: 769px) {
+  .info-toggle {
+    animation: info-toggle-accent-pulse 2.4s ease-in-out infinite;
+  }
+}
+@keyframes info-toggle-accent-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 0 transparent,
+      0 0 10px var(--interp-accent, var(--accent)),
+      0 0 20px color-mix(in srgb, var(--interp-accent, var(--accent)) 45%, transparent);
+  }
+  50% {
+    box-shadow:
+      0 0 0 2px color-mix(in srgb, var(--interp-accent, var(--accent)) 35%, transparent),
+      0 0 18px var(--interp-accent, var(--accent)),
+      0 0 32px color-mix(in srgb, var(--interp-accent, var(--accent)) 50%, transparent);
+  }
+}
+@media (min-width: 769px) and (prefers-reduced-motion: reduce) {
+  .info-toggle {
+    animation: none;
+    box-shadow: 0 0 12px color-mix(in srgb, var(--interp-accent, var(--accent)) 40%, transparent);
+  }
+}
 
 .tour-btn {
   padding: 10px 14px;
