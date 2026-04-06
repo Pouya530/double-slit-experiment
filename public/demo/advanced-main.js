@@ -1298,7 +1298,10 @@ function setupFocusViewMode() {
   });
 
   accExplore?.addEventListener('toggle', () => {
-    if (accExplore.open && explore) explore.setAttribute('open', '');
+    if (accExplore.open && explore) {
+      explore.setAttribute('open', '');
+      updateExploreSection();
+    }
   });
 
   function syncFocusRailUi() {
@@ -1457,6 +1460,9 @@ function animate(now = 0) {
         rebuildParticleBuffer(Date.now());
       }
     }
+  }
+  /* HUD + slider readout must track γ every frame (focus sheet relies on this during drag). */
+  if (modeAnim === 'binary') {
     updateExploreSection();
   }
 

@@ -1757,6 +1757,11 @@ details.explore-deeper[open] > .explore-deeper-summary::before {
   grid-template-rows: min-content;
 }
 
+/* Explore deeper: entrance animation uses transform — can prevent SVG dot repaints inside nested panels */
+#focus-acc-2 .focus-acc-panel-inner {
+  animation: none !important;
+}
+
 .focus-acc-panel-inner {
   overflow: hidden;
   min-height: 0;
