@@ -8,6 +8,7 @@ import { OrbitControls } from 'https://esm.sh/three@0.160.0/examples/jsm/control
 import { createParticleBuffer } from './simulation.js?v=18';
 import { wavelengthToRGB, fringeVisibility, getComplementarity } from './physics.js?v=18';
 import { INTERPRETATIONS_ADV, INTERPRETATION_IDS_ADV } from './interpretations-advanced.js';
+import { INTERP_KEYBOARD_ORDER, INTERP_KEY_DIGITS, INTERP_UI_GROUPS } from './interpretation-order.js';
 import { MEASUREMENT_CONFIGS, narrativeForGamma } from './measurement-configs.js';
 import {
   collapseSuppressionFactor,
@@ -121,15 +122,11 @@ function syncPlayButton() {
 }
 
 function syncInterpretationUI() {
-  document.querySelectorAll('.interp-tab').forEach((b) => b.classList.toggle('active', b.dataset.interp === activeInterpretation));
-  if (showInfoPanel) renderInfoPanel(activeInterpretation);
   renderInterpretationPanelBody();
   updateObserveAndAdvancedControls();
   syncPlayButton();
-  const interpMobile = document.getElementById('interp-select-mobile');
-  if (interpMobile) interpMobile.value = activeInterpretation;
-  const infoAccent = INTERPRETATIONS_ADV[activeInterpretation]?.color || '#129079';
-  document.getElementById('info-toggle')?.style.setProperty('--interp-accent', infoAccent);
+  updateInterpTriggerButton();
+  syncInterpNavRows();
 }
 
 let massRecomputeTimer = null;
@@ -167,7 +164,6 @@ let gridHelper, sourceMesh, sourceGlow, barrierLeft, barrierCenter, barrierRight
 let waveOverlay, envParticles, qbismOverlay;
 let isDarkMode = false;
 let activeInterpretation = 'copenhagen';
-let showInfoPanel = false;
 let singleParticleMode = false;
 let particleMassAmu = 0.00055;
 let envCoupling = 0;
@@ -617,8 +613,9 @@ function getCanvasHostSize() {
 function init() {
   initSafariDetectionFastPathFlag();
 
-  isDarkMode = false;
-  document.documentElement.setAttribute('data-theme', 'light');
+  const savedTheme = localStorage.getItem('doubleSlitTheme');
+  isDarkMode = savedTheme === 'dark';
+  document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
 
   initInterpParamSnapshots();
 
@@ -652,8 +649,10 @@ function init() {
 
   applySceneTheme();
   setupUI();
-  setupInterpretationUI();
+  setupInterpretationNav();
   syncInterpretationUI();
+  setupHeaderAmbient();
+  setupHelpAndNudges();
   window.addEventListener('resize', onResize);
   const canvasHost = document.getElementById('canvas');
   if (typeof ResizeObserver !== 'undefined' && canvasHost) {
@@ -1086,86 +1085,169 @@ function getWhatsHappening(interpId) {
   }
 }
 
-function renderInfoPanel(interpId) {
-  const interp = INTERPRETATIONS_ADV[interpId];
-  if (!interp) return;
-  const el = document.getElementById('info-content');
-  const happening = getWhatsHappening(interpId);
-  el.innerHTML = `
-    <h3 style="border-left: 4px solid ${interp.color}; padding-left: 12px;">${interp.name}</h3>
-    <p class="meta"><span class="status-badge">${interp.statusLabel}</span> · ${interp.proponents} (${interp.year})</p>
-    ${interp.observerHint ? `<p class="meta" style="opacity:0.95;"><strong>Controls:</strong> ${interp.observerHint}</p>` : ''}
-    ${happening ? `<p class="happening"><strong>What's happening:</strong> ${happening}</p>` : ''}
-    <p class="story">${interp.story}</p>
-    <div class="section">
-      <div class="section-title">Strengths</div>
-      <ul class="strengths">${interp.strengths.map(s => `<li>${s}</li>`).join('')}</ul>
-    </div>
-    <div class="section">
-      <div class="section-title">What it struggles with</div>
-      <ul class="weaknesses">${interp.weaknesses.map(w => `<li>${w}</li>`).join('')}</ul>
-    </div>
-    ${interp.support ? `<p class="support">${interp.support}% of physicists (Nature 2025)</p>` : ''}
-    <div class="quote">${interp.quote}<br><small>— ${interp.quoteAuthor}</small></div>
-    <p class="meta">Level: ${interp.level}</p>
-  `;
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 }
 
-function setupInterpretationUI() {
-  const pills = document.querySelector('.interp-tabs-pills');
-  const mobile = document.getElementById('interp-select-mobile');
-  if (pills && !pills.querySelector('.interp-tab')) {
-    for (const id of INTERPRETATION_IDS_ADV) {
-      const def = INTERPRETATIONS_ADV[id];
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'interp-tab';
-      btn.dataset.interp = id;
-      btn.textContent = def.name.replace(/\s*\([^)]*\)\s*$/, '').slice(0, 22) + (def.name.length > 22 ? '…' : '');
-      btn.title = def.name;
-      pills.appendChild(btn);
+/** @type {Record<string, string>} */
+const INTERP_ID_TO_DIGIT = {};
+INTERP_KEYBOARD_ORDER.forEach((id, i) => {
+  INTERP_ID_TO_DIGIT[id] = INTERP_KEY_DIGITS[i];
+});
+
+function updateInterpTriggerButton() {
+  const def = INTERPRETATIONS_ADV[activeInterpretation];
+  const label = document.getElementById('interp-trigger-label');
+  const dot = document.getElementById('interp-trigger-dot');
+  if (label) label.textContent = def?.name ?? '';
+  if (dot && def?.color) dot.style.background = def.color;
+}
+
+function syncInterpNavRows() {
+  document.querySelectorAll('.interp-row[data-interp]').forEach((row) => {
+    row.classList.toggle('is-active', row.dataset.interp === activeInterpretation);
+    const chk = row.querySelector('.interp-row__check');
+    if (chk) chk.textContent = row.dataset.interp === activeInterpretation ? '✓' : '';
+  });
+}
+
+function interpRowHintText(def) {
+  if (!def?.story) return '';
+  const t = def.story.trim();
+  const cut = t.indexOf('.') >= 0 ? t.slice(0, t.indexOf('.') + 1) : t.slice(0, 110);
+  return cut.length < t.length && !cut.endsWith('.') ? `${cut}…` : cut;
+}
+
+function buildInterpListRow(id, opts) {
+  const def = INTERPRETATIONS_ADV[id];
+  if (!def) return '';
+  const stat =
+    typeof def.support === 'number' ? `${def.support}%` : def.statusLabel.replace(/\([^)]*\)/g, '').trim().slice(0, 22);
+  const hint = escapeHtml(interpRowHintText(def));
+  const name = escapeHtml(def.name);
+  const trail = opts.sheet
+    ? `<span class="interp-row__check" aria-hidden="true">${id === activeInterpretation ? '✓' : ''}</span>`
+    : `<span class="interp-row__key">${INTERP_ID_TO_DIGIT[id] ?? ''}</span>`;
+  return `<button type="button" class="interp-row${opts.sheet ? ' interp-row--sheet' : ''}" data-interp="${id}" role="option" aria-selected="${id === activeInterpretation}">
+    <span class="interp-row-line">
+      <span class="interp-row__dot" style="background:${escapeHtml(def.color)}"></span>
+      <span class="interp-row__name">${name}</span>
+      <span class="interp-row__stat">${escapeHtml(stat)}</span>
+      ${trail}
+    </span>
+    <p class="interp-row__hint">${hint}</p>
+  </button>`;
+}
+
+function fillInterpPopoverBody() {
+  const host = document.getElementById('interp-popover-list');
+  if (!host) return;
+  let html = '';
+  for (const grp of INTERP_UI_GROUPS) {
+    html += `<div class="interp-group-label">${escapeHtml(grp.label)}</div>`;
+    for (const id of grp.ids) {
+      html += buildInterpListRow(id, { sheet: false });
     }
   }
-  if (mobile && mobile.options.length === 0) {
-    mobile.innerHTML = INTERPRETATION_IDS_ADV.map((id) => {
-      const d = INTERPRETATIONS_ADV[id];
-      return `<option value="${id}">${d.name}</option>`;
-    }).join('');
+  host.innerHTML = html;
+}
+
+function fillInterpSheetBody() {
+  const host = document.getElementById('interp-sheet-body');
+  if (!host) return;
+  let html = '';
+  for (const grp of INTERP_UI_GROUPS) {
+    html += `<div class="interp-group-label">${escapeHtml(grp.label)}</div>`;
+    for (const id of grp.ids) {
+      html += buildInterpListRow(id, { sheet: true });
+    }
+  }
+  host.innerHTML = html;
+}
+
+function setupInterpretationNav() {
+  fillInterpPopoverBody();
+  fillInterpSheetBody();
+
+  const trigger = document.getElementById('interp-trigger');
+  const wrap = document.getElementById('interp-popover-wrap');
+  const backdrop = document.getElementById('interp-popover-backdrop');
+  const closeBtn = document.getElementById('interp-popover-close');
+  const list = document.getElementById('interp-popover-list');
+  const sheet = document.getElementById('interp-sheet');
+  const sheetBackdrop = document.getElementById('interp-sheet-backdrop');
+  const sheetClose = document.getElementById('interp-sheet-close');
+
+  function closePopover() {
+    wrap?.setAttribute('hidden', '');
+    trigger?.setAttribute('aria-expanded', 'false');
   }
 
-  document.querySelectorAll('.interp-tab').forEach((btn) => {
-    const color = INTERPRETATIONS_ADV[btn.dataset.interp]?.color;
-    btn.style.setProperty('--interp-accent', color || '#129079');
-    btn.addEventListener('click', () => {
-      switchInterpretation(btn.dataset.interp);
-      document.querySelectorAll('.interp-tab').forEach(b => b.classList.toggle('active', b.dataset.interp === activeInterpretation));
-      const interpMobile = document.getElementById('interp-select-mobile');
-      if (interpMobile) interpMobile.value = activeInterpretation;
-      syncInterpretationUI();
-      renderInfoPanel(activeInterpretation);
-      if (showInfoPanel) document.getElementById('info-panel').classList.add('open');
-    });
+  function openPopover() {
+    if (window.matchMedia('(max-width: 1023px)').matches) {
+      sheet?.removeAttribute('hidden');
+      return;
+    }
+    fillInterpPopoverBody();
+    wrap?.removeAttribute('hidden');
+    trigger?.setAttribute('aria-expanded', 'true');
+    syncInterpNavRows();
+  }
+
+  function closeSheet() {
+    sheet?.setAttribute('hidden', '');
+  }
+
+  trigger?.addEventListener('click', () => {
+    if (window.matchMedia('(max-width: 1023px)').matches) {
+      fillInterpSheetBody();
+      if (sheet?.hasAttribute('hidden')) sheet.removeAttribute('hidden');
+      else sheet?.setAttribute('hidden', '');
+      syncInterpNavRows();
+      return;
+    }
+    if (wrap?.hasAttribute('hidden')) openPopover();
+    else closePopover();
   });
-  document.querySelector('.interp-tab[data-interp="copenhagen"]')?.classList.add('active');
-  document.getElementById('interp-select-mobile')?.addEventListener('change', (e) => {
-    switchInterpretation(e.target.value);
-    document.querySelectorAll('.interp-tab').forEach((b) => b.classList.toggle('active', b.dataset.interp === activeInterpretation));
+
+  closeBtn?.addEventListener('click', closePopover);
+  backdrop?.addEventListener('click', closePopover);
+  sheetBackdrop?.addEventListener('click', closeSheet);
+  sheetClose?.addEventListener('click', closeSheet);
+
+  list?.addEventListener('click', (e) => {
+    const btn = e.target.closest('.interp-row[data-interp]');
+    if (!btn) return;
+    switchInterpretation(btn.dataset.interp);
     syncInterpretationUI();
-    renderInfoPanel(activeInterpretation);
-    if (showInfoPanel) document.getElementById('info-panel').classList.add('open');
+    closePopover();
   });
 
-  document.getElementById('info-toggle')?.addEventListener('click', () => {
-    showInfoPanel = !showInfoPanel;
-    document.getElementById('info-panel').classList.toggle('open', showInfoPanel);
-    if (showInfoPanel) renderInfoPanel(activeInterpretation);
-  });
-  document.getElementById('info-close')?.addEventListener('click', () => {
-    showInfoPanel = false;
-    document.getElementById('info-panel').classList.remove('open');
+  document.getElementById('interp-sheet-body')?.addEventListener('click', (e) => {
+    const btn = e.target.closest('.interp-row[data-interp]');
+    if (!btn) return;
+    switchInterpretation(btn.dataset.interp);
+    syncInterpretationUI();
+    closeSheet();
   });
 
-  renderInfoPanel(activeInterpretation);
+  document.addEventListener('keydown', (e) => {
+    const tag = document.activeElement?.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+    const idx = INTERP_KEY_DIGITS.indexOf(e.key);
+    if (idx >= 0 && idx < INTERP_KEYBOARD_ORDER.length) {
+      e.preventDefault();
+      switchInterpretation(INTERP_KEYBOARD_ORDER[idx]);
+      syncInterpretationUI();
+    }
+  });
+
+  updateInterpTriggerButton();
+  syncInterpNavRows();
 }
 
 function drawDetectionScreen() {
@@ -1311,7 +1393,6 @@ function setupUI() {
     const hint = document.getElementById('explore-deeper-hint');
     if (hint) hint.hidden = false;
     updateExploreSection();
-    if (showInfoPanel) renderInfoPanel(activeInterpretation);
     scheduleGammaRecompute();
   });
   exEl?.addEventListener('dblclick', () => {
@@ -1336,7 +1417,6 @@ function setupUI() {
     clearTimeout(gammaRecomputeTimer);
     gammaRecomputeTimer = null;
     rebuildParticleBuffer(Date.now());
-    if (showInfoPanel) renderInfoPanel(activeInterpretation);
   });
 
   document.getElementById('recompute')?.addEventListener('click', () => {
@@ -1345,33 +1425,18 @@ function setupUI() {
     rebuildParticleBuffer(Date.now());
     currentTime = 0;
     timelineEl.value = 0;
-    const cluster = document.getElementById('demo-toolbar-cluster');
-    const pToggle = document.getElementById('params-toggle');
-    if (cluster && pToggle && window.matchMedia('(max-width: 768px)').matches) {
-      cluster.classList.remove('params-panel-open');
-      pToggle.setAttribute('aria-expanded', 'false');
-    }
   });
 
-  const toolbarCluster = document.getElementById('demo-toolbar-cluster');
   const paramsToggleBtn = document.getElementById('params-toggle');
-  function closeMobileParamsIfDesktop() {
-    if (window.matchMedia('(min-width: 769px)').matches) {
-      toolbarCluster?.classList.remove('params-panel-open');
-      paramsToggleBtn?.setAttribute('aria-expanded', 'false');
-    }
-  }
   paramsToggleBtn?.addEventListener('click', () => {
-    const open = toolbarCluster?.classList.toggle('params-panel-open');
-    paramsToggleBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
     if (window.matchMedia('(max-width: 1023px)').matches) {
       const rp = document.getElementById('demo-right-panel');
       rp?.classList.remove('sheet-peek', 'sheet-half', 'sheet-full');
       rp?.classList.add('sheet-full');
       document.getElementById('panel-section-params')?.setAttribute('open', '');
+      paramsToggleBtn.setAttribute('aria-expanded', 'true');
     }
   });
-  window.addEventListener('resize', closeMobileParamsIfDesktop);
 
   syncPlayButton();
 
@@ -1385,7 +1450,6 @@ function setupUI() {
     massEl.addEventListener('input', () => {
       particleMassAmu = massSliderToAmu(Number(massEl.value) / 1000);
       updateObserveAndAdvancedControls();
-      if (showInfoPanel) renderInfoPanel(activeInterpretation);
       scheduleMassRecompute();
     });
   }
@@ -1395,7 +1459,6 @@ function setupUI() {
     envEl.addEventListener('input', () => {
       envCoupling = Number(envEl.value) / 100;
       updateObserveAndAdvancedControls();
-      if (showInfoPanel) renderInfoPanel(activeInterpretation);
       scheduleGammaRecompute();
     });
   }
@@ -1404,7 +1467,6 @@ function setupUI() {
     radio.addEventListener('change', () => {
       if (radio.checked) perspective = radio.value;
       updateObserveAndAdvancedControls();
-      if (showInfoPanel) renderInfoPanel(activeInterpretation);
       scheduleGammaRecompute();
     });
   });
@@ -1424,7 +1486,6 @@ function setupUI() {
     isObserving = goHigh;
     rebuildParticleBuffer(Date.now());
     updateExploreSection();
-    if (showInfoPanel) renderInfoPanel(activeInterpretation);
   });
 
   document.getElementById('measurement-gamma-input')?.addEventListener('change', () => {
@@ -1441,7 +1502,6 @@ function setupUI() {
     isObserving = g >= 0.5;
     updateExploreSection();
     scheduleGammaRecompute();
-    if (showInfoPanel) renderInfoPanel(activeInterpretation);
   });
 
   document.getElementById('reset-params-defaults')?.addEventListener('click', () => {
@@ -1573,8 +1633,8 @@ function setupRightPanelUi() {
 
   document.addEventListener('keydown', (e) => {
     if (e.key !== ']' || e.ctrlKey || e.metaKey || e.altKey) return;
-    const modal = document.getElementById('features-help-modal');
-    if (modal && !modal.hasAttribute('hidden')) return;
+    const help = document.getElementById('help-slide-panel');
+    if (help && !help.hasAttribute('hidden')) return;
     if (document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'TEXTAREA') return;
     e.preventDefault();
     setCollapsed(!panel?.classList.contains('panel-collapsed'));
@@ -1677,7 +1737,6 @@ function setupComplementarityInteraction() {
     exploreSliderDragging = false;
     updateExploreSection();
     scheduleGammaRecompute();
-    if (showInfoPanel) renderInfoPanel(activeInterpretation);
     requestAnimationFrame(() => {
       isUpdatingFromCircle = false;
     });
@@ -1700,6 +1759,309 @@ function setupComplementarityInteraction() {
   svg.addEventListener('pointercancel', () => {
     dragging = false;
   });
+}
+
+function syncThemeToggleGlyph() {
+  const icon = document.querySelector('#theme-toggle .theme-icon');
+  if (icon) icon.textContent = isDarkMode ? '☀' : '🌙';
+}
+
+function setupHeaderAmbient() {
+  const header = document.getElementById('header-overlay');
+  const layout = document.querySelector('.demo-layout-advanced');
+  const canvasStack = document.getElementById('canvas-stack');
+  const reduceMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  syncThemeToggleGlyph();
+  document.getElementById('theme-toggle')?.addEventListener('click', () => {
+    isDarkMode = !isDarkMode;
+    document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
+    localStorage.setItem('doubleSlitTheme', isDarkMode ? 'dark' : 'light');
+    syncThemeToggleGlyph();
+    applySceneTheme();
+  });
+
+  if (layout && header) {
+    const syncFocusHeader = () => {
+      const on = layout.classList.contains('demo-layout--focus');
+      header.classList.toggle('focus-hidden', on);
+      if (!on) header.classList.remove('header-overlay--peek');
+    };
+    syncFocusHeader();
+    new MutationObserver(syncFocusHeader).observe(layout, { attributes: true, attributeFilter: ['class'] });
+  }
+
+  let orbitInteracting = false;
+  let fadeTimer = null;
+  let peekHideTimer = 0;
+
+  function clearFadeTimer() {
+    if (fadeTimer != null) {
+      clearTimeout(fadeTimer);
+      fadeTimer = null;
+    }
+  }
+
+  function armFade() {
+    if (reduceMotion) return;
+    clearFadeTimer();
+    fadeTimer = window.setTimeout(() => {
+      if (orbitInteracting) header?.classList.add('faded');
+    }, 1000);
+  }
+
+  function wakeHeader() {
+    clearFadeTimer();
+    header?.classList.remove('faded');
+  }
+
+  controls?.addEventListener('start', () => {
+    orbitInteracting = true;
+    armFade();
+  });
+  controls?.addEventListener('end', () => {
+    orbitInteracting = false;
+    wakeHeader();
+  });
+
+  canvasStack?.addEventListener('pointerleave', wakeHeader);
+
+  document.addEventListener(
+    'pointermove',
+    (e) => {
+      if (e.clientY <= 60) wakeHeader();
+      if (!layout?.classList.contains('demo-layout--focus') || !header?.classList.contains('focus-hidden')) return;
+      if (e.clientY <= 56) {
+        window.clearTimeout(peekHideTimer);
+        header.classList.add('header-overlay--peek');
+      } else {
+        window.clearTimeout(peekHideTimer);
+        peekHideTimer = window.setTimeout(() => header.classList.remove('header-overlay--peek'), 420);
+      }
+    },
+    { passive: true },
+  );
+
+  header?.addEventListener('pointerenter', wakeHeader);
+}
+
+function setupHelpAndNudges() {
+  const helpPanel = document.getElementById('help-slide-panel');
+  const openBtn = document.getElementById('help-panel-open');
+  const closeBtn = document.getElementById('help-slide-close');
+  const backdrop = document.getElementById('help-slide-panel-backdrop');
+  const nudge = document.getElementById('first-visit-nudge');
+  const nudgeClose = document.getElementById('first-visit-nudge-close');
+  const layout = document.querySelector('.demo-layout-advanced');
+
+  function openHelp() {
+    if (!helpPanel) return;
+    helpPanel.removeAttribute('hidden');
+    helpPanel.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('help-slide-panel-open');
+    openBtn?.setAttribute('aria-expanded', 'true');
+    localStorage.setItem('ds-helpOpened', '1');
+    openBtn?.classList.remove('help-has-hint');
+  }
+
+  function closeHelp() {
+    if (!helpPanel) return;
+    helpPanel.setAttribute('hidden', '');
+    helpPanel.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('help-slide-panel-open');
+    openBtn?.setAttribute('aria-expanded', 'false');
+  }
+
+  if (localStorage.getItem('ds-helpOpened')) {
+    openBtn?.classList.remove('help-has-hint');
+  }
+
+  openBtn?.addEventListener('click', () => {
+    if (helpPanel?.hasAttribute('hidden')) openHelp();
+    else closeHelp();
+  });
+  closeBtn?.addEventListener('click', closeHelp);
+  backdrop?.addEventListener('click', closeHelp);
+
+  try {
+    const q = new URLSearchParams(window.location.search);
+    if (q.get('how') === '1' || q.get('help') === '1') {
+      queueMicrotask(() => openHelp());
+    }
+  } catch {
+    /* ignore */
+  }
+
+  function dismissNudge() {
+    if (!nudge || nudge.hasAttribute('hidden')) return;
+    nudge.setAttribute('hidden', '');
+    localStorage.setItem('ds-hasVisited', 'true');
+  }
+
+  nudgeClose?.addEventListener('click', dismissNudge);
+
+  document.addEventListener(
+    'pointerdown',
+    (e) => {
+      if (!nudge || nudge.hasAttribute('hidden')) return;
+      if (e.target.closest('#first-visit-nudge')) return;
+      dismissNudge();
+    },
+    true,
+  );
+
+  const markVisitedOnControl = () => dismissNudge();
+  document.getElementById('demo-right-panel')?.addEventListener('pointerdown', markVisitedOnControl);
+  document.getElementById('transport-overlay')?.addEventListener('pointerdown', markVisitedOnControl);
+  document.getElementById('canvas-stack')?.addEventListener('pointerdown', markVisitedOnControl);
+  document.getElementById('interp-trigger')?.addEventListener('click', markVisitedOnControl);
+
+  if (!localStorage.getItem('ds-hasVisited')) {
+    window.setTimeout(() => {
+      if (localStorage.getItem('ds-hasVisited') || !nudge) return;
+      const mobile = window.matchMedia('(max-width: 1023px)').matches;
+      nudge.style.left = '';
+      nudge.style.right = '';
+      nudge.style.top = '';
+      nudge.style.bottom = '';
+      if (mobile) {
+        const handle = document.getElementById('bottom-sheet-handle');
+        const r = handle?.getBoundingClientRect();
+        if (r) {
+          const w = 280;
+          const cx = r.left + r.width / 2;
+          nudge.style.left = `${Math.max(12, Math.min(cx - w / 2, window.innerWidth - w - 12))}px`;
+          nudge.style.bottom = `${window.innerHeight - r.top + 12}px`;
+        } else {
+          nudge.style.left = '12px';
+          nudge.style.bottom = '100px';
+        }
+      } else {
+        const el = document.getElementById('measurement-slider-explore');
+        const r = el?.getBoundingClientRect();
+        const panelEl = document.getElementById('demo-right-panel');
+        const pr = panelEl?.getBoundingClientRect();
+        if (r && pr) {
+          const w = 280;
+          const cx = (r.left + r.right) / 2;
+          nudge.style.left = `${Math.max(12, Math.min(cx - w / 2, pr.right - w - 8))}px`;
+        } else {
+          nudge.style.right = '16px';
+        }
+        nudge.style.top = '72px';
+      }
+      nudge.removeAttribute('hidden');
+      if (!mobile) {
+        const mEl = document.getElementById('measurement-slider-explore');
+        const mr = mEl?.getBoundingClientRect();
+        if (mr) {
+          requestAnimationFrame(() => {
+            const h = nudge.getBoundingClientRect().height || 72;
+            nudge.style.top = `${Math.max(48, mr.top - h - 10)}px`;
+          });
+        }
+      }
+    }, 3000);
+  }
+
+  const tip = document.getElementById('ctx-tooltip');
+  /** @type {HTMLElement | null} */
+  let tipPinnedTarget = null;
+
+  function hideCtxTip() {
+    if (tip) tip.hidden = true;
+  }
+
+  function placeCtxTip(anchor) {
+    if (!tip || !anchor) return;
+    const r = anchor.getBoundingClientRect();
+    const tw = tip.offsetWidth || 200;
+    const th = tip.offsetHeight || 40;
+    let x = r.left + r.width / 2 - tw / 2;
+    let y = r.top - th - 8;
+    if (y < 12) y = r.bottom + 8;
+    x = Math.max(8, Math.min(x, window.innerWidth - tw - 8));
+    tip.style.left = `${x}px`;
+    tip.style.top = `${y}px`;
+  }
+
+  function showCtxTip(anchor, text) {
+    if (!tip || !text) return;
+    tip.textContent = text;
+    tip.hidden = false;
+    placeCtxTip(anchor);
+    requestAnimationFrame(() => placeCtxTip(anchor));
+  }
+
+  document.querySelectorAll('.ctx-hint[data-hint]').forEach((btn) => {
+    const el = /** @type {HTMLElement} */ (btn);
+    const text = el.getAttribute('data-hint') || '';
+    el.addEventListener('mouseenter', () => {
+      if (tipPinnedTarget) return;
+      showCtxTip(el, text);
+    });
+    el.addEventListener('mouseleave', () => {
+      if (tipPinnedTarget === el) return;
+      hideCtxTip();
+    });
+    el.addEventListener('focus', () => showCtxTip(el, text));
+    el.addEventListener('blur', () => {
+      if (tipPinnedTarget === el) return;
+      hideCtxTip();
+    });
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (tipPinnedTarget === el && tip && !tip.hidden) {
+        tipPinnedTarget = null;
+        hideCtxTip();
+      } else {
+        tipPinnedTarget = el;
+        showCtxTip(el, text);
+      }
+    });
+  });
+
+  document.addEventListener('pointerdown', (e) => {
+    if (e.target.closest('.ctx-hint')) return;
+    tipPinnedTarget = null;
+    hideCtxTip();
+  });
+
+  document.addEventListener(
+    'keydown',
+    (e) => {
+      if (e.key !== 'Escape') return;
+      const help = document.getElementById('help-slide-panel');
+      if (help && !help.hasAttribute('hidden')) {
+        closeHelp();
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        return;
+      }
+      const wrap = document.getElementById('interp-popover-wrap');
+      const sheet = document.getElementById('interp-sheet');
+      if (wrap && !wrap.hasAttribute('hidden')) {
+        wrap.setAttribute('hidden', '');
+        document.getElementById('interp-trigger')?.setAttribute('aria-expanded', 'false');
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        return;
+      }
+      if (sheet && !sheet.hasAttribute('hidden')) {
+        sheet.setAttribute('hidden', '');
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        return;
+      }
+      const header = document.getElementById('header-overlay');
+      if (layout?.classList.contains('demo-layout--focus') && header?.classList.contains('focus-hidden')) {
+        header.classList.toggle('header-overlay--peek');
+        e.preventDefault();
+      }
+    },
+    true,
+  );
 }
 
 function onResize() {

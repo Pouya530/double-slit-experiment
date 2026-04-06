@@ -56,45 +56,107 @@
   <link rel="icon" href="/favicon.png" type="image/png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/demo/demo.css?v=50">
+  <link rel="stylesheet" href="/demo/demo.css?v=51">
   <script type="application/ld+json">
   {"@context":"https://schema.org","@graph":[{"@type":"WebPage","@id":"https://doubleslitexperiment.app/demo/#webpage","name":"Double Slit Experiment — Interactive Demo","description":"Run the Double Slit 3D demo: double-slit interference, measurement strength (continuous decoherence), quantum interpretations, and live parameters in your browser.","url":"https://doubleslitexperiment.app/demo/","isPartOf":{"@type":"WebSite","name":"Double Slit Experiment","url":"https://doubleslitexperiment.app/"},"breadcrumb":{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://doubleslitexperiment.app/"},{"@type":"ListItem","position":2,"name":"Demo","item":"https://doubleslitexperiment.app/demo/"}]}},{"@type":"SoftwareApplication","name":"Double Slit Experiment","applicationCategory":"EducationalApplication","operatingSystem":"Web","url":"https://doubleslitexperiment.app/demo/","description":"Interactive 3D double-slit experiment with timeline scrubber, measurement-strength control, interpretations, and adjustable experimental parameters.","author":{"@type":"Organization","name":"Nocturnal Cloud","url":"https://nocturnal.cloud"},"offers":{"@type":"Offer","price":"0","priceCurrency":"GBP","availability":"https://schema.org/InStock"}}]}
   </script>
 </head>
 <body>
   <div class="demo-layout demo-layout-advanced">
-    <div class="demo-header">
-      <a href="/" class="logo">
-        <img src="/double-slit-experiment-logo-icon.png" alt="" class="logo-mark" width="64" height="64" decoding="async">
-        <span class="logo-text">Double Slit Experiment</span>
-      </a>
-      <div class="header-right">
-        <button type="button" class="help-features-btn" id="features-help-open" aria-haspopup="dialog" aria-controls="features-help-modal" aria-expanded="false">
-          How it works
+    <header class="header-overlay" id="header-overlay" role="banner">
+      <div class="header-overlay__left">
+        <a href="/" class="header-logo-link" id="header-logo-link" title="Back to home" aria-label="Back to home">
+          <img src="/double-slit-experiment-logo-icon.png" alt="" class="header-logo-img" width="24" height="24" decoding="async">
+        </a>
+        <button type="button" class="interp-trigger" id="interp-trigger" aria-expanded="false" aria-haspopup="listbox" aria-controls="interp-popover-list">
+          <span class="interp-trigger__dot" id="interp-trigger-dot" aria-hidden="true"></span>
+          <span class="interp-trigger__label" id="interp-trigger-label">Copenhagen</span>
+          <span class="interp-trigger__chev" aria-hidden="true">▾</span>
         </button>
-        <button type="button" class="focus-view-header-btn" id="focus-view-enter" aria-label="Focus view: hide menus" title="Focus view — side controls">
-          <span class="focus-view-header-icon" aria-hidden="true">◧</span>
-          <span class="focus-view-header-label">Focus</span>
+      </div>
+      <div class="header-overlay__right">
+        <a href="/demo/classic.html" class="header-tour-link" id="header-tour-link">▶ Tour</a>
+        <button type="button" class="header-icon-btn help-has-hint" id="help-panel-open" aria-label="Help" aria-controls="help-slide-panel" title="Help" aria-expanded="false">
+          <span class="header-help-dot" id="help-panel-hint-dot" aria-hidden="true"></span>
+          <span aria-hidden="true">?</span>
         </button>
-        <a href="/" class="back">← Home</a>
+        <button type="button" class="header-icon-btn" id="theme-toggle" aria-label="Toggle light or dark mode" title="Theme">
+          <span class="theme-icon" aria-hidden="true">🌙</span>
+        </button>
+        <button type="button" class="header-icon-btn" id="focus-view-enter" aria-label="Focus view: hide side panel" title="Focus view">
+          <span aria-hidden="true">◧</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="interpretation-popover-wrap" id="interp-popover-wrap" hidden>
+      <div class="interpretation-popover-backdrop" id="interp-popover-backdrop" aria-hidden="true"></div>
+      <div class="interpretation-popover" id="interp-popover" role="dialog" aria-modal="true" aria-labelledby="interp-popover-title">
+        <div class="interpretation-popover-head">
+          <h2 class="interpretation-popover-title" id="interp-popover-title">Interpretations</h2>
+          <button type="button" class="interpretation-popover-close" id="interp-popover-close" aria-label="Close">×</button>
+        </div>
+        <div class="interpretation-popover-body" id="interp-popover-list" role="listbox" aria-multiselectable="false"></div>
       </div>
     </div>
 
-    <div class="demo-toolbar-cluster" id="demo-toolbar-cluster">
-      <div class="interpretation-tabs interpretation-tabs-many" id="interpretation-tabs">
-        <label class="interp-mobile-label" for="interp-select-mobile">Interpretation</label>
-        <select id="interp-select-mobile" class="interp-select-mobile" aria-label="Quantum interpretation"></select>
-        <div class="interp-tabs-pills interp-tabs-pills-advanced"></div>
-        <div class="interp-toolbar-actions">
-          <button type="button" class="info-toggle" id="info-toggle" aria-label="Toggle info panel">ℹ</button>
+    <div class="interpretation-sheet" id="interp-sheet" hidden>
+      <div class="interpretation-sheet-backdrop" id="interp-sheet-backdrop"></div>
+      <div class="interpretation-sheet-panel" role="dialog" aria-modal="true" aria-labelledby="interp-sheet-title">
+        <div class="interpretation-sheet-handle" id="interp-sheet-handle"><span></span></div>
+        <div class="interpretation-sheet-head">
+          <h2 class="interpretation-sheet-title" id="interp-sheet-title">Interpretations</h2>
+          <button type="button" class="interpretation-sheet-close" id="interp-sheet-close" aria-label="Close">×</button>
+        </div>
+        <div class="interpretation-sheet-body" id="interp-sheet-body"></div>
+      </div>
+    </div>
+
+    <div class="help-slide-panel" id="help-slide-panel" hidden aria-hidden="true">
+      <div class="help-slide-panel-backdrop" id="help-slide-panel-backdrop"></div>
+      <div class="help-slide-panel-inner" role="dialog" aria-modal="true" aria-labelledby="help-slide-title">
+        <div class="help-slide-panel-head">
+          <h2 id="help-slide-title" class="help-slide-panel-title">Help</h2>
+          <button type="button" class="help-slide-panel-close" id="help-slide-close" aria-label="Close help">×</button>
+        </div>
+        <div class="help-slide-panel-body">
+          <details class="help-acc" open>
+            <summary>The experiment</summary>
+            <div class="help-acc-body">
+              <p>In the double-slit experiment, particles are sent one at a time toward two slits and a detection screen. With both slits open and no which-path information, an interference pattern appears — as if each particle went through both slits. Introducing measurement that reveals which slit the particle used destroys that pattern in steps described by complementarity. This demo lets you vary measurement strength and compare how different quantum interpretations describe the same statistics.</p>
+            </div>
+          </details>
+          <details class="help-acc">
+            <summary>Controls quick reference</summary>
+            <div class="help-acc-body">
+              <ul class="help-list">
+                <li><strong>γ slider / complementarity circle</strong> — measurement strength; more which-path information means less fringe visibility.</li>
+                <li><strong>Transport bar</strong> — play, pause, scrub the particle animation; speed and reset.</li>
+                <li><strong>Right panel</strong> — parameters (slits, wavelength), interpretation text, measurement narrative.</li>
+                <li><strong>Keyboard</strong> — <kbd>1</kbd>–<kbd>0</kbd> switch interpretations (see list in the interpretation menu), <kbd>Space</kbd> play/pause on the canvas, <kbd>]</kbd> collapse/expand the side panel.</li>
+              </ul>
+            </div>
+          </details>
+          <details class="help-acc">
+            <summary>About</summary>
+            <div class="help-acc-body">
+              <p><a href="/">Home page</a> — Double Slit Experiment</p>
+              <p class="help-credits">Built by <a href="https://nocturnal.cloud" rel="noopener noreferrer">Nocturnal Cloud</a></p>
+            </div>
+          </details>
         </div>
       </div>
-      <button type="button" class="params-toggle-mobile" id="params-toggle" aria-expanded="false" aria-controls="params-panel">
-        <span class="params-toggle-icon" aria-hidden="true">⚙</span>
-        <span>Parameters</span>
-        <span class="params-toggle-chevron" aria-hidden="true">▾</span>
-      </button>
     </div>
+
+    <div class="first-visit-nudge" id="first-visit-nudge" role="status" hidden>
+      <button type="button" class="first-visit-nudge-close" id="first-visit-nudge-close" aria-label="Dismiss">×</button>
+      <p class="first-visit-nudge-text">Drag the measurement slider to watch interference disappear — then switch interpretations to see why physicists disagree about what's happening.</p>
+    </div>
+
+    <button type="button" class="params-fab-mobile" id="params-toggle" aria-expanded="false" aria-controls="params-panel">
+      <span aria-hidden="true">⚙</span>
+      <span class="params-fab-label">Params</span>
+    </button>
 
     <div class="demo-stage" id="demo-stage">
       <div class="canvas-stack" id="canvas-stack">
@@ -148,6 +210,7 @@
                 </div>
                 <div class="measurement-meta measurement-meta--with-input">
                   <span id="measurement-label-explore" class="measurement-label">Measurement strength γ</span>
+                  <button type="button" class="ctx-hint" data-hint="Controls how much which-path information is gained. At 0%, full interference. At 100%, a classical-like pattern." aria-label="About measurement strength">i</button>
                   <span id="measurement-value-readout-explore" class="measurement-readout">0%</span>
                   <label class="sr-only" for="measurement-gamma-input">Gamma percent</label>
                   <input type="number" id="measurement-gamma-input" class="measurement-gamma-input" min="0" max="100" value="0" step="1" aria-label="Gamma precise value percent">
@@ -180,7 +243,7 @@
           </details>
 
           <details class="panel-section" id="panel-section-comp" open>
-            <summary class="panel-section-summary">Complementarity</summary>
+            <summary class="panel-section-summary panel-section-summary--row">Complementarity <button type="button" class="ctx-hint ctx-hint--in-summary" data-hint="Drag the point to explore the tradeoff. D² + V² ≤ 1 is a law of nature — you cannot have full knowledge of both which-path and fringe visibility." aria-label="About complementarity">i</button></summary>
             <div class="panel-section-body">
               <div class="complementarity-panel" id="complementarity-hud-explore" role="img" aria-label="Complementarity D versus V diagram">
                 <svg id="complementarity-svg" class="complementarity-svg-lg" viewBox="0 0 100 100" aria-hidden="true">
@@ -232,16 +295,16 @@
                   <label class="radio-label"><input type="radio" name="perspective" value="particle"> Particle</label>
                 </fieldset>
                 <div class="param-row param-row--swatch">
-                  <label for="wavelength">Wavelength (nm)</label>
+                  <label class="param-label-inline" for="wavelength">Wavelength (nm) <button type="button" class="ctx-hint" data-hint="Longer wavelengths produce wider fringe spacing on the screen." aria-label="About wavelength">i</button></label>
                   <input type="number" id="wavelength" value="550" min="380" max="700">
                   <span class="wavelength-swatch" id="wavelength-swatch" aria-hidden="true"></span>
                 </div>
                 <div class="param-row">
-                  <label for="slit-width">Slit width (nm)</label>
+                  <label class="param-label-inline" for="slit-width">Slit width (nm) <button type="button" class="ctx-hint" data-hint="Narrower slits produce wider diffraction envelopes." aria-label="About slit width">i</button></label>
                   <input type="number" id="slit-width" value="100" min="10" max="500">
                 </div>
                 <div class="param-row">
-                  <label for="slit-sep">Slit separation (nm)</label>
+                  <label class="param-label-inline" for="slit-sep">Slit separation (nm) <button type="button" class="ctx-hint" data-hint="Wider separation produces more closely spaced interference fringes." aria-label="About slit separation">i</button></label>
                   <input type="number" id="slit-sep" value="500" min="100" max="2000">
                 </div>
                 <button class="recompute-btn" id="recompute">Recompute</button>
@@ -252,38 +315,10 @@
         </div>
       </aside>
     </div>
-
-    <div class="info-panel" id="info-panel">
-      <button class="info-close" id="info-close" aria-label="Close">×</button>
-      <div class="info-content" id="info-content"></div>
-    </div>
   </div>
 
-  <div
-    class="demo-modal-overlay"
-    id="features-help-modal"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="features-help-title"
-    hidden
-  >
-    <div class="demo-modal-dialog">
-      <button type="button" class="demo-modal-close" id="features-help-close" aria-label="Close how it works">×</button>
-      <h2 id="features-help-title" class="demo-modal-title">How this demo works</h2>
-      <p class="demo-modal-lead">These controls mirror the main product: timeline, measurement strength, camera, and experiment parameters.</p>
-      <ul class="demo-modal-list">
-        <li><strong>Timeline</strong> — Drag the slider to scrub through time, or use Play / Pause (in the bar or inside Explore deeper) to run or hold the animation.</li>
-        <li><strong>Measurement &amp; complementarity</strong> — Use the right panel (or bottom sheet on small screens): drag γ, use the observer toggle, or drag the point on the D–V diagram. The pattern follows the chosen visibility model (quadratic / linear / exponential).</li>
-        <li><strong>Camera</strong> — Drag to orbit, scroll or pinch to zoom, right-drag (or trackpad two-finger) to pan—full 3D around the bench.</li>
-        <li><strong>Parameters &amp; Recompute</strong> — Slit width, separation, and wavelength (colour). After edits, <strong>Recompute</strong> regenerates the particle set. Extended options in this build add mass-related behaviour for some interpretations.</li>
-        <li><strong>Interpretations &amp; ℹ</strong> — Tabs switch the story and overlays (Copenhagen, pilot-wave, etc.). The <strong>ℹ</strong> panel explains the active view without changing the underlying simulation.</li>
-        <li><strong>Focus view</strong> — <strong>Focus</strong> collapses the control panel to a slim icon rail so the canvas is full width. Click an icon to expand a section. Timeline controls stay as a bar along the bottom of the canvas.</li>
-      </ul>
-      <p id="features-help-tour-note" class="demo-modal-note" hidden><strong>Tour</strong> — On the classic demo, use ▶ Tour next to ℹ for a guided walkthrough.</p>
-    </div>
-  </div>
+  <div id="ctx-tooltip" class="ctx-tooltip" hidden role="tooltip"></div>
 
-  <script src="/demo/help-modal.js?v=6" defer></script>
-  <script type="module" src="/demo/advanced-main.js?v=35"></script>
+  <script type="module" src="/demo/advanced-main.js?v=37"></script>
 </body>
 </html>
