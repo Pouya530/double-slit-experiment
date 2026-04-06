@@ -617,9 +617,8 @@ function getCanvasHostSize() {
 function init() {
   initSafariDetectionFastPathFlag();
 
-  const savedTheme = localStorage.getItem('doubleSlitTheme');
-  isDarkMode = savedTheme === 'dark';
-  document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
+  isDarkMode = false;
+  document.documentElement.setAttribute('data-theme', 'light');
 
   initInterpParamSnapshots();
 
@@ -1270,27 +1269,6 @@ function setupUI() {
     isPlaying = !isPlaying;
     syncPlayButton();
   });
-
-  function syncThemeToggleLabels() {
-    const icon = isDarkMode ? '☀' : '🌙';
-    const label = isDarkMode ? 'Light' : 'Dark';
-    document.querySelectorAll('.theme-btn .theme-icon').forEach((el) => {
-      el.textContent = icon;
-    });
-    document.querySelectorAll('.theme-btn .theme-label').forEach((el) => {
-      el.textContent = label;
-    });
-  }
-  const onThemeToggle = () => {
-    isDarkMode = !isDarkMode;
-    document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
-    localStorage.setItem('doubleSlitTheme', isDarkMode ? 'dark' : 'light');
-    syncThemeToggleLabels();
-    applySceneTheme();
-  };
-  document.getElementById('theme-toggle')?.addEventListener('click', onThemeToggle);
-  document.getElementById('theme-toggle-panel')?.addEventListener('click', onThemeToggle);
-  syncThemeToggleLabels();
 
   document.getElementById('transport-speed')?.addEventListener('click', () => {
     const i = PLAYBACK_SPEEDS.indexOf(playbackSpeed);

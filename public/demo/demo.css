@@ -2510,33 +2510,6 @@ a.help-features-btn {
   flex-wrap: wrap;
 }
 
-.panel-appearance-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 14px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--panel-border);
-}
-.panel-appearance-label {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-muted);
-}
-.theme-btn--panel {
-  flex-shrink: 0;
-  padding: 8px 12px;
-  font-size: 13px;
-}
-.theme-btn--panel .theme-label {
-  display: inline;
-}
-@media (max-width: 320px) {
-  .theme-btn--panel .theme-label {
-    display: none;
-  }
-}
 .param-row--swatch {
   display: grid;
   grid-template-columns: 1fr auto;
