@@ -213,7 +213,7 @@ body {
   justify-content: center;
   gap: 8px;
   max-width: calc(100vw - 24px);
-  padding: 11px 17px;
+  padding: 6px 12px;
   background: var(--panel-bg);
   border-radius: 999px;
   border: 1px solid var(--panel-border);
@@ -273,7 +273,7 @@ body {
   border-radius: 999px;
   background: transparent;
   color: var(--text-muted);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
@@ -414,7 +414,7 @@ body {
     width: 100%;
     max-width: none;
     border-radius: 14px;
-    padding: 13px 15px;
+    padding: 8px 10px;
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
@@ -568,11 +568,11 @@ body {
 @media (min-width: 769px) and (max-width: 1100px) {
   .interpretation-tabs {
     border-radius: 16px;
-    padding: 13px 15px;
+    padding: 8px 10px;
   }
   .interp-tab {
     padding: 7px 11px;
-    font-size: 13px;
+    font-size: 12px;
     min-height: 34px;
   }
   .tour-btn {
@@ -1198,7 +1198,7 @@ details.explore-deeper[open] > .explore-deeper-summary::before {
       )
     );
     flex-wrap: nowrap;
-    padding: 9px 13px 9px 15px;
+    padding: 4px 8px 4px 10px;
     gap: 6px;
     border-radius: 999px;
   }
@@ -1224,7 +1224,7 @@ details.explore-deeper[open] > .explore-deeper-summary::before {
   }
   .demo-layout-advanced .interpretation-tabs-many .interp-tab {
     padding: 5px 9px;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
     min-height: 30px;
     flex-shrink: 0;
@@ -1238,6 +1238,24 @@ details.explore-deeper[open] > .explore-deeper-summary::before {
     width: 36px;
     height: 36px;
     font-size: 16px;
+  }
+}
+
+/* Non-focus large desktop only: roomier interpretation bar (+5px shell, slightly larger tab type) */
+@media (min-width: 1025px) {
+  .demo-layout:not(.demo-layout--focus) .interpretation-tabs,
+  .demo-layout-advanced:not(.demo-layout--focus) .interpretation-tabs {
+    padding: 11px 17px;
+  }
+  .demo-layout:not(.demo-layout--focus) .interpretation-tabs .interp-tab,
+  .demo-layout-advanced:not(.demo-layout--focus) .interpretation-tabs .interp-tab {
+    font-size: 14px;
+  }
+  .demo-layout-advanced:not(.demo-layout--focus) .interpretation-tabs-many {
+    padding: 9px 13px 9px 15px;
+  }
+  .demo-layout-advanced:not(.demo-layout--focus) .interpretation-tabs-many .interp-tab {
+    font-size: 12px;
   }
 }
 
@@ -1265,7 +1283,7 @@ details.explore-deeper[open] > .explore-deeper-summary::before {
     width: 100%;
     max-width: none;
     border-radius: 14px;
-    padding: 15px 17px;
+    padding: 10px 12px;
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
@@ -1893,11 +1911,11 @@ details.explore-deeper[open] > .explore-deeper-summary::before {
 /* Focus-only: extra inner padding + larger pill type (non-advanced wide layout) */
 @media (min-width: 769px) {
   .demo-layout-advanced.demo-layout--focus #interpretation-tabs {
-    padding: 21px 27px;
+    padding: 16px 22px;
   }
   .demo-layout-advanced.demo-layout--focus #interpretation-tabs .interp-tab {
     padding: 10px 16px;
-    font-size: 16px;
+    font-size: 15px;
     min-height: 40px;
   }
 }
@@ -1916,11 +1934,11 @@ details.explore-deeper[open] > .explore-deeper-summary::before {
     );
   }
   .demo-layout-advanced.demo-layout--focus #interpretation-tabs.interpretation-tabs-many {
-    padding: 19px 23px 19px 25px;
+    padding: 14px 18px 14px 20px;
   }
   .demo-layout-advanced.demo-layout--focus #interpretation-tabs.interpretation-tabs-many .interp-tab {
     padding: 8px 12px;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     min-height: 34px;
     letter-spacing: -0.015em;
