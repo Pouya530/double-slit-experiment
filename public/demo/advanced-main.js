@@ -15,6 +15,11 @@ import {
   effectiveWavelength,
 } from './physics-interpretations.js?v=18';
 
+const COMP_PAD = 12;
+const COMP_SCALE = 76;
+const PANEL_W_STORAGE = 'doubleSlitDemoPanelWidth';
+const SHEET_SNAP_STORAGE = 'doubleSlitDemoSheetSnap';
+
 /** Map interpretation UI accent (#RRGGBB) to Three.js hex for overlays. */
 function hexFromInterpBrand(def) {
   const c = def?.color;
@@ -110,18 +115,12 @@ function syncPlayButton() {
     playBtn.classList.toggle('play-btn--playing', isPlaying);
     playBtn.setAttribute('aria-label', label);
   }
-  const explorePause = document.getElementById('explore-pause');
-  if (explorePause) {
-    explorePause.textContent = glyph;
-    explorePause.classList.toggle('play-btn--paused', !isPlaying);
-    explorePause.classList.toggle('play-btn--playing', isPlaying);
-    explorePause.setAttribute('aria-label', label);
-  }
 }
 
 function syncInterpretationUI() {
   document.querySelectorAll('.interp-tab').forEach((b) => b.classList.toggle('active', b.dataset.interp === activeInterpretation));
   if (showInfoPanel) renderInfoPanel(activeInterpretation);
+  renderInterpretationPanelBody();
   updateObserveAndAdvancedControls();
   syncPlayButton();
   const interpMobile = document.getElementById('interp-select-mobile');
@@ -152,6 +151,14 @@ let isObserving = false;
 let observerTarget = 0;
 let observerTransition = 0;
 let exploreSliderDragging = false;
+let isUpdatingFromCircle = false;
+let playbackSpeed = 1;
+const PLAYBACK_SPEEDS = [0.5, 1, 2];
+let transportActivity = false;
+let transportHideTimer = 0;
+/** @type {Array<{ x: number; y: number }>} */
+let complementarityTrail = [];
+let lastTrailGamma = -1;
 let lastToggleAnimRebuild = 0;
 let gridHelper, sourceMesh, sourceGlow, barrierLeft, barrierCenter, barrierRight, screenFrame;
 let waveOverlay, envParticles, qbismOverlay;
@@ -248,6 +255,11 @@ function switchInterpretation(nextId) {
   isObserving = hydrated.measurementStrength >= 0.5;
   observerTarget = hydrated.measurementStrength;
   observerTransition = hydrated.measurementStrength;
+  const vms = document.getElementById('vis-model-select');
+  if (vms) {
+    const pref = MEASUREMENT_CONFIGS[activeInterpretation]?.preferredVisModel ?? 'quadratic';
+    vms.value = pref;
+  }
   syncAdvancedControlsFromGlobals();
   updateObserveAndAdvancedControls();
   snapPhysicsStateImmediate();
@@ -255,6 +267,7 @@ function switchInterpretation(nextId) {
   currentTime = 0;
   const timelineEl = document.getElementById('timeline');
   if (timelineEl) timelineEl.value = 0;
+  renderInterpretationPanelBody();
 }
 
 const THEMES = {
@@ -288,10 +301,14 @@ function getActiveVisibilityModel() {
   return MEASUREMENT_CONFIGS[activeInterpretation]?.preferredVisModel ?? 'quadratic';
 }
 
-/** Simulation visibility: Englert V = √(1−γ²) for binary observer + explore slider (SPEC-MEASUREMENT). */
+/** Simulation visibility model (SPEC-MEASUREMENT). Binary mode: user dropdown; else interpretation default. */
 function getSimulationVisibilityModel() {
   const mode = getInterpDef()?.observerToggleMode ?? 'binary';
-  if (mode === 'binary') return 'quadratic';
+  if (mode === 'binary') {
+    const sel = document.getElementById('vis-model-select');
+    const v = sel?.value;
+    if (v === 'linear' || v === 'quadratic' || v === 'exponential') return v;
+  }
   return getActiveVisibilityModel();
 }
 
@@ -378,39 +395,118 @@ function rebuildParticleBuffer(seed) {
   effectiveTMax = singleParticleMode ? FLIGHT_TIME + 0.4 : tMax;
 }
 
-/** Inline complementarity HUD (Englert / quadratic: D² + V² = 1). */
-function updateExploreComplementarityHud() {
-  const sumEl = document.getElementById('complementarity-sum-explore');
+function buildComplementarityPathD(model) {
+  const parts = [];
+  for (let i = 0; i <= 64; i++) {
+    const g = i / 64;
+    const V = fringeVisibility(g, model);
+    const x = COMP_PAD + g * COMP_SCALE;
+    const y = COMP_PAD + (1 - V) * COMP_SCALE;
+    parts.push(i === 0 ? `M ${x} ${y}` : `L ${x} ${y}`);
+  }
+  return parts.join(' ');
+}
+
+function ensureCompGrid(svg) {
+  const g = svg.querySelector('.comp-grid');
+  if (!g || g.childElementCount) return;
+  for (let t = 0.25; t < 1; t += 0.25) {
+    const x = COMP_PAD + t * COMP_SCALE;
+    const y = COMP_PAD + (1 - t) * COMP_SCALE;
+    const l1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    l1.setAttribute('x1', String(x));
+    l1.setAttribute('y1', String(COMP_PAD));
+    l1.setAttribute('x2', String(x));
+    l1.setAttribute('y2', String(COMP_PAD + COMP_SCALE));
+    g.appendChild(l1);
+    const l2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    l2.setAttribute('x1', String(COMP_PAD));
+    l2.setAttribute('y1', String(y));
+    l2.setAttribute('x2', String(COMP_PAD + COMP_SCALE));
+    l2.setAttribute('y2', String(y));
+    g.appendChild(l2);
+  }
+}
+
+function nearestGammaOnCurve(normD, normV, model) {
+  let bestG = 0;
+  let best = Infinity;
+  for (let i = 0; i <= 100; i++) {
+    const g = i / 100;
+    const V = fringeVisibility(g, model);
+    const dD = g - normD;
+    const dV = V - normV;
+    const dist = dD * dD + dV * dV;
+    if (dist < best) {
+      best = dist;
+      bestG = g;
+    }
+  }
+  return bestG;
+}
+
+/** Complementarity diagram path + point + trail (right panel). */
+function updateComplementarityDiagram() {
+  const svg = document.getElementById('complementarity-svg');
+  const pathEl = document.getElementById('complementarity-curve-path');
   const pt = document.getElementById('complementarity-point-explore');
-  if (!sumEl || !pt) return;
-  const g = computeMeasurementGamma();
+  const readout = document.getElementById('complementarity-dv-readout');
+  const sumEl = document.getElementById('complementarity-sum-explore');
+  if (!svg || !pathEl || !pt) return;
+  ensureCompGrid(svg);
   const model = getSimulationVisibilityModel();
+  pathEl.setAttribute('d', buildComplementarityPathD(model));
+  const g = computeMeasurementGamma();
   const { distinguishability: D, visibility: V, complementarityCheck } = getComplementarity(g, model);
-  sumEl.textContent = `D² + V² = ${complementarityCheck.toFixed(2)}`;
-  const cx = 14 + D * 60;
-  const cy = 74 - V * 60;
+  const cx = COMP_PAD + D * COMP_SCALE;
+  const cy = COMP_PAD + (1 - V) * COMP_SCALE;
   pt.setAttribute('cx', String(cx));
   pt.setAttribute('cy', String(cy));
+  if (readout) {
+    readout.textContent = `D = ${D.toFixed(2)}  V = ${V.toFixed(2)}  D² + V² = ${complementarityCheck.toFixed(2)}`;
+  }
+  if (sumEl) sumEl.textContent = `D² + V² = ${complementarityCheck.toFixed(2)}`;
+
+  let trailG = svg.querySelector('.comp-trail');
+  if (!trailG) {
+    trailG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    trailG.setAttribute('class', 'comp-trail');
+    svg.insertBefore(trailG, pt);
+  }
+  while (trailG.firstChild) trailG.removeChild(trailG.firstChild);
+  for (let i = 0; i < complementarityTrail.length; i++) {
+    const p = complementarityTrail[i];
+    const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    const fade = ((i + 1) / complementarityTrail.length) * 0.35;
+    c.setAttribute('cx', String(p.x));
+    c.setAttribute('cy', String(p.y));
+    c.setAttribute('r', '3');
+    c.setAttribute('fill', 'currentColor');
+    c.setAttribute('opacity', String(fade));
+    trailG.appendChild(c);
+  }
 }
 
 function updateExploreSection() {
   const def = getInterpDef();
   const mode = def?.observerToggleMode ?? 'binary';
-  const explore = document.getElementById('explore-deeper');
-  if (explore) explore.hidden = mode !== 'binary';
+  const measureBin = document.getElementById('panel-measure-binary');
+  if (measureBin) measureBin.hidden = mode !== 'binary';
+  document.querySelector('.vis-model-row')?.classList.toggle('vis-model-row--hidden', mode !== 'binary');
 
   const gUi = computeMeasurementGamma();
   const slider = document.getElementById('measurement-slider-explore');
   const labelEl = document.getElementById('measurement-label-explore');
   const readout = document.getElementById('measurement-value-readout-explore');
   const narrative = document.getElementById('measurement-narrative-explore');
+  const gammaInput = document.getElementById('measurement-gamma-input');
   const config = MEASUREMENT_CONFIGS[activeInterpretation];
 
   if (labelEl && config && mode === 'binary') {
     labelEl.textContent = `${config.sliderLabel} (γ)`;
   }
 
-  if (slider && mode === 'binary' && !exploreSliderDragging) {
+  if (slider && mode === 'binary' && !exploreSliderDragging && !isUpdatingFromCircle) {
     slider.value = String(Math.round(observerTransition * 100));
     slider.setAttribute('aria-valuetext', `${Math.round(observerTransition * 100)}%`);
   }
@@ -418,12 +514,27 @@ function updateExploreSection() {
   if (readout && mode === 'binary') {
     readout.textContent = `${Math.round(gUi * 100)}%`;
   }
+  if (gammaInput && mode === 'binary' && document.activeElement !== gammaInput && !isUpdatingFromCircle) {
+    gammaInput.value = String(Math.round(gUi * 100));
+  }
 
   if (narrative && config && mode === 'binary') {
     narrative.textContent = narrativeForGamma(gUi, config);
   }
 
-  if (mode === 'binary') updateExploreComplementarityHud();
+  if (mode === 'binary') updateComplementarityDiagram();
+
+  const obsBtn = document.getElementById('panel-observe-toggle');
+  if (obsBtn) {
+    obsBtn.hidden = mode !== 'binary';
+    if (mode === 'binary') {
+      const on = observerTransition >= 0.5;
+      obsBtn.classList.toggle('active', on);
+      obsBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      const lab = obsBtn.querySelector('.panel-observe-label');
+      if (lab) lab.textContent = on ? 'Observer: on' : 'Observer: off';
+    }
+  }
 
   const fullInd = document.getElementById('explore-full-measure-indicator');
   if (fullInd && mode === 'binary') {
@@ -433,6 +544,32 @@ function updateExploreSection() {
   } else if (fullInd) {
     fullInd.hidden = true;
   }
+}
+
+function renderInterpretationPanelBody() {
+  const host = document.getElementById('panel-interpretation-body');
+  if (!host) return;
+  const interp = INTERPRETATIONS_ADV[activeInterpretation];
+  if (!interp) return;
+  const happening = getWhatsHappening(activeInterpretation);
+  host.innerHTML = `
+    <h4 style="border-left: 4px solid ${interp.color}; padding-left: 10px;">${interp.name}</h4>
+    <p class="meta"><span class="status-badge">${interp.statusLabel}</span> · ${interp.proponents} (${interp.year})</p>
+    ${interp.observerHint ? `<p class="meta" style="opacity:0.95;"><strong>Controls:</strong> ${interp.observerHint}</p>` : ''}
+    ${happening ? `<p class="happening"><strong>What's happening:</strong> ${happening}</p>` : ''}
+    <p class="story">${interp.story}</p>
+    <div class="quote">${interp.quote}<br><small>— ${interp.quoteAuthor}</small></div>
+    ${interp.support != null ? `<p class="support"><strong>${interp.support}%</strong> of physicists (Nature 2025 survey framing)</p>` : ''}
+    <details>
+      <summary>What it explains well</summary>
+      <ul class="strengths">${interp.strengths.map((s) => `<li>${s}</li>`).join('')}</ul>
+    </details>
+    <details>
+      <summary>What it doesn't explain as easily</summary>
+      <ul class="weaknesses">${interp.weaknesses.map((w) => `<li>${w}</li>`).join('')}</ul>
+    </details>
+    <p class="meta">Level: ${interp.level}</p>
+  `;
 }
 
 function updateObserveAndAdvancedControls() {
@@ -515,7 +652,6 @@ function init() {
   setupUI();
   setupInterpretationUI();
   syncInterpretationUI();
-  setupFocusViewMode();
   window.addEventListener('resize', onResize);
   queueMicrotask(() => onResize());
   animate();
@@ -1146,11 +1282,19 @@ function setupUI() {
     applySceneTheme();
   };
   document.getElementById('theme-toggle')?.addEventListener('click', onThemeToggle);
-  document.getElementById('theme-toggle-focus')?.addEventListener('click', onThemeToggle);
   syncThemeToggleLabels();
 
-  document.getElementById('explore-pause')?.addEventListener('click', () => {
-    isPlaying = !isPlaying;
+  document.getElementById('transport-speed')?.addEventListener('click', () => {
+    const i = PLAYBACK_SPEEDS.indexOf(playbackSpeed);
+    playbackSpeed = PLAYBACK_SPEEDS[(i + 1) % PLAYBACK_SPEEDS.length];
+    const b = document.getElementById('transport-speed');
+    if (b) b.textContent = `${playbackSpeed === 1 ? '1' : playbackSpeed}×`;
+  });
+
+  document.getElementById('transport-reset')?.addEventListener('click', () => {
+    currentTime = 0;
+    timelineEl.value = 0;
+    isPlaying = false;
     syncPlayButton();
   });
 
@@ -1176,6 +1320,10 @@ function setupUI() {
     observerTransition = g;
     observerTarget = g;
     isObserving = g >= 0.5;
+    localStorage.setItem('demoGammaHintSeen', '1');
+    exEl.classList.remove('gamma-hint-wiggle');
+    const hint = document.getElementById('explore-deeper-hint');
+    if (hint) hint.hidden = false;
     updateExploreSection();
     if (showInfoPanel) renderInfoPanel(activeInterpretation);
     scheduleGammaRecompute();
@@ -1230,6 +1378,12 @@ function setupUI() {
   paramsToggleBtn?.addEventListener('click', () => {
     const open = toolbarCluster?.classList.toggle('params-panel-open');
     paramsToggleBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (window.matchMedia('(max-width: 1023px)').matches) {
+      const rp = document.getElementById('demo-right-panel');
+      rp?.classList.remove('sheet-peek', 'sheet-half', 'sheet-full');
+      rp?.classList.add('sheet-full');
+      document.getElementById('panel-section-params')?.setAttribute('open', '');
+    }
   });
   window.addEventListener('resize', closeMobileParamsIfDesktop);
 
@@ -1269,29 +1423,297 @@ function setupUI() {
     });
   });
 
-  setupExploreDeeperDesktopAlwaysOpen();
+  document.getElementById('vis-model-select')?.addEventListener('change', () => {
+    rebuildParticleBuffer(Date.now());
+    updateExploreSection();
+  });
+
+  document.getElementById('panel-observe-toggle')?.addEventListener('click', () => {
+    const mode = getInterpDef()?.observerToggleMode ?? 'binary';
+    if (mode !== 'binary') return;
+    const goHigh = observerTarget < 0.5;
+    observerTarget = goHigh ? 1 : 0;
+    observerTransition = observerTarget;
+    measurementStrength = observerTarget;
+    isObserving = goHigh;
+    rebuildParticleBuffer(Date.now());
+    updateExploreSection();
+    if (showInfoPanel) renderInfoPanel(activeInterpretation);
+  });
+
+  document.getElementById('measurement-gamma-input')?.addEventListener('change', () => {
+    const mode = getInterpDef()?.observerToggleMode ?? 'binary';
+    if (mode !== 'binary') return;
+    const inp = document.getElementById('measurement-gamma-input');
+    let v = Math.round(Number(inp?.value));
+    if (!Number.isFinite(v)) v = 0;
+    v = Math.max(0, Math.min(100, v));
+    const g = v / 100;
+    measurementStrength = g;
+    observerTransition = g;
+    observerTarget = g;
+    isObserving = g >= 0.5;
+    updateExploreSection();
+    scheduleGammaRecompute();
+    if (showInfoPanel) renderInfoPanel(activeInterpretation);
+  });
+
+  document.getElementById('reset-params-defaults')?.addEventListener('click', () => {
+    document.getElementById('slit-width').value = '100';
+    document.getElementById('slit-sep').value = '500';
+    document.getElementById('wavelength').value = '550';
+    particleMassAmu = DEFAULT_ELECTRON_AMU;
+    envCoupling = 0;
+    syncAdvancedControlsFromGlobals();
+    updateWavelengthSwatch();
+    updateObserveAndAdvancedControls();
+    rebuildParticleBuffer(Date.now());
+    currentTime = 0;
+    timelineEl.value = 0;
+  });
+
+  const waveEl = document.getElementById('wavelength');
+  waveEl?.addEventListener('input', updateWavelengthSwatch);
+  waveEl?.addEventListener('change', updateWavelengthSwatch);
+  updateWavelengthSwatch();
+
+  setupTransportAutoHide();
+  setupRightPanelUi();
+  setupComplementarityInteraction();
+  scheduleGammaHint();
+  renderInterpretationPanelBody();
+
+  document.getElementById('canvas')?.addEventListener('keydown', (e) => {
+    if (e.target !== e.currentTarget) return;
+    if (e.code === 'Space') {
+      e.preventDefault();
+      isPlaying = !isPlaying;
+      syncPlayButton();
+      markTransportActive();
+    } else if (e.key === 'r' || e.key === 'R') {
+      e.preventDefault();
+      currentTime = 0;
+      const tl = document.getElementById('timeline');
+      if (tl) tl.value = 0;
+      syncPlayButton();
+    }
+  });
 }
 
-/** Keep Explore deeper expanded on wide non-focus layout (summary hidden in CSS). */
-function setupExploreDeeperDesktopAlwaysOpen() {
+function updateWavelengthSwatch() {
+  const wEl = document.getElementById('wavelength');
+  const sw = document.getElementById('wavelength-swatch');
+  if (!wEl || !sw) return;
+  const lam = parseFloat(wEl.value) || 550;
+  const [r, g, b] = wavelengthToRGB(lam * 1e-9);
+  sw.style.backgroundColor = `rgb(${Math.round(r * 255)},${Math.round(g * 255)},${Math.round(b * 255)})`;
+}
+
+function markTransportActive() {
+  transportActivity = true;
+  const t = document.getElementById('transport-overlay');
+  t?.classList.remove('transport-overlay--hidden');
+  window.clearTimeout(transportHideTimer);
+  transportHideTimer = window.setTimeout(() => {
+    transportActivity = false;
+    document.getElementById('transport-overlay')?.classList.add('transport-overlay--hidden');
+  }, 3000);
+}
+
+function setupTransportAutoHide() {
+  const stack = document.getElementById('canvas-stack');
+  const canvas = document.getElementById('canvas');
+  const transport = document.getElementById('transport-overlay');
+  if (!stack || !transport) return;
+  const wake = () => markTransportActive();
+  stack.addEventListener('pointermove', wake);
+  stack.addEventListener('pointerdown', wake);
+  canvas?.addEventListener('focus', wake);
+  transport.addEventListener('pointerenter', wake);
+  markTransportActive();
+}
+
+function setupRightPanelUi() {
+  const panel = document.getElementById('demo-right-panel');
+  const inner = document.getElementById('demo-right-panel-inner');
+  const handle = document.getElementById('panel-resize-edge');
+  const chev = document.getElementById('panel-collapse-chevron');
+  const rail = document.getElementById('panel-icon-rail');
   const layout = document.querySelector('.demo-layout-advanced');
-  const explore = document.getElementById('explore-deeper');
-  if (!layout || !explore) return;
-  const mq = window.matchMedia('(min-width: 1025px)');
-  function apply() {
-    if (layout.classList.contains('demo-layout--focus')) return;
-    if (mq.matches) explore.setAttribute('open', '');
-    else explore.removeAttribute('open');
+  const savedW = localStorage.getItem(PANEL_W_STORAGE);
+  if (panel && savedW) {
+    const n = parseInt(savedW, 10);
+    if (n >= 240 && n <= 400) panel.style.setProperty('--panel-user-width', `${n}px`);
   }
-  explore.addEventListener('toggle', () => {
-    if (layout.classList.contains('demo-layout--focus') || !mq.matches) return;
-    queueMicrotask(() => {
-      if (!explore.open) explore.open = true;
+
+  let resizing = false;
+  handle?.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    resizing = true;
+    handle.setPointerCapture(e.pointerId);
+  });
+  handle?.addEventListener('pointermove', (e) => {
+    if (!resizing || !panel) return;
+    const w = Math.max(240, Math.min(400, window.innerWidth - e.clientX));
+    panel.style.setProperty('--panel-user-width', `${w}px`);
+  });
+  handle?.addEventListener('pointerup', () => {
+    resizing = false;
+    if (!panel) return;
+    const w = panel.getBoundingClientRect().width;
+    localStorage.setItem(PANEL_W_STORAGE, String(Math.round(w)));
+  });
+
+  function setCollapsed(on) {
+    panel?.classList.toggle('panel-collapsed', on);
+    chev?.setAttribute('aria-expanded', on ? 'false' : 'true');
+    window.dispatchEvent(new Event('resize'));
+  }
+
+  chev?.addEventListener('click', () => {
+    setCollapsed(!panel?.classList.contains('panel-collapsed'));
+  });
+
+  rail?.querySelectorAll('.panel-icon-rail-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      setCollapsed(false);
+      const id = btn.getAttribute('data-panel-section');
+      const map = { measure: 'panel-section-measure', comp: 'panel-section-comp', interp: 'panel-section-interp', params: 'panel-section-params' };
+      const det = document.getElementById(map[id]);
+      det?.setAttribute('open', '');
+      det?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     });
   });
-  mq.addEventListener('change', apply);
-  window.addEventListener('resize', apply);
-  apply();
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== ']' || e.ctrlKey || e.metaKey || e.altKey) return;
+    const modal = document.getElementById('features-help-modal');
+    if (modal && !modal.hasAttribute('hidden')) return;
+    if (document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'TEXTAREA') return;
+    e.preventDefault();
+    setCollapsed(!panel?.classList.contains('panel-collapsed'));
+  });
+
+  function applySheetSnap() {
+    if (!panel || !layout) return;
+    if (window.matchMedia('(min-width: 1024px)').matches) {
+      panel.classList.remove('sheet-peek', 'sheet-half', 'sheet-full');
+      return;
+    }
+    const snap = sessionStorage.getItem(SHEET_SNAP_STORAGE) || 'half';
+    panel.classList.remove('sheet-peek', 'sheet-half', 'sheet-full');
+    panel.classList.add(snap === 'peek' ? 'sheet-peek' : snap === 'full' ? 'sheet-full' : 'sheet-half');
+  }
+
+  const sheetHandle = document.getElementById('bottom-sheet-handle');
+  const sheetSnaps = ['sheet-peek', 'sheet-half', 'sheet-full'];
+  sheetHandle?.addEventListener('click', () => {
+    if (!panel || window.matchMedia('(min-width: 1024px)').matches) return;
+    let i = 1;
+    if (panel.classList.contains('sheet-peek')) i = 0;
+    else if (panel.classList.contains('sheet-full')) i = 2;
+    const next = (i + 1) % 3;
+    panel.classList.remove('sheet-peek', 'sheet-half', 'sheet-full');
+    panel.classList.add(sheetSnaps[next]);
+    sessionStorage.setItem(SHEET_SNAP_STORAGE, ['peek', 'half', 'full'][next]);
+  });
+
+  window.addEventListener('resize', applySheetSnap);
+  applySheetSnap();
+
+  document.getElementById('focus-view-enter')?.addEventListener('click', () => {
+    layout?.classList.toggle('demo-layout--focus');
+    const focused = layout?.classList.contains('demo-layout--focus');
+    if (focused) {
+      setCollapsed(true);
+      if (window.matchMedia('(max-width: 1023px)').matches) {
+        panel?.classList.remove('sheet-peek', 'sheet-half', 'sheet-full');
+        panel?.classList.add('sheet-peek');
+      }
+    } else {
+      setCollapsed(false);
+    }
+    window.dispatchEvent(new Event('resize'));
+  });
+}
+
+function scheduleGammaHint() {
+  if (typeof localStorage === 'undefined' || localStorage.getItem('demoGammaHintSeen')) return;
+  const slider = document.getElementById('measurement-slider-explore');
+  window.setTimeout(() => {
+    if (localStorage.getItem('demoGammaHintSeen')) return;
+    slider?.classList.add('gamma-hint-wiggle');
+    slider?.addEventListener(
+      'animationend',
+      () => {
+        if (!localStorage.getItem('demoGammaHintSeen')) localStorage.setItem('demoGammaHintSeen', '1');
+      },
+      { once: true },
+    );
+  }, 3000);
+}
+
+function setupComplementarityInteraction() {
+  const svg = document.getElementById('complementarity-svg');
+  if (!svg) return;
+
+  function svgPoint(clientX, clientY) {
+    const pt = svg.createSVGPoint();
+    pt.x = clientX;
+    pt.y = clientY;
+    const ctm = svg.getScreenCTM();
+    if (!ctm) return { x: 0, y: 0 };
+    const p = pt.matrixTransform(ctm.inverse());
+    return { x: p.x, y: p.y };
+  }
+
+  function applyPointer(clientX, clientY) {
+    const mode = getInterpDef()?.observerToggleMode ?? 'binary';
+    if (mode !== 'binary') return;
+    const { x, y } = svgPoint(clientX, clientY);
+    const normD = (x - COMP_PAD) / COMP_SCALE;
+    const normV = (COMP_PAD + COMP_SCALE - y) / COMP_SCALE;
+    const model = getSimulationVisibilityModel();
+    const g = nearestGammaOnCurve(normD, normV, model);
+    isUpdatingFromCircle = true;
+    measurementStrength = g;
+    observerTransition = g;
+    observerTarget = g;
+    isObserving = g >= 0.5;
+    if (lastTrailGamma < 0 || Math.abs(g - lastTrailGamma) > 0.04) {
+      complementarityTrail.push({
+        x: COMP_PAD + g * COMP_SCALE,
+        y: COMP_PAD + (1 - fringeVisibility(g, model)) * COMP_SCALE,
+      });
+      if (complementarityTrail.length > 10) complementarityTrail.shift();
+      lastTrailGamma = g;
+    }
+    exploreSliderDragging = false;
+    updateExploreSection();
+    scheduleGammaRecompute();
+    if (showInfoPanel) renderInfoPanel(activeInterpretation);
+    requestAnimationFrame(() => {
+      isUpdatingFromCircle = false;
+    });
+  }
+
+  let dragging = false;
+  svg.addEventListener('pointerdown', (e) => {
+    if ((getInterpDef()?.observerToggleMode ?? 'binary') !== 'binary') return;
+    dragging = true;
+    svg.setPointerCapture(e.pointerId);
+    applyPointer(e.clientX, e.clientY);
+  });
+  svg.addEventListener('pointermove', (e) => {
+    if (!dragging) return;
+    applyPointer(e.clientX, e.clientY);
+  });
+  svg.addEventListener('pointerup', () => {
+    dragging = false;
+  });
+  svg.addEventListener('pointercancel', () => {
+    dragging = false;
+  });
 }
 
 function onResize() {
@@ -1301,194 +1723,13 @@ function onResize() {
   renderer.setSize(w, h);
 }
 
-/**
- * Focus view: reparent interpretation, parameters, and Explore deeper into a left accordion rail.
- * Preserves element ids; restores DOM on exit.
- */
-function setupFocusViewMode() {
-  const layout = document.querySelector('.demo-layout-advanced');
-  const rail = document.getElementById('demo-focus-rail');
-  const enter = document.getElementById('focus-view-enter');
-  const helpRail = document.getElementById('focus-rail-help');
-  const closeRail = document.getElementById('focus-rail-close');
-  const dockRail = document.getElementById('focus-rail-dock');
-  const backdropRail = document.getElementById('focus-rail-backdrop');
-  const accExplore = document.getElementById('focus-acc-2');
-  const cluster = document.getElementById('demo-toolbar-cluster');
-  const paramsToggle = document.getElementById('params-toggle');
-  const paramsPanel = document.getElementById('params-panel');
-  const explore = document.getElementById('explore-deeper');
-  const bodyParams = document.getElementById('focus-body-parameters');
-  const bodyExplore = document.getElementById('focus-body-explore');
-
-  if (
-    !layout ||
-    !rail ||
-    !enter ||
-    !cluster ||
-    !paramsToggle ||
-    !paramsPanel ||
-    !explore ||
-    !bodyParams ||
-    !bodyExplore
-  ) {
-    return;
-  }
-
-  /** @type {Array<[HTMLElement | Element, Comment]>} */
-  let restoreList = [];
-  let active = false;
-
-  rail.querySelectorAll('.focus-acc').forEach((det) => {
-    det.addEventListener('toggle', () => {
-      if (!det.open) return;
-      rail.querySelectorAll('.focus-acc').forEach((other) => {
-        if (other !== det) other.removeAttribute('open');
-      });
-    });
-  });
-
-  accExplore?.addEventListener('toggle', () => {
-    if (accExplore.open && explore) {
-      explore.setAttribute('open', '');
-      updateExploreSection();
-    }
-  });
-
-  function syncFocusRailUi() {
-    if (!active) {
-      if (dockRail) dockRail.hidden = true;
-      backdropRail?.setAttribute('hidden', '');
-      backdropRail?.setAttribute('aria-hidden', 'true');
-      return;
-    }
-    if (!dockRail) return;
-    dockRail.hidden = false;
-    const collapsed = layout.classList.contains('demo-focus-rail-collapsed');
-    const open = !collapsed;
-    dockRail.setAttribute('aria-expanded', open ? 'true' : 'false');
-    closeRail?.setAttribute('aria-expanded', open ? 'true' : 'false');
-    if (collapsed) {
-      backdropRail?.setAttribute('hidden', '');
-      backdropRail?.setAttribute('aria-hidden', 'true');
-    } else {
-      backdropRail?.removeAttribute('hidden');
-      backdropRail?.setAttribute('aria-hidden', 'false');
-    }
-  }
-
-  function mark(node) {
-    const m = document.createComment('focus-restore');
-    node.parentNode.insertBefore(m, node);
-    restoreList.push([node, m]);
-  }
-
-  function enterFocus() {
-    if (active) return;
-    active = true;
-    restoreList = [];
-
-    mark(paramsToggle);
-    bodyParams.appendChild(paramsToggle);
-
-    mark(paramsPanel);
-    bodyParams.appendChild(paramsPanel);
-
-    mark(explore);
-    bodyExplore.appendChild(explore);
-
-    explore.setAttribute('open', '');
-    layout.classList.add('demo-focus-rail-collapsed');
-
-    layout.classList.add('demo-layout--focus');
-    rail.hidden = false;
-    syncFocusRailUi();
-    const reduceMotion =
-      typeof window.matchMedia === 'function' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduceMotion) {
-      layout.classList.add('demo-focus-rail-ready');
-    } else {
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          layout.classList.add('demo-focus-rail-ready');
-        });
-      });
-    }
-    window.dispatchEvent(new Event('resize'));
-  }
-
-  function leaveFocus() {
-    if (!active) return;
-    active = false;
-    layout.classList.remove('demo-focus-rail-ready');
-
-    for (let i = restoreList.length - 1; i >= 0; i--) {
-      const [node, marker] = restoreList[i];
-      marker.parentNode.insertBefore(node, marker);
-      marker.remove();
-    }
-    restoreList = [];
-
-    layout.classList.remove('demo-focus-rail-collapsed');
-    layout.classList.remove('demo-layout--focus');
-    rail.hidden = true;
-    syncFocusRailUi();
-    window.dispatchEvent(new Event('resize'));
-  }
-
-  enter.addEventListener('click', enterFocus);
-  document.getElementById('focus-exit-corner')?.addEventListener('click', () => {
-    leaveFocus();
-  });
-  closeRail?.addEventListener('click', () => {
-    layout.classList.add('demo-focus-rail-collapsed');
-    syncFocusRailUi();
-    window.dispatchEvent(new Event('resize'));
-  });
-  dockRail?.addEventListener('click', () => {
-    layout.classList.remove('demo-focus-rail-collapsed');
-    syncFocusRailUi();
-    window.dispatchEvent(new Event('resize'));
-  });
-  backdropRail?.addEventListener('click', () => {
-    layout.classList.add('demo-focus-rail-collapsed');
-    syncFocusRailUi();
-    window.dispatchEvent(new Event('resize'));
-  });
-  helpRail?.addEventListener('click', () => {
-    document.getElementById('features-help-open')?.click();
-  });
-
-  document.addEventListener('keydown', (e) => {
-    if (!active || e.key !== 'Escape') return;
-    const helpModal = document.getElementById('features-help-modal');
-    if (helpModal && !helpModal.hasAttribute('hidden')) return;
-    const infoPanel = document.getElementById('info-panel');
-    if (infoPanel?.classList.contains('open')) {
-      e.preventDefault();
-      infoPanel.classList.remove('open');
-      showInfoPanel = false;
-      return;
-    }
-    e.preventDefault();
-    if (!layout.classList.contains('demo-focus-rail-collapsed')) {
-      layout.classList.add('demo-focus-rail-collapsed');
-      syncFocusRailUi();
-      window.dispatchEvent(new Event('resize'));
-    } else {
-      leaveFocus();
-    }
-  });
-}
-
 function animate(now = 0) {
   requestAnimationFrame(animate);
   const dt = (now - lastTime) / 1000;
   lastTime = now;
 
   if (isPlaying) {
-    currentTime += dt;
+    currentTime += dt * playbackSpeed;
     if (currentTime >= effectiveTMax) {
       if (singleParticleMode) {
         currentTime = effectiveTMax;

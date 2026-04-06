@@ -81,9 +81,11 @@ app.get('/preview/who', (req, res) => res.sendFile(path.join(__dirname, 'public'
 app.get('/preview/benefits', (req, res) => res.sendFile(path.join(__dirname, 'public', 'preview', 'benefits.html')));
 app.get('/preview/features', (req, res) => res.sendFile(path.join(__dirname, 'public', 'preview', 'features.html')));
 
-app.get(['/in-detail', '/in-detail/'], (req, res) =>
-  res.sendFile(path.join(__dirname, 'public', 'in-detail', 'index.html')),
-);
+app.get(['/in-detail', '/in-detail/'], (req, res) => {
+  const q = req.url.indexOf('?');
+  const qs = q >= 0 ? req.url.slice(q) : '';
+  res.redirect(302, `/demo/${qs}`);
+});
 
 module.exports = app;
 

@@ -56,7 +56,7 @@
   <link rel="icon" href="/favicon.png" type="image/png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/demo/demo.css?v=47">
+  <link rel="stylesheet" href="/demo/demo.css?v=48">
   <script type="application/ld+json">
   {"@context":"https://schema.org","@graph":[{"@type":"WebPage","@id":"https://doubleslitexperiment.app/demo/#webpage","name":"Double Slit Experiment — Interactive Demo","description":"Run the Double Slit 3D demo: double-slit interference, measurement strength (continuous decoherence), quantum interpretations, and live parameters in your browser.","url":"https://doubleslitexperiment.app/demo/","isPartOf":{"@type":"WebSite","name":"Double Slit Experiment","url":"https://doubleslitexperiment.app/"},"breadcrumb":{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://doubleslitexperiment.app/"},{"@type":"ListItem","position":2,"name":"Demo","item":"https://doubleslitexperiment.app/demo/"}]}},{"@type":"SoftwareApplication","name":"Double Slit Experiment","applicationCategory":"EducationalApplication","operatingSystem":"Web","url":"https://doubleslitexperiment.app/demo/","description":"Interactive 3D double-slit experiment with timeline scrubber, measurement-strength control, interpretations, and adjustable experimental parameters.","author":{"@type":"Organization","name":"Nocturnal Cloud","url":"https://nocturnal.cloud"},"offers":{"@type":"Offer","price":"0","priceCurrency":"GBP","availability":"https://schema.org/InStock"}}]}
   </script>
@@ -98,198 +98,168 @@
         <span>Parameters</span>
         <span class="params-toggle-chevron" aria-hidden="true">▾</span>
       </button>
-      <div class="params-panel params-panel-advanced" id="params-panel">
-        <h4>Parameters</h4>
-        <div class="param-row" id="adv-mass-row">
-          <label for="adv-mass">Particle mass (slider → amu)</label>
-          <input type="range" id="adv-mass" min="0" max="1000" value="0" aria-valuetext="electron scale">
-          <span class="param-readout" id="adv-mass-readout"></span>
-        </div>
-        <div class="param-row" id="adv-env-row" hidden>
-          <label for="adv-env">Environment coupling</label>
-          <input type="range" id="adv-env" min="0" max="100" value="0" aria-valuetext="0%">
-        </div>
-        <fieldset class="param-fieldset" id="adv-perspective-row" hidden>
-          <legend>RQM perspective</legend>
-          <label class="radio-label"><input type="radio" name="perspective" value="external" checked> External</label>
-          <label class="radio-label"><input type="radio" name="perspective" value="detector"> Detector</label>
-          <label class="radio-label"><input type="radio" name="perspective" value="particle"> Particle</label>
-        </fieldset>
-        <div class="param-row">
-          <label for="slit-width">Slit width (nm)</label>
-          <input type="number" id="slit-width" value="100" min="10" max="500">
-        </div>
-        <div class="param-row">
-          <label for="slit-sep">Slit separation (nm)</label>
-          <input type="number" id="slit-sep" value="500" min="100" max="2000">
-        </div>
-        <div class="param-row">
-          <label for="wavelength">Wavelength (nm)</label>
-          <input type="number" id="wavelength" value="550" min="380" max="700">
-        </div>
-        <button class="recompute-btn" id="recompute">Recompute</button>
-      </div>
     </div>
 
-    <aside
-      class="demo-focus-rail"
-      id="demo-focus-rail"
-      aria-label="Simulation controls"
-      hidden
-    >
-      <button
-        type="button"
-        class="focus-exit-corner"
-        id="focus-exit-corner"
-        aria-label="Exit focus view"
-        title="Exit focus view"
-      >
-        <span aria-hidden="true">×</span>
-      </button>
-      <button
-        type="button"
-        class="focus-rail-dock"
-        id="focus-rail-dock"
-        aria-label="Open controls"
-        aria-controls="focus-rail-panel"
-        aria-expanded="false"
-        hidden
-      >
-        <span class="focus-rail-dock-icon" aria-hidden="true">☰</span>
-        <span class="focus-rail-dock-label">Controls</span>
-      </button>
-      <div
-        class="focus-rail-backdrop"
-        id="focus-rail-backdrop"
-        hidden
-        aria-hidden="true"
-      ></div>
-      <div class="focus-rail-panel" id="focus-rail-panel">
-        <div class="focus-rail-head">
-          <span class="focus-rail-brand">Controls</span>
-          <div class="focus-rail-head-actions">
-            <button
-              type="button"
-              class="theme-btn theme-btn--focus-rail"
-              id="theme-toggle-focus"
-              aria-label="Toggle light/dark mode"
-              title="Toggle theme"
-            >
-              <span class="theme-icon">☀</span>
-              <span class="theme-label">Light</span>
-            </button>
-            <button
-              type="button"
-              class="focus-rail-help-btn"
-              id="focus-rail-help"
-              aria-haspopup="dialog"
-              aria-controls="features-help-modal"
-            >
-              How it works
-            </button>
-            <button
-              type="button"
-              class="focus-rail-close"
-              id="focus-rail-close"
-              aria-label="Close controls panel"
-              aria-controls="focus-rail-panel"
-              title="Close"
-            >
-              <span aria-hidden="true">×</span>
-            </button>
+    <div class="demo-stage" id="demo-stage">
+      <div class="canvas-stack" id="canvas-stack">
+        <div id="canvas" tabindex="0"></div>
+        <div class="transport-overlay" id="transport-overlay" aria-label="Timeline controls">
+          <button type="button" class="play-btn play-btn--playing transport-play" id="play" aria-label="Pause">❚❚</button>
+          <div class="transport-scrub-wrap">
+            <input type="range" id="timeline" class="timeline-slider transport-scrubber" aria-label="Timeline" aria-valuetext="0%">
           </div>
-        </div>
-        <div class="focus-accordion" role="presentation">
-          <details class="focus-acc" id="focus-acc-1" open>
-            <summary class="focus-acc-summary">
-              <span class="focus-acc-num" aria-hidden="true">1</span>
-              <span class="focus-acc-title">Parameters</span>
-              <span class="focus-acc-chev" aria-hidden="true"></span>
-            </summary>
-            <div class="focus-acc-panel">
-              <div class="focus-acc-panel-inner" id="focus-body-parameters"></div>
-            </div>
-          </details>
-          <details class="focus-acc" id="focus-acc-2">
-            <summary class="focus-acc-summary">
-              <span class="focus-acc-num" aria-hidden="true">2</span>
-              <span class="focus-acc-title">Explore deeper</span>
-              <span class="focus-acc-chev" aria-hidden="true"></span>
-            </summary>
-            <div class="focus-acc-panel">
-              <div class="focus-acc-panel-inner" id="focus-body-explore"></div>
-            </div>
-          </details>
+          <button type="button" class="transport-speed" id="transport-speed" aria-label="Playback speed" title="Playback speed">1×</button>
+          <button type="button" class="transport-reset" id="transport-reset" aria-label="Reset timeline" title="Reset timeline">↺</button>
+          <span class="particle-count transport-count" id="particle-count">0 / 2000 particles</span>
         </div>
       </div>
-    </aside>
 
-    <div id="canvas"></div>
+      <aside
+        class="demo-right-panel"
+        id="demo-right-panel"
+        style="--panel-user-width: 300px;"
+        aria-label="Experiment controls"
+      >
+        <button
+          type="button"
+          class="panel-collapse-chevron"
+          id="panel-collapse-chevron"
+          aria-expanded="true"
+          aria-controls="demo-right-panel-inner"
+          title="Collapse panel (keyboard ])"
+        >
+          <span aria-hidden="true">›</span>
+        </button>
+        <div class="panel-resize-edge" id="panel-resize-edge" role="separator" aria-orientation="vertical" aria-label="Resize panel"></div>
+        <div class="panel-icon-rail" id="panel-icon-rail" aria-label="Open panel section" hidden>
+          <button type="button" class="panel-icon-rail-btn" data-panel-section="measure" title="Measurement" aria-label="Measurement">▤</button>
+          <button type="button" class="panel-icon-rail-btn" data-panel-section="comp" title="Complementarity" aria-label="Complementarity">◔</button>
+          <button type="button" class="panel-icon-rail-btn" data-panel-section="interp" title="Interpretation" aria-label="Interpretation">📖</button>
+          <button type="button" class="panel-icon-rail-btn" data-panel-section="params" title="Parameters" aria-label="Parameters">⚙</button>
+        </div>
+        <div class="bottom-sheet-handle" id="bottom-sheet-handle" aria-hidden="true">
+          <span class="bottom-sheet-handle-bar"></span>
+        </div>
+        <div class="demo-right-panel-inner" id="demo-right-panel-inner">
+          <details class="panel-section" id="panel-section-measure" open>
+            <summary class="panel-section-summary">Measurement</summary>
+            <div class="panel-section-body">
+              <div id="panel-measure-binary" class="panel-measure-binary">
+                <div class="measurement-slider-row measurement-slider-row--explore">
+                  <span class="measurement-icon measurement-icon--wave" aria-hidden="true">〰</span>
+                  <input type="range" id="measurement-slider-explore" min="0" max="100" value="0" step="1" aria-labelledby="measurement-label-explore" aria-valuetext="0%">
+                  <span class="measurement-icon measurement-icon--particle" aria-hidden="true">●</span>
+                </div>
+                <div class="measurement-meta measurement-meta--with-input">
+                  <span id="measurement-label-explore" class="measurement-label">Measurement strength γ</span>
+                  <span id="measurement-value-readout-explore" class="measurement-readout">0%</span>
+                  <label class="sr-only" for="measurement-gamma-input">Gamma percent</label>
+                  <input type="number" id="measurement-gamma-input" class="measurement-gamma-input" min="0" max="100" value="0" step="1" aria-label="Gamma precise value percent">
+                </div>
+                <button type="button" class="observe-btn panel-observe-toggle" id="panel-observe-toggle" aria-pressed="false">
+                  <span aria-hidden="true">◎</span> <span class="panel-observe-label">Observer: off</span>
+                </button>
+                <div class="vis-model-row">
+                  <label for="vis-model-select">Visibility model</label>
+                  <select id="vis-model-select" aria-label="Complementarity visibility model">
+                    <option value="quadratic">Quadratic (D² + V² = 1)</option>
+                    <option value="linear">Linear</option>
+                    <option value="exponential">Exponential</option>
+                  </select>
+                </div>
+                <p id="measurement-narrative-explore" class="measurement-narrative measurement-narrative--compact"></p>
+                <span
+                  id="explore-full-measure-indicator"
+                  class="explore-full-measure-indicator"
+                  role="status"
+                  aria-live="polite"
+                  aria-label=""
+                  hidden
+                >
+                  <span class="explore-full-measure-icon" aria-hidden="true">◎</span>
+                  <span class="explore-full-measure-label">100%</span>
+                </span>
+              </div>
+            </div>
+          </details>
+
+          <details class="panel-section" id="panel-section-comp" open>
+            <summary class="panel-section-summary">Complementarity</summary>
+            <div class="panel-section-body">
+              <div class="complementarity-panel" id="complementarity-hud-explore" role="img" aria-label="Complementarity D versus V diagram">
+                <svg id="complementarity-svg" class="complementarity-svg-lg" viewBox="0 0 100 100" aria-hidden="true">
+                  <g opacity="0.9">
+                    <line x1="12" y1="88" x2="88" y2="88" stroke="currentColor" stroke-width="0.4" opacity="0.35"></line>
+                    <line x1="12" y1="88" x2="12" y2="12" stroke="currentColor" stroke-width="0.4" opacity="0.35"></line>
+                    <g class="comp-grid" stroke="currentColor" stroke-width="0.2" opacity="0.2"></g>
+                  </g>
+                  <path id="complementarity-curve-path" fill="none" stroke="currentColor" stroke-width="0.85" opacity="0.55"></path>
+                  <text x="50" y="97" text-anchor="middle" font-size="5" fill="currentColor" opacity="0.65" class="comp-axis-d">Which-path knowledge (D)</text>
+                  <text transform="translate(5,50) rotate(-90)" text-anchor="middle" font-size="5" fill="currentColor" opacity="0.65" class="comp-axis-v">Fringe visibility (V)</text>
+                  <circle id="complementarity-point-explore" cx="12" cy="88" r="6" fill="url(#comp-grad-explore)" stroke="currentColor" stroke-width="0.5" opacity="0.95"></circle>
+                  <defs>
+                    <linearGradient id="comp-grad-explore" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stop-color="#38bdf8"></stop>
+                      <stop offset="100%" stop-color="#f59e0b"></stop>
+                    </linearGradient>
+                  </defs>
+                </svg>
+                <div class="complementarity-readout" id="complementarity-dv-readout">D = 0.00 &nbsp; V = 1.00 &nbsp; D² + V² = 1.00</div>
+                <div class="complementarity-hud-sum complementarity-hud-sum--sm" id="complementarity-sum-explore" hidden>D² + V² = 1.00</div>
+              </div>
+              <p class="explore-deeper-hint" id="explore-deeper-hint" hidden>Explore deeper — interpretation &amp; parameters below.</p>
+            </div>
+          </details>
+
+          <details class="panel-section" id="panel-section-interp">
+            <summary class="panel-section-summary">Interpretation</summary>
+            <div class="panel-section-body panel-interpretation-body" id="panel-interpretation-body"></div>
+          </details>
+
+          <details class="panel-section" id="panel-section-params">
+            <summary class="panel-section-summary">Parameters</summary>
+            <div class="panel-section-body">
+              <div class="params-panel params-panel-advanced" id="params-panel">
+                <div class="param-row" id="adv-mass-row">
+                  <label for="adv-mass">Particle mass (slider → amu)</label>
+                  <input type="range" id="adv-mass" min="0" max="1000" value="0" aria-valuetext="electron scale">
+                  <span class="param-readout" id="adv-mass-readout"></span>
+                </div>
+                <div class="param-row" id="adv-env-row" hidden>
+                  <label for="adv-env">Environment coupling</label>
+                  <input type="range" id="adv-env" min="0" max="100" value="0" aria-valuetext="0%">
+                </div>
+                <fieldset class="param-fieldset" id="adv-perspective-row" hidden>
+                  <legend>RQM perspective</legend>
+                  <label class="radio-label"><input type="radio" name="perspective" value="external" checked> External</label>
+                  <label class="radio-label"><input type="radio" name="perspective" value="detector"> Detector</label>
+                  <label class="radio-label"><input type="radio" name="perspective" value="particle"> Particle</label>
+                </fieldset>
+                <div class="param-row param-row--swatch">
+                  <label for="wavelength">Wavelength (nm)</label>
+                  <input type="number" id="wavelength" value="550" min="380" max="700">
+                  <span class="wavelength-swatch" id="wavelength-swatch" aria-hidden="true"></span>
+                </div>
+                <div class="param-row">
+                  <label for="slit-width">Slit width (nm)</label>
+                  <input type="number" id="slit-width" value="100" min="10" max="500">
+                </div>
+                <div class="param-row">
+                  <label for="slit-sep">Slit separation (nm)</label>
+                  <input type="number" id="slit-sep" value="500" min="100" max="2000">
+                </div>
+                <button class="recompute-btn" id="recompute">Recompute</button>
+                <button type="button" class="reset-defaults-link" id="reset-params-defaults">Reset to defaults</button>
+              </div>
+            </div>
+          </details>
+        </div>
+      </aside>
+    </div>
 
     <div class="info-panel" id="info-panel">
       <button class="info-close" id="info-close" aria-label="Close">×</button>
       <div class="info-content" id="info-content"></div>
-    </div>
-
-    <div class="demo-bottom-chrome" id="demo-bottom-chrome">
-      <div class="demo-ui demo-ui-timeline-only">
-        <div class="timeline-row">
-          <label>Timeline</label>
-          <input type="range" id="timeline" class="timeline-slider" aria-label="Timeline" aria-valuetext="0%">
-          <button type="button" class="play-btn play-btn--playing" id="play" aria-label="Pause">❚❚</button>
-          <span class="particle-count" id="particle-count">0 / 2000 particles</span>
-        </div>
-      <details class="explore-deeper" id="explore-deeper">
-        <summary class="explore-deeper-summary">Explore deeper — continuous measurement (γ)</summary>
-        <h3 class="explore-deeper-static-title">Explore deeper — continuous measurement (γ)</h3>
-        <div class="explore-deeper-body">
-          <div class="explore-deeper-controls">
-            <div class="explore-deeper-toolbar">
-              <button type="button" class="explore-pause-btn" id="explore-pause" aria-label="Pause timeline">❚❚</button>
-              <span
-                id="explore-full-measure-indicator"
-                class="explore-full-measure-indicator"
-                role="status"
-                aria-live="polite"
-                aria-label=""
-                hidden
-              >
-                <span class="explore-full-measure-icon" aria-hidden="true">◎</span>
-                <span class="explore-full-measure-label">100%</span>
-              </span>
-            </div>
-            <div class="measurement-slider-row measurement-slider-row--explore">
-              <span class="measurement-icon measurement-icon--wave" aria-hidden="true">〰</span>
-              <input type="range" id="measurement-slider-explore" min="0" max="100" value="0" step="1" aria-labelledby="measurement-label-explore" aria-valuetext="0%">
-              <span class="measurement-icon measurement-icon--particle" aria-hidden="true">●</span>
-            </div>
-            <div class="measurement-meta">
-              <span id="measurement-label-explore" class="measurement-label">Measurement strength γ</span>
-              <span id="measurement-value-readout-explore" class="measurement-readout">0%</span>
-            </div>
-            <p id="measurement-narrative-explore" class="measurement-narrative measurement-narrative--compact"></p>
-          </div>
-          <div class="complementarity-hud complementarity-hud--inline" id="complementarity-hud-explore" role="img" aria-label="Complementarity diagram: D equals gamma, V is fringe visibility">
-            <div class="complementarity-hud-title">D vs V</div>
-            <svg class="complementarity-hud-svg complementarity-hud-svg--sm" viewBox="0 0 88 88" aria-hidden="true">
-              <path d="M 14 74 A 60 60 0 0 1 74 14" fill="none" stroke="currentColor" stroke-width="1" opacity="0.35" />
-              <line x1="14" y1="74" x2="74" y2="74" stroke="currentColor" stroke-width="0.6" opacity="0.25" />
-              <line x1="14" y1="74" x2="14" y2="14" stroke="currentColor" stroke-width="0.6" opacity="0.25" />
-              <text x="16" y="84" font-size="7" fill="currentColor" opacity="0.7">D</text>
-              <text x="4" y="22" font-size="7" fill="currentColor" opacity="0.7">V</text>
-              <circle id="complementarity-point-explore" cx="14" cy="74" r="4" fill="url(#comp-grad-explore)" />
-              <defs>
-                <linearGradient id="comp-grad-explore" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stop-color="#38bdf8" />
-                  <stop offset="100%" stop-color="#f59e0b" />
-                </linearGradient>
-              </defs>
-            </svg>
-            <div class="complementarity-hud-sum complementarity-hud-sum--sm" id="complementarity-sum-explore">D² + V² = 1.00</div>
-          </div>
-        </div>
-      </details>
-      </div>
     </div>
   </div>
 
@@ -307,18 +277,18 @@
       <p class="demo-modal-lead">These controls mirror the main product: timeline, measurement strength, camera, and experiment parameters.</p>
       <ul class="demo-modal-list">
         <li><strong>Timeline</strong> — Drag the slider to scrub through time, or use Play / Pause (in the bar or inside Explore deeper) to run or hold the animation.</li>
-        <li><strong>Explore deeper</strong> — Drag γ from wave-like (0%) toward full which-path (100%). The pattern updates with Englert complementarity (V = √(1−γ²)). A ◎ badge appears at 100%. The small diagram shows (D, V) with D = γ.</li>
+        <li><strong>Measurement &amp; complementarity</strong> — Use the right panel (or bottom sheet on small screens): drag γ, use the observer toggle, or drag the point on the D–V diagram. The pattern follows the chosen visibility model (quadratic / linear / exponential).</li>
         <li><strong>Camera</strong> — Drag to orbit, scroll or pinch to zoom, right-drag (or trackpad two-finger) to pan—full 3D around the bench.</li>
         <li><strong>Parameters &amp; Recompute</strong> — Slit width, separation, and wavelength (colour). After edits, <strong>Recompute</strong> regenerates the particle set. Extended options in this build add mass-related behaviour for some interpretations.</li>
         <li><strong>Interpretations &amp; ℹ</strong> — Tabs switch the story and overlays (Copenhagen, pilot-wave, etc.). The <strong>ℹ</strong> panel explains the active view without changing the underlying simulation.</li>
         <li><strong>Theme</strong> — Use the sun/moon control in the header for light or dark UI.</li>
-        <li><strong>Focus view</strong> — Use <strong>Focus</strong> in the header for a clean canvas. <strong>Interpretation</strong> (tabs and ℹ) stay at the top; <strong>Parameters</strong> and <strong>Explore deeper</strong> live in the <strong>Controls</strong> side sheet. Close the sheet with <strong>×</strong>, the dimmed area, or <strong>Esc</strong> (twice to exit focus). The timeline stays usable at the bottom.</li>
+        <li><strong>Focus view</strong> — <strong>Focus</strong> collapses the control panel to a slim icon rail so the canvas is full width. Click an icon to expand a section. Timeline controls stay as a bar along the bottom of the canvas.</li>
       </ul>
       <p id="features-help-tour-note" class="demo-modal-note" hidden><strong>Tour</strong> — On the classic demo, use ▶ Tour next to ℹ for a guided walkthrough.</p>
     </div>
   </div>
 
   <script src="/demo/help-modal.js?v=6" defer></script>
-  <script type="module" src="/demo/advanced-main.js?v=32"></script>
+  <script type="module" src="/demo/advanced-main.js?v=33"></script>
 </body>
 </html>

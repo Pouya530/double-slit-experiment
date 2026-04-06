@@ -91,7 +91,12 @@
     },
     {
       "source": "/in-detail",
-      "destination": "/in-detail/",
+      "destination": "/demo/",
+      "permanent": false
+    },
+    {
+      "source": "/in-detail/",
+      "destination": "/demo/",
       "permanent": false
     }
   ],
@@ -100,7 +105,6 @@
     { "source": "/preview/about/", "destination": "/preview/about.html" },
     { "source": "/preview/who", "destination": "/preview/who.html" },
     { "source": "/preview/benefits", "destination": "/preview/benefits.html" },
-    { "source": "/preview/features", "destination": "/preview/features.html" },
-    { "source": "/in-detail/", "destination": "/in-detail/index.html" }
+    { "source": "/preview/features", "destination": "/preview/features.html" }
   ]
 }
