@@ -81,6 +81,10 @@ app.get('/preview/who', (req, res) => res.sendFile(path.join(__dirname, 'public'
 app.get('/preview/benefits', (req, res) => res.sendFile(path.join(__dirname, 'public', 'preview', 'benefits.html')));
 app.get('/preview/features', (req, res) => res.sendFile(path.join(__dirname, 'public', 'preview', 'features.html')));
 
+app.get(['/in-detail', '/in-detail/'], (req, res) =>
+  res.sendFile(path.join(__dirname, 'public', 'in-detail', 'index.html')),
+);
+
 module.exports = app;
 
 if (require.main === module) {

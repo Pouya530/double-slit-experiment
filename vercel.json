@@ -88,6 +88,11 @@
       "source": "/preview/what.html",
       "destination": "/preview/about",
       "permanent": true
+    },
+    {
+      "source": "/in-detail",
+      "destination": "/in-detail/",
+      "permanent": false
     }
   ],
   "rewrites": [
@@ -95,6 +100,7 @@
     { "source": "/preview/about/", "destination": "/preview/about.html" },
     { "source": "/preview/who", "destination": "/preview/who.html" },
     { "source": "/preview/benefits", "destination": "/preview/benefits.html" },
-    { "source": "/preview/features", "destination": "/preview/features.html" }
+    { "source": "/preview/features", "destination": "/preview/features.html" },
+    { "source": "/in-detail/", "destination": "/in-detail/index.html" }
   ]
 }

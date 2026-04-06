@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="In detail — power-user view of the double-slit experiment: full controls and 3D simulation (roadmap).">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://doubleslitexperiment.app/in-detail/">
+  <title>In detail — Double Slit Experiment</title>
+  <link rel="icon" href="/favicon.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #050510;
+      --text: #fff;
+      --muted: rgba(255, 255, 255, 0.78);
+      --dim: rgba(255, 255, 255, 0.55);
+      --panel: rgba(0, 0, 0, 0.65);
+      --border: rgba(255, 255, 255, 0.12);
+      --accent: #129079;
+      --accent-hover: #0f7a6a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'DM Sans', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+      padding: clamp(24px, 4vw, 48px);
+    }
+    .wrap {
+      max-width: 42rem;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: clamp(1.5rem, 4vw, 2rem);
+      font-weight: 600;
+      margin: 0 0 0.5rem;
+      letter-spacing: -0.02em;
+    }
+    .lead {
+      color: var(--muted);
+      margin: 0 0 1.5rem;
+      font-size: 1.05rem;
+    }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.35rem;
+      margin-bottom: 1.5rem;
+    }
+    .panel h2 {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--dim);
+      margin: 0 0 0.75rem;
+      font-weight: 600;
+    }
+    ul {
+      margin: 0;
+      padding-left: 1.2rem;
+      color: var(--muted);
+    }
+    li { margin-bottom: 0.45rem; }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 1.75rem;
+    }
+    a.btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 18px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      font-family: inherit;
+      border: 1px solid var(--border);
+      transition: background 0.2s, border-color 0.2s;
+    }
+    a.btn--primary {
+      background: var(--accent);
+      color: #fff;
+      border-color: transparent;
+    }
+    a.btn--primary:hover {
+      background: var(--accent-hover);
+    }
+    a.btn--ghost {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+    }
+    a.btn--ghost:hover {
+      background: rgba(255, 255, 255, 0.12);
+    }
+    footer {
+      margin-top: 2.5rem;
+      font-size: 13px;
+      color: var(--dim);
+    }
+    footer a {
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>In detail</h1>
+    <p class="lead">
+      This route is reserved for the full <strong>power-user</strong> layout: split panel with every interpretation,
+      measurement controls, physics parameters, and the live 3D run side by side (see product spec). The interactive
+      demo you can use today stays on the main demo page.
+    </p>
+    <div class="panel">
+      <h2>Planned for this page</h2>
+      <ul>
+        <li>Fixed left control column + resizable divider + full-height 3D view</li>
+        <li>All ten interpretation pills, γ slider, complementarity HUD, and rich interpretation copy</li>
+        <li>Full parameter set, camera presets, quality tier, and Explore deeper tools</li>
+      </ul>
+    </div>
+    <div class="actions">
+      <a class="btn btn--primary" href="/demo/">Open interactive demo</a>
+      <a class="btn btn--ghost" href="/">← Home</a>
+    </div>
+    <footer>
+      <a href="/demo/">Demo</a>
+      ·
+      <a href="/">Marketing site</a>
+    </footer>
+  </div>
+</body>
+</html>
