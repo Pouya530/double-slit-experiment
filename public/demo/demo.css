@@ -1730,6 +1730,26 @@ details.explore-deeper[open] > .explore-deeper-summary::before {
   gap: 8px;
 }
 
+/* Focus sheet: icon-only theme control to the left of “How it works” */
+.theme-btn--focus-rail {
+  gap: 0;
+  padding: 8px 10px;
+  min-width: 44px;
+  min-height: 44px;
+  justify-content: center;
+}
+.theme-btn--focus-rail .theme-label {
+  display: none;
+}
+.theme-btn--focus-rail .theme-icon {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.demo-layout-advanced.demo-layout--focus #theme-toggle {
+  display: none !important;
+}
+
 .focus-rail-help-btn {
   padding: 8px 10px;
   border: 1px solid var(--panel-border);

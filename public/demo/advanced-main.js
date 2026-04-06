@@ -1112,16 +1112,26 @@ function setupUI() {
     syncPlayButton();
   });
 
-  document.getElementById('theme-toggle')?.addEventListener('click', () => {
+  function syncThemeToggleLabels() {
+    const icon = isDarkMode ? '☀' : '🌙';
+    const label = isDarkMode ? 'Light' : 'Dark';
+    document.querySelectorAll('.theme-btn .theme-icon').forEach((el) => {
+      el.textContent = icon;
+    });
+    document.querySelectorAll('.theme-btn .theme-label').forEach((el) => {
+      el.textContent = label;
+    });
+  }
+  const onThemeToggle = () => {
     isDarkMode = !isDarkMode;
     document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
     localStorage.setItem('doubleSlitTheme', isDarkMode ? 'dark' : 'light');
-    document.querySelector('.theme-icon').textContent = isDarkMode ? '☀' : '🌙';
-    document.querySelector('.theme-label').textContent = isDarkMode ? 'Light' : 'Dark';
+    syncThemeToggleLabels();
     applySceneTheme();
-  });
-  document.querySelector('.theme-icon').textContent = isDarkMode ? '☀' : '🌙';
-  document.querySelector('.theme-label').textContent = isDarkMode ? 'Light' : 'Dark';
+  };
+  document.getElementById('theme-toggle')?.addEventListener('click', onThemeToggle);
+  document.getElementById('theme-toggle-focus')?.addEventListener('click', onThemeToggle);
+  syncThemeToggleLabels();
 
   document.getElementById('explore-pause')?.addEventListener('click', () => {
     isPlaying = !isPlaying;
