@@ -1258,6 +1258,9 @@ function setupFocusViewMode() {
   const enter = document.getElementById('focus-view-enter');
   const exit = document.getElementById('focus-view-exit');
   const helpRail = document.getElementById('focus-rail-help');
+  const collapseRail = document.getElementById('focus-rail-collapse');
+  const dockRail = document.getElementById('focus-rail-dock');
+  const accExplore = document.getElementById('focus-acc-3');
   const cluster = document.getElementById('demo-toolbar-cluster');
   const interp = document.getElementById('interpretation-tabs');
   const paramsToggle = document.getElementById('params-toggle');
@@ -1297,6 +1300,22 @@ function setupFocusViewMode() {
     });
   });
 
+  accExplore?.addEventListener('toggle', () => {
+    if (accExplore.open && explore) explore.setAttribute('open', '');
+  });
+
+  function syncFocusRailDock() {
+    if (!dockRail) return;
+    if (!active) {
+      dockRail.hidden = true;
+      return;
+    }
+    const collapsed = layout.classList.contains('demo-focus-rail-collapsed');
+    dockRail.hidden = !collapsed;
+    dockRail.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+    collapseRail?.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+  }
+
   function mark(node) {
     const m = document.createComment('focus-restore');
     node.parentNode.insertBefore(m, node);
@@ -1321,9 +1340,11 @@ function setupFocusViewMode() {
     bodyExplore.appendChild(explore);
 
     explore.setAttribute('open', '');
+    layout.classList.remove('demo-focus-rail-collapsed');
 
     layout.classList.add('demo-layout--focus');
     rail.hidden = false;
+    syncFocusRailDock();
     const reduceMotion =
       typeof window.matchMedia === 'function' &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -1351,13 +1372,25 @@ function setupFocusViewMode() {
     }
     restoreList = [];
 
+    layout.classList.remove('demo-focus-rail-collapsed');
     layout.classList.remove('demo-layout--focus');
     rail.hidden = true;
+    syncFocusRailDock();
     window.dispatchEvent(new Event('resize'));
   }
 
   enter.addEventListener('click', enterFocus);
   exit.addEventListener('click', leaveFocus);
+  collapseRail?.addEventListener('click', () => {
+    layout.classList.add('demo-focus-rail-collapsed');
+    syncFocusRailDock();
+    window.dispatchEvent(new Event('resize'));
+  });
+  dockRail?.addEventListener('click', () => {
+    layout.classList.remove('demo-focus-rail-collapsed');
+    syncFocusRailDock();
+    window.dispatchEvent(new Event('resize'));
+  });
   helpRail?.addEventListener('click', () => {
     document.getElementById('features-help-open')?.click();
   });

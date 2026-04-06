@@ -56,7 +56,7 @@
   <link rel="icon" href="/favicon.png" type="image/png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/demo/demo.css?v=26">
+  <link rel="stylesheet" href="/demo/demo.css?v=27">
   <script type="application/ld+json">
   {"@context":"https://schema.org","@graph":[{"@type":"WebPage","@id":"https://doubleslitexperiment.app/demo/#webpage","name":"Double Slit Experiment — Interactive Demo","description":"Run the Double Slit 3D demo: double-slit interference, measurement strength (continuous decoherence), quantum interpretations, and live parameters in your browser.","url":"https://doubleslitexperiment.app/demo/","isPartOf":{"@type":"WebSite","name":"Double Slit Experiment","url":"https://doubleslitexperiment.app/"},"breadcrumb":{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://doubleslitexperiment.app/"},{"@type":"ListItem","position":2,"name":"Demo","item":"https://doubleslitexperiment.app/demo/"}]}},{"@type":"SoftwareApplication","name":"Double Slit Experiment","applicationCategory":"EducationalApplication","operatingSystem":"Web","url":"https://doubleslitexperiment.app/demo/","description":"Interactive 3D double-slit experiment with timeline scrubber, measurement-strength control, interpretations, and adjustable experimental parameters.","author":{"@type":"Organization","name":"Nocturnal Cloud","url":"https://nocturnal.cloud"},"offers":{"@type":"Offer","price":"0","priceCurrency":"GBP","availability":"https://schema.org/InStock"}}]}
   </script>
@@ -137,9 +137,33 @@
       aria-label="Simulation controls"
       hidden
     >
-      <div class="focus-rail-panel">
+      <button
+        type="button"
+        class="focus-rail-dock"
+        id="focus-rail-dock"
+        aria-label="Open controls panel"
+        aria-controls="focus-rail-panel"
+        aria-expanded="false"
+        hidden
+      >
+        <span class="focus-rail-dock-icon" aria-hidden="true">☰</span>
+      </button>
+      <div class="focus-rail-panel" id="focus-rail-panel">
         <div class="focus-rail-head">
-          <span class="focus-rail-brand">Controls</span>
+          <div class="focus-rail-head-left">
+            <button
+              type="button"
+              class="focus-rail-collapse"
+              id="focus-rail-collapse"
+              aria-label="Hide controls panel"
+              aria-controls="focus-rail-panel"
+              aria-expanded="true"
+              title="Hide panel"
+            >
+              <span aria-hidden="true">⟨</span>
+            </button>
+            <span class="focus-rail-brand">Controls</span>
+          </div>
           <div class="focus-rail-head-actions">
             <button
               type="button"
@@ -277,13 +301,13 @@
         <li><strong>Parameters &amp; Recompute</strong> — Slit width, separation, and wavelength (colour). After edits, <strong>Recompute</strong> regenerates the particle set. Extended options in this build add mass-related behaviour for some interpretations.</li>
         <li><strong>Interpretations &amp; ℹ</strong> — Tabs switch the story and overlays (Copenhagen, pilot-wave, etc.). The <strong>ℹ</strong> panel explains the active view without changing the underlying simulation.</li>
         <li><strong>Theme</strong> — Use the sun/moon control in the header for light or dark UI.</li>
-        <li><strong>Focus view</strong> — Use <strong>Focus</strong> in the header for a clean canvas: interpretation, parameters, and Explore deeper move into an expandable panel on the left; the timeline stays at the bottom. Choose <strong>Full UI</strong> inside the panel to restore the standard layout.</li>
+        <li><strong>Focus view</strong> — Use <strong>Focus</strong> in the header for a clean canvas: interpretation, parameters, and Explore deeper move into an expandable panel on the left; the timeline stays at the bottom. Use <strong>⟨</strong> beside “Controls” to hide the panel (a mid-left button brings it back). <strong>Full UI</strong> restores the standard layout.</li>
       </ul>
       <p id="features-help-tour-note" class="demo-modal-note" hidden><strong>Tour</strong> — On the classic demo, use ▶ Tour next to ℹ for a guided walkthrough.</p>
     </div>
   </div>
 
   <script src="/demo/help-modal.js?v=6" defer></script>
-  <script type="module" src="/demo/advanced-main.js?v=20"></script>
+  <script type="module" src="/demo/advanced-main.js?v=21"></script>
 </body>
 </html>
