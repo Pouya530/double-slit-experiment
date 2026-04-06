@@ -1260,13 +1260,11 @@ function setupFocusViewMode() {
   const closeRail = document.getElementById('focus-rail-close');
   const dockRail = document.getElementById('focus-rail-dock');
   const backdropRail = document.getElementById('focus-rail-backdrop');
-  const accExplore = document.getElementById('focus-acc-3');
+  const accExplore = document.getElementById('focus-acc-2');
   const cluster = document.getElementById('demo-toolbar-cluster');
-  const interp = document.getElementById('interpretation-tabs');
   const paramsToggle = document.getElementById('params-toggle');
   const paramsPanel = document.getElementById('params-panel');
   const explore = document.getElementById('explore-deeper');
-  const bodyInterp = document.getElementById('focus-body-interpretation');
   const bodyParams = document.getElementById('focus-body-parameters');
   const bodyExplore = document.getElementById('focus-body-explore');
 
@@ -1275,11 +1273,9 @@ function setupFocusViewMode() {
     !rail ||
     !enter ||
     !cluster ||
-    !interp ||
     !paramsToggle ||
     !paramsPanel ||
     !explore ||
-    !bodyInterp ||
     !bodyParams ||
     !bodyExplore
   ) {
@@ -1335,9 +1331,6 @@ function setupFocusViewMode() {
     if (active) return;
     active = true;
     restoreList = [];
-
-    mark(interp);
-    bodyInterp.appendChild(interp);
 
     mark(paramsToggle);
     bodyParams.appendChild(paramsToggle);

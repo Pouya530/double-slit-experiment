@@ -1723,7 +1723,7 @@ details.explore-deeper[open] > .explore-deeper-summary::before {
 }
 
 /* Section 3: nested controls need intrinsic row height (grid 1fr + min-height 0 can collapse) */
-#focus-acc-3.focus-acc[open] > .focus-acc-panel {
+#focus-acc-2.focus-acc[open] > .focus-acc-panel {
   grid-template-rows: min-content;
 }
 
@@ -1763,28 +1763,79 @@ details.explore-deeper[open] > .explore-deeper-summary::before {
   overflow: hidden;
 }
 
+/*
+ * Focus view: keep interpretation toolbar visible at the top (same idea as non-focus layout;
+ * header is hidden so top/safe-area offsets are tightened). Params are in the sheet only.
+ */
 .demo-layout-advanced.demo-layout--focus .demo-toolbar-cluster {
-  position: fixed;
-  left: -9999px;
-  top: 0;
-  width: 0;
-  height: 0;
-  overflow: hidden;
-  visibility: hidden;
+  visibility: visible;
   pointer-events: none;
 }
 
+.demo-layout-advanced.demo-layout--focus .demo-toolbar-cluster > * {
+  pointer-events: auto;
+}
+
+/* Desktop / wide: centred pill bar under safe area (above focus sheet z-193) */
 .demo-layout-advanced.demo-layout--focus #interpretation-tabs {
-  position: static !important;
-  transform: none !important;
-  left: auto !important;
-  top: auto !important;
-  max-width: 100% !important;
-  width: 100%;
-  border-radius: 10px;
-  margin: 0 0 4px;
-  box-shadow: none;
-  z-index: auto;
+  position: absolute;
+  z-index: 198;
+  top: max(12px, env(safe-area-inset-top, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: min(96vw, 1720px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  visibility: visible;
+}
+
+/* Tablet advanced: interpretation row already uses grid — keep cluster positioned below safe area */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .demo-layout-advanced.demo-layout--focus .demo-toolbar-cluster {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: max(10px, env(safe-area-inset-top, 0px));
+    left: 12px;
+    right: 12px;
+    z-index: 198;
+    gap: 10px;
+    align-items: stretch;
+    width: auto;
+    height: auto;
+    overflow: visible;
+  }
+  .demo-layout-advanced.demo-layout--focus #interpretation-tabs {
+    position: static;
+    transform: none;
+    left: auto;
+    width: 100%;
+    max-width: none;
+  }
+}
+
+/* Mobile: single column under safe area (only interpretation remains in cluster) */
+@media (max-width: 768px) {
+  .demo-layout-advanced.demo-layout--focus .demo-toolbar-cluster {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: max(10px, env(safe-area-inset-top, 0px));
+    left: 12px;
+    right: 12px;
+    z-index: 198;
+    gap: 10px;
+    align-items: stretch;
+    width: auto;
+    height: auto;
+    overflow: visible;
+  }
+  .demo-layout-advanced.demo-layout--focus #interpretation-tabs {
+    position: static;
+    transform: none;
+    left: auto;
+    width: 100%;
+    max-width: none;
+  }
 }
 
 .demo-layout-advanced.demo-layout--focus #params-toggle-mobile {
@@ -1841,14 +1892,6 @@ details.explore-deeper[open] > .explore-deeper-summary::before {
   margin-top: 0;
   padding-top: 0;
   border-top: none;
-}
-
-.demo-layout-advanced.demo-layout--focus .interp-tabs-pills-advanced {
-  max-height: min(36vh, 280px);
-  overflow-x: hidden;
-  overflow-y: auto;
-  flex-wrap: wrap;
-  padding-bottom: 4px;
 }
 
 /* Timeline strip stays operable above the backdrop while the sheet is open */
