@@ -1555,6 +1555,52 @@ details.explore-deeper[open] > .explore-deeper-summary::before {
   pointer-events: none;
 }
 
+/* Desktop: subtle × to exit focus (fixed top-right; inside rail for lifecycle only) */
+.focus-exit-corner {
+  display: none;
+  box-sizing: border-box;
+  position: fixed;
+  top: max(10px, env(safe-area-inset-top, 0px));
+  right: max(14px, env(safe-area-inset-right, 0px));
+  z-index: 246;
+  width: 36px;
+  height: 36px;
+  margin: 0;
+  padding: 0;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 22px;
+  line-height: 1;
+  font-weight: 300;
+  cursor: pointer;
+  font-family: inherit;
+  opacity: 0.38;
+  pointer-events: auto;
+  transition:
+    opacity 0.2s ease,
+    color 0.2s ease,
+    background 0.2s ease;
+}
+.focus-exit-corner:hover {
+  opacity: 0.92;
+  color: var(--text);
+  background: color-mix(in srgb, var(--panel-bg) 55%, transparent);
+}
+.focus-exit-corner:focus-visible {
+  opacity: 1;
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+@media (min-width: 1025px) {
+  .demo-layout-advanced.demo-layout--focus .demo-focus-rail:not([hidden]) .focus-exit-corner {
+    display: inline-flex;
+  }
+}
+
 /* Mid-left dock: stays in the stack; full-height panel (higher z-index) covers it while open */
 .focus-rail-dock {
   position: fixed;

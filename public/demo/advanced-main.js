@@ -1397,6 +1397,9 @@ function setupFocusViewMode() {
   }
 
   enter.addEventListener('click', enterFocus);
+  document.getElementById('focus-exit-corner')?.addEventListener('click', () => {
+    leaveFocus();
+  });
   closeRail?.addEventListener('click', () => {
     layout.classList.add('demo-focus-rail-collapsed');
     syncFocusRailUi();
