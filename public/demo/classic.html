@@ -59,9 +59,11 @@
   <script>
   (function () {
     try {
-      if (localStorage.getItem('doubleSlitTheme') === 'light')
-        document.documentElement.setAttribute('data-theme', 'light');
-    } catch (e) {}
+      var dark = localStorage.getItem('doubleSlitTheme') === 'dark';
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+    } catch (e) {
+      document.documentElement.setAttribute('data-theme', 'light');
+    }
   })();
   </script>
   <link rel="stylesheet" href="/demo/demo.css?v=63">
