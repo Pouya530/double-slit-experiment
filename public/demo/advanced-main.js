@@ -160,6 +160,8 @@ let transportHideTimer = 0;
 let complementarityTrail = [];
 let lastTrailGamma = -1;
 let lastToggleAnimRebuild = 0;
+/** Avoid toggling DOM every frame; only binary interpretations use the Measurement details + rail icon */
+let lastRightPanelMeasurementBinary = null;
 let gridHelper, sourceMesh, sourceGlow, barrierLeft, barrierCenter, barrierRight, screenFrame;
 let waveOverlay, envParticles, qbismOverlay;
 let isDarkMode = false;
@@ -486,9 +488,37 @@ function updateComplementarityDiagram() {
   }
 }
 
+function syncRightPanelMeasurementSectionForMode(mode) {
+  const show = mode === 'binary';
+  if (lastRightPanelMeasurementBinary === show) return;
+  lastRightPanelMeasurementBinary = show;
+
+  const measureDetails = document.getElementById('panel-section-measure');
+  const measureBtn = document.querySelector('#panel-icon-rail .panel-icon-rail-btn[data-panel-section="measure"]');
+  const paramsDetails = document.getElementById('panel-section-params');
+
+  if (measureDetails) {
+    if (show) {
+      measureDetails.removeAttribute('hidden');
+      measureDetails.setAttribute('open', '');
+    } else {
+      measureDetails.setAttribute('hidden', '');
+      measureDetails.removeAttribute('open');
+    }
+  }
+  if (measureBtn) {
+    if (show) measureBtn.removeAttribute('hidden');
+    else measureBtn.setAttribute('hidden', '');
+  }
+  if (paramsDetails && !show) {
+    paramsDetails.setAttribute('open', '');
+  }
+}
+
 function updateExploreSection() {
   const def = getInterpDef();
   const mode = def?.observerToggleMode ?? 'binary';
+  syncRightPanelMeasurementSectionForMode(mode);
   const measureBin = document.getElementById('panel-measure-binary');
   if (measureBin) measureBin.hidden = mode !== 'binary';
   document.querySelector('.vis-model-row')?.classList.toggle('vis-model-row--hidden', mode !== 'binary');
