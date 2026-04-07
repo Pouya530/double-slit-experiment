@@ -1783,8 +1783,11 @@ a.help-features-btn {
   line-height: 1;
 }
 
-.demo-layout-advanced.demo-layout--focus #theme-toggle {
-  display: none !important;
+/* Hide header theme in focus mode on small screens only; desktop keeps sun/moon in the (peekable) header */
+@media (max-width: 1023px) {
+  .demo-layout-advanced.demo-layout--focus #theme-toggle {
+    display: none !important;
+  }
 }
 
 .focus-rail-help-btn {
