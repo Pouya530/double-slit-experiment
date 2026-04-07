@@ -2545,7 +2545,22 @@ a.help-features-btn {
   display: grid;
   grid-template-columns: 1fr auto;
   align-items: center;
-  gap: 8px;
+  column-gap: 10px;
+  row-gap: 6px;
+}
+.param-row--swatch > label {
+  grid-column: 1 / -1;
+  margin-bottom: 0;
+}
+.param-row--swatch > input {
+  grid-column: 1;
+  grid-row: 2;
+  min-width: 0;
+}
+.param-row--swatch > .wavelength-swatch {
+  grid-column: 2;
+  grid-row: 2;
+  align-self: center;
 }
 .wavelength-swatch {
   width: 28px;
