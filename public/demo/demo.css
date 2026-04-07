@@ -471,7 +471,8 @@ body {
     order: 2;
   }
 
-  .params-panel {
+  /* Classic demo only: params live under .demo-toolbar-cluster. Advanced demo panel uses .demo-right-panel — do not hide globally. */
+  .demo-toolbar-cluster .params-panel {
     order: 3;
     position: static;
     display: none;
@@ -1302,7 +1303,7 @@ details.explore-deeper[open] > .explore-deeper-summary::before {
     display: flex !important;
     order: 2;
   }
-  .demo-layout-advanced .params-panel {
+  .demo-layout-advanced .demo-toolbar-cluster .params-panel {
     order: 3;
     position: static;
     display: none;
