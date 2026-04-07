@@ -30,8 +30,8 @@ const DESKTOP_INITIAL_CAM_Y = 1.5 * DESKTOP_INITIAL_ORBIT_SCALE;
 /** Mobile-only: world Y after orbit offset; offset also scaled ~15% toward target */
 const MOBILE_INITIAL_CAM_Y = 2.5;
 const MOBILE_INITIAL_DISTANCE_SCALE = 0.85;
-/** Mobile OrbitControls: max dolly-out (was 67; lower = less extreme zoom out) */
-const MOBILE_MAX_ORBIT_DISTANCE = 44;
+/** Mobile OrbitControls: max dolly-out */
+const MOBILE_MAX_ORBIT_DISTANCE = 20;
 
 /** Map interpretation UI accent (#RRGGBB) to Three.js hex for overlays. */
 function hexFromInterpBrand(def) {
