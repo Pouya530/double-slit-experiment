@@ -734,7 +734,17 @@ function applyInitialCameraAndControls() {
       const rightN = new THREE.Vector3().crossVectors(new THREE.Vector3(0, 1, 0), dirN);
       if (rightN.lengthSq() > 1e-10) {
         rightN.normalize();
-        off.applyAxisAngle(rightN, (8 * Math.PI) / 180);
+        off.applyAxisAngle(rightN, (10 * Math.PI) / 180);
+      }
+    }
+    /* Mobile: ~25% closer + ~25% more downward tilt (extra ~2.5° on top of narrow-phone pitch above). */
+    off.multiplyScalar(0.75);
+    {
+      const dirF = off.clone().normalize();
+      const rightF = new THREE.Vector3().crossVectors(new THREE.Vector3(0, 1, 0), dirF);
+      if (rightF.lengthSq() > 1e-10) {
+        rightF.normalize();
+        off.applyAxisAngle(rightF, (2.5 * Math.PI) / 180);
       }
     }
     camera.position.copy(tgt).add(off);
