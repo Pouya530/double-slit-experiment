@@ -513,7 +513,11 @@ function syncRightPanelMeasurementSectionForMode(mode) {
   if (measureDetails) {
     if (show) {
       measureDetails.removeAttribute('hidden');
-      measureDetails.setAttribute('open', '');
+      if (narrowPanelViewport()) {
+        measureDetails.removeAttribute('open');
+      } else {
+        measureDetails.setAttribute('open', '');
+      }
     } else {
       measureDetails.setAttribute('hidden', '');
       measureDetails.removeAttribute('open');
@@ -522,7 +526,11 @@ function syncRightPanelMeasurementSectionForMode(mode) {
   if (compDetails) {
     if (show) {
       compDetails.removeAttribute('hidden');
-      compDetails.setAttribute('open', '');
+      if (narrowPanelViewport()) {
+        compDetails.removeAttribute('open');
+      } else {
+        compDetails.setAttribute('open', '');
+      }
     } else {
       compDetails.setAttribute('hidden', '');
       compDetails.removeAttribute('open');
@@ -721,6 +729,11 @@ function init() {
 
 function mobileViewport() {
   return typeof window !== 'undefined' && window.innerWidth <= 768;
+}
+
+/** Matches bottom-sheet layout — panel sections start collapsed (see syncRightPanelMeasurementSectionForMode). */
+function narrowPanelViewport() {
+  return typeof window !== 'undefined' && window.matchMedia('(max-width: 1023px)').matches;
 }
 
 /** Samsung Internet / Galaxy-style UA — mobile demo only; used for default camera framing. */
