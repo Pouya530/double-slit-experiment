@@ -2330,8 +2330,11 @@ a.help-features-btn {
 .demo-right-panel.panel-collapsed .panel-resize-edge {
   display: none !important;
 }
-.demo-right-panel.panel-collapsed .panel-icon-rail {
-  display: flex !important;
+/* Icon rail: only when panel is collapsed on mobile/tablet sheet. Desktop collapsed = thin strip + chevron only. */
+@media (max-width: 1023px) {
+  .demo-right-panel.panel-collapsed .panel-icon-rail {
+    display: flex !important;
+  }
 }
 
 .panel-icon-rail {
@@ -2794,26 +2797,6 @@ a.help-features-btn {
   font-size: 10px;
 }
 
-.header-tour-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--accent);
-  text-decoration: none;
-  padding: 6px 8px;
-  border-radius: 8px;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-.header-tour-glyph {
-  flex-shrink: 0;
-}
-.header-tour-link:hover {
-  background: var(--theme-btn-bg);
-}
-
 .header-icon-btn {
   position: relative;
   width: 32px;
@@ -2882,22 +2865,6 @@ a.help-features-btn {
   }
   .header-overlay__right {
     gap: 4px;
-  }
-  .header-tour-text {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-  }
-  .header-tour-link {
-    padding: 6px;
-    min-width: 32px;
-    justify-content: center;
   }
   .interp-trigger {
     min-width: 96px;
