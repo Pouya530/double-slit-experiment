@@ -1960,6 +1960,9 @@ body:is(.page-home, .page-marketing) .nav-mobile-overlay--open .nav-mobile-credi
   filter: none;
   border-left-color: rgba(93, 212, 196, 0.45);
   background: rgba(255, 255, 255, 0.06);
+  margin-left: 0;
+  margin-right: 0;
+  width: 100%;
 }
 
 /* Footer */
