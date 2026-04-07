@@ -50,16 +50,17 @@ app.use(
   }),
 );
 
+// Demo — interactive simulation (trailing slash only). MUST be registered before `GET /demo`
+// or Express treats `/demo` and `/demo/` as the same and the redirect below steals `/demo/`.
+app.get('/demo/', (req, res) => {
+  res.sendFile(demoPath);
+});
+
 // /demo without trailing slash makes relative asset URLs (e.g. help-modal.js) resolve to /
 app.get('/demo', (req, res) => {
   const i = req.url.indexOf('?');
   const qs = i >= 0 ? req.url.slice(i) : '';
   res.redirect(308, `/demo/${qs}`);
-});
-
-// Demo — interactive simulation (trailing slash only)
-app.get('/demo/', (req, res) => {
-  res.sendFile(demoPath);
 });
 
 app.get(['/demo/advanced', '/demo/advanced/'], (req, res) => {
