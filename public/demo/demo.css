@@ -2891,6 +2891,10 @@ a.help-features-btn {
     width: 36px;
     height: 36px;
   }
+  /* Focus / chrome-less mode is desktop-oriented; bottom sheet already maximises canvas on phones */
+  #focus-view-enter {
+    display: none !important;
+  }
 }
 
 /* Laptop + desktop: when the side panel is open the canvas column narrows — compact header like transport */
