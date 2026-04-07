@@ -2218,13 +2218,14 @@ a.help-features-btn {
 }
 .transport-overlay .transport-play {
   flex-shrink: 0;
-  width: 40px;
-  height: 40px;
-  min-width: 40px;
-  min-height: 40px;
-  max-width: 40px;
-  max-height: 40px;
-  font-size: 14px;
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  min-height: 34px;
+  max-width: 34px;
+  max-height: 34px;
+  font-size: 12px;
+  border-width: 1px;
 }
 .transport-scrub-wrap {
   flex: 1 1 auto;
@@ -2855,6 +2856,21 @@ a.help-features-btn {
 .header-icon-btn:not(.help-needs-hint) .header-help-dot,
 .help-slide-panel-open .header-help-dot {
   display: none;
+}
+
+/* Desktop + wide canvas: wider interpretation control & popover; narrow canvas keeps @container rules below */
+@media (min-width: 1024px) {
+  @container demo-canvas (min-width: 560px) {
+    .demo-layout-advanced .interp-trigger {
+      min-width: 200px;
+      max-width: min(52cqw, 340px);
+      font-size: 13px;
+      height: 34px;
+    }
+    .demo-layout-advanced .interpretation-popover {
+      width: min(420px, calc(100vw - 24px));
+    }
+  }
 }
 
 @media (max-width: 1023px) {
