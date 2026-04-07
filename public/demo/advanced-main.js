@@ -23,6 +23,8 @@ const SHEET_SNAP_STORAGE = 'doubleSlitDemoSheetSnap';
 /** Base vertical FOV (deg); widened slightly when canvas is narrow so the scene doesn’t feel “squished”. */
 const BASE_CAMERA_FOV = 45;
 const CAMERA_FOV_NUDGE_MAX = 6;
+/** Desktop initial orbit: ~10% farther from target than legacy framing (tablet unchanged). */
+const DESKTOP_INITIAL_ORBIT_SCALE = 1.1;
 
 /** Map interpretation UI accent (#RRGGBB) to Three.js hex for overlays. */
 function hexFromInterpBrand(def) {
@@ -811,7 +813,12 @@ function applyInitialCameraAndControls() {
     const rx = offX * c + offZ * s;
     const rz = -offX * s + offZ * c;
     const tabletZoom = tablet ? 1.4 : 1;
-    camera.position.set(tgt.x + rx * tabletZoom, 0.6 * tabletZoom, tgt.z + rz * tabletZoom);
+    const startScale = tablet ? 1 : DESKTOP_INITIAL_ORBIT_SCALE;
+    camera.position.set(
+      tgt.x + rx * tabletZoom * startScale,
+      0.6 * tabletZoom * startScale,
+      tgt.z + rz * tabletZoom * startScale
+    );
     controls.target.copy(tgt);
     if (tablet) {
       controls.minDistance = 4.5;
