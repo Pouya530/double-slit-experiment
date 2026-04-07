@@ -1337,6 +1337,65 @@ body:is(.page-home, .page-marketing) .nav-mobile-overlay--open .nav-mobile-credi
   }
 }
 
+/* Homepage — Who it's for: full-bleed background (section-scoped; /preview/* uses body + fixed bg) */
+.home-who-section {
+  position: relative;
+  overflow: hidden;
+  --home-who-bg-image: url('/images/benefit-2.png');
+  --home-who-kenburns-duration: 30s;
+}
+
+.home-who-section__bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: var(--home-who-bg-image);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  transform: scale(1);
+  transform-origin: center center;
+  will-change: transform;
+  animation: preview-fullbleed-kenburns var(--home-who-kenburns-duration) ease-in-out infinite alternate;
+}
+
+.home-who-section__bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.home-who-section--scrim-dark .home-who-section__bg::after {
+  background: linear-gradient(
+    145deg,
+    rgba(12, 18, 28, 0.82) 0%,
+    rgba(18, 24, 36, 0.76) 50%,
+    rgba(10, 14, 22, 0.85) 100%
+  );
+}
+
+.home-who-section .home-who-section__inner.section-dark {
+  background: transparent;
+}
+
+.home-who-section__inner {
+  position: relative;
+  z-index: 1;
+  padding-top: 80px;
+  padding-bottom: 88px;
+}
+
+.home-who-section__inner .section-title {
+  margin-bottom: 40px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-who-section__bg {
+    animation: none;
+  }
+}
+
 /* Who it's for */
 .audience-grid {
   display: grid;
