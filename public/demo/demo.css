@@ -2166,6 +2166,8 @@ a.help-features-btn {
   position: relative;
   z-index: 1;
   transition: flex-grow 0.32s ease, min-width 0.32s ease;
+  container-type: inline-size;
+  container-name: demo-canvas;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -2680,14 +2682,18 @@ a.help-features-btn {
 }
 
 .header-overlay {
-  position: fixed;
+  /* Anchored to .canvas-stack (same column as transport) so the bar does not sit over the right panel */
+  position: absolute;
   top: 0;
   left: 0;
   right: 0;
+  width: 100%;
+  max-width: 100%;
   height: 40px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 6px;
   padding: 0 10px 0 8px;
   padding-left: max(8px, env(safe-area-inset-left));
   padding-right: max(10px, env(safe-area-inset-right));
@@ -2723,6 +2729,14 @@ a.help-features-btn {
   gap: 8px;
   min-width: 0;
 }
+.header-overlay__left {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.header-overlay__right {
+  flex-shrink: 0;
+  gap: 6px;
+}
 
 .header-logo-link {
   display: flex;
@@ -2747,8 +2761,9 @@ a.help-features-btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  min-width: 140px;
+  min-width: 120px;
   max-width: min(42vw, 240px);
+  max-width: min(42cqw, 240px);
   height: 32px;
   padding: 0 10px 0 8px;
   border: 1px solid var(--input-border);
@@ -2780,6 +2795,9 @@ a.help-features-btn {
 }
 
 .header-tour-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
   font-size: 12px;
   font-weight: 600;
   color: var(--accent);
@@ -2787,6 +2805,10 @@ a.help-features-btn {
   padding: 6px 8px;
   border-radius: 8px;
   white-space: nowrap;
+  flex-shrink: 0;
+}
+.header-tour-glyph {
+  flex-shrink: 0;
 }
 .header-tour-link:hover {
   background: var(--theme-btn-bg);
@@ -2848,6 +2870,50 @@ a.help-features-btn {
   .header-logo-link {
     width: 36px;
     height: 36px;
+  }
+}
+
+/* Laptop + desktop: when the side panel is open the canvas column narrows — compact header like transport */
+@container demo-canvas (max-width: 720px) {
+  .header-overlay {
+    gap: 4px;
+    padding-left: 6px;
+    padding-right: 6px;
+  }
+  .header-overlay__right {
+    gap: 4px;
+  }
+  .header-tour-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+  .header-tour-link {
+    padding: 6px;
+    min-width: 32px;
+    justify-content: center;
+  }
+  .interp-trigger {
+    min-width: 96px;
+  }
+}
+@container demo-canvas (max-width: 520px) {
+  .interp-trigger {
+    min-width: 72px;
+    flex: 1 1 auto;
+    max-width: min(48cqw, 200px);
+  }
+  .header-icon-btn {
+    width: 30px;
+    height: 30px;
+    min-width: 30px;
+    font-size: 14px;
   }
 }
 
