@@ -2471,6 +2471,14 @@ a.help-features-btn {
   display: none;
 }
 
+/* Avoid browser text selection on axis labels / readout while dragging the handle */
+.complementarity-panel {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
 .complementarity-svg-lg {
   width: 100%;
   max-width: 220px;
@@ -2480,6 +2488,8 @@ a.help-features-btn {
   color: var(--text);
   cursor: crosshair;
   touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
 .complementarity-readout {
   text-align: center;

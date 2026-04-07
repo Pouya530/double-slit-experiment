@@ -1815,12 +1815,14 @@ function setupComplementarityInteraction() {
   let dragging = false;
   svg.addEventListener('pointerdown', (e) => {
     if ((getInterpDef()?.observerToggleMode ?? 'binary') !== 'binary') return;
+    e.preventDefault();
     dragging = true;
     svg.setPointerCapture(e.pointerId);
     applyPointer(e.clientX, e.clientY);
   });
   svg.addEventListener('pointermove', (e) => {
     if (!dragging) return;
+    e.preventDefault();
     applyPointer(e.clientX, e.clientY);
   });
   svg.addEventListener('pointerup', () => {
