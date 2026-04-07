@@ -2204,7 +2204,8 @@ a.help-features-btn {
   height: 48px;
   display: flex;
   align-items: center;
-  padding: 0 10px 8px;
+  /* Symmetric horizontal + vertical: extra bottom padding had shifted the row upward */
+  padding: 0 10px;
   gap: 6px;
   background: rgba(0, 0, 0, 0.42);
   backdrop-filter: blur(8px);
