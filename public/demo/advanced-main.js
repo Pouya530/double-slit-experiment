@@ -25,8 +25,11 @@ const BASE_CAMERA_FOV = 45;
 const CAMERA_FOV_NUDGE_MAX = 6;
 /** Desktop initial orbit: ~10% farther from target than legacy framing (tablet unchanged). */
 const DESKTOP_INITIAL_ORBIT_SCALE = 1.1;
-/** Initial camera world Y for desktop/tablet (non-tablet) and mobile — same vertical framing */
+/** Initial camera world Y for desktop (non-tablet); tablet uses scaled 0.6 */
 const DESKTOP_INITIAL_CAM_Y = 1.5 * DESKTOP_INITIAL_ORBIT_SCALE;
+/** Mobile-only: world Y after orbit offset; offset also scaled ~15% toward target */
+const MOBILE_INITIAL_CAM_Y = 2.5;
+const MOBILE_INITIAL_DISTANCE_SCALE = 0.85;
 
 /** Map interpretation UI accent (#RRGGBB) to Three.js hex for overlays. */
 function hexFromInterpBrand(def) {
@@ -801,8 +804,9 @@ function applyInitialCameraAndControls() {
         off.applyAxisAngle(rightF, (2.5 * Math.PI) / 180);
       }
     }
+    off.multiplyScalar(MOBILE_INITIAL_DISTANCE_SCALE);
     camera.position.copy(tgt).add(off);
-    camera.position.y = DESKTOP_INITIAL_CAM_Y;
+    camera.position.y = MOBILE_INITIAL_CAM_Y;
     controls.target.copy(tgt);
     controls.minDistance = 5.4;
     controls.maxDistance = 67;
