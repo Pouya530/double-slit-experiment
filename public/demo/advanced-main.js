@@ -1167,11 +1167,25 @@ function interpRowHintText(def) {
   return cut.length < t.length && !cut.endsWith('.') ? `${cut}…` : cut;
 }
 
+/** Readable status for list rows: category (statusLabel without parentheses) · survey % when present. */
+function buildInterpRowStat(def) {
+  if (!def?.statusLabel) {
+    return typeof def.support === 'number' ? `${def.support}%` : '';
+  }
+  const category = String(def.statusLabel)
+    .replace(/\([^)]*\)/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (typeof def.support === 'number') {
+    return category ? `${category} · ${def.support}%` : `${def.support}%`;
+  }
+  return category;
+}
+
 function buildInterpListRow(id, opts) {
   const def = INTERPRETATIONS_ADV[id];
   if (!def) return '';
-  const stat =
-    typeof def.support === 'number' ? `${def.support}%` : def.statusLabel.replace(/\([^)]*\)/g, '').trim().slice(0, 22);
+  const stat = buildInterpRowStat(def);
   const hint = escapeHtml(interpRowHintText(def));
   const name = escapeHtml(def.name);
   const trail = opts.sheet
