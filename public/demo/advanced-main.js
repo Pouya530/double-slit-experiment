@@ -6,7 +6,7 @@
 import * as THREE from 'https://esm.sh/three@0.160.0';
 import { OrbitControls } from 'https://esm.sh/three@0.160.0/examples/jsm/controls/OrbitControls.js';
 import { createParticleBuffer } from './simulation.js?v=18';
-import { wavelengthToRGB, fringeVisibility, getComplementarity, intensityWithDecoherenceZ } from './physics.js?v=18';
+import { wavelengthToRGB, fringeVisibility, getComplementarity } from './physics.js?v=18';
 import { INTERPRETATIONS_ADV, INTERPRETATION_IDS_ADV } from './interpretations-advanced.js';
 import { INTERP_KEYBOARD_ORDER, INTERP_KEY_DIGITS, INTERP_UI_GROUPS } from './interpretation-order.js';
 import { MEASUREMENT_CONFIGS, narrativeForGamma } from './measurement-configs.js';
@@ -56,8 +56,8 @@ function drawDetectionScreenWebKitFast(ctx, w, h, theme, _positionBlend, collaps
   const { birthTimes, interferencePositions, wavelengths } = particleBuffer;
   const isDark = isDarkMode;
   ctx.globalCompositeOperation = isDark ? 'lighter' : 'source-over';
-  const r0 = thinStripHits ? 3.5 : 5.5;
-  const r1 = thinStripHits ? 1.85 : 2.85;
+  const r0 = thinStripHits ? 3 : 5;
+  const r1 = thinStripHits ? 1.6 : 2.5;
 
   for (let i = 0; i < particleBuffer.count; i++) {
     if (singleParticleMode && i > 0) continue;
@@ -107,59 +107,6 @@ function drawDetectionScreenWebKitFast(ctx, w, h, theme, _positionBlend, collaps
     ctx.fill();
   }
   ctx.globalCompositeOperation = 'source-over';
-  drawTheoreticalIntensityOverlay(ctx, w, h);
-}
-
-/** Same L / normalized d,a,λ as `simulation.js` — for drawing only (not changing sampling). */
-function getTheoreticalIntensityParams() {
-  const slitWidthM = parseFloat(document.getElementById('slit-width')?.value || 100) * 1e-9;
-  const slitSepM = parseFloat(document.getElementById('slit-sep')?.value || 500) * 1e-9;
-  const userLambda = parseFloat(document.getElementById('wavelength')?.value || 550) * 1e-9;
-  const lambdaEff = effectiveWavelength(particleMassAmu, userLambda);
-  const lambdaNm = lambdaEff * 1e9;
-  const slitSepNm = slitSepM * 1e9;
-  const slitWidthNm = slitWidthM * 1e9;
-  return {
-    L: 1.5,
-    dNorm: (slitSepNm / 100) * 1.5,
-    aNorm: (slitWidthNm / 50) * 0.6,
-    lambdaNorm: (lambdaNm / 200) * 1,
-  };
-}
-
-/**
- * Smooth “textbook” Fraunhofer profile (vertical fringes × envelope) overlaid on the detection texture.
- * Matches I(z) used for sampling so it aligns with the hit pattern; purely visual.
- */
-function drawTheoreticalIntensityOverlay(ctx, w, h) {
-  const { L, dNorm, aNorm, lambdaNorm } = getTheoreticalIntensityParams();
-  const gamma = computeMeasurementGamma();
-  const visModel = getSimulationVisibilityModel();
-  const zMin = -SCREEN_WIDTH / 2;
-  const zMax = SCREEN_WIDTH / 2;
-  let Imax = 0;
-  for (let s = 0; s <= 400; s++) {
-    const z = zMin + (s / 400) * (zMax - zMin);
-    const I = intensityWithDecoherenceZ(z, L, dNorm, aNorm, lambdaNorm, gamma, visModel);
-    if (I > Imax) Imax = I;
-  }
-  if (!(Imax > 1e-30)) return;
-
-  const isDark = isDarkMode;
-  ctx.save();
-  ctx.globalCompositeOperation = isDark ? 'lighter' : 'source-over';
-  for (let x = 0; x < w; x++) {
-    const z = (x / w) * SCREEN_WIDTH + zMin;
-    const I = intensityWithDecoherenceZ(z, L, dNorm, aNorm, lambdaNorm, gamma, visModel);
-    const n = Math.min(1, I / Imax);
-    if (isDark) {
-      ctx.fillStyle = `rgba(235,245,255,${0.15 * n})`;
-    } else {
-      ctx.fillStyle = `rgba(28,38,62,${0.085 * n})`;
-    }
-    ctx.fillRect(x, 0, 1, h);
-  }
-  ctx.restore();
 }
 
 function syncPlayButton() {
@@ -1406,7 +1353,7 @@ function drawDetectionScreen() {
       ctx.fill();
     }
 
-    let glowR = thinStripHits ? 8 : 14;
+    let glowR = thinStripHits ? 7 : 12;
     if (!Number.isFinite(glowR) || glowR <= 0) glowR = 8;
     const grad = ctx.createRadialGradient(px, py, 0, px, py, glowR);
     grad.addColorStop(0, `rgba(${R},${G},${B},${alpha})`);
@@ -1423,7 +1370,6 @@ function drawDetectionScreen() {
     ctx.arc(px, py, coreR, 0, Math.PI * 2);
     ctx.fill();
   }
-  drawTheoreticalIntensityOverlay(ctx, w, h);
   detectionTexture.needsUpdate = true;
 }
 
