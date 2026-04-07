@@ -802,7 +802,15 @@ body {
     transform: none;
   }
 }
-.particle-count { font-size: 14px; color: var(--text-muted); }
+.particle-count {
+  font-size: 14px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  min-width: 21ch;
+  text-align: right;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
 
 .controls-row {
   display: flex;
@@ -2257,10 +2265,15 @@ a.help-features-btn {
 .transport-count {
   flex-shrink: 0;
   font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  /* Reserve width for "3000 / 3000 particles" so the scrubber doesn’t shift when counts tick */
+  min-width: 21ch;
+  text-align: right;
   max-width: 38vw;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  box-sizing: border-box;
 }
 
 .demo-right-panel {
