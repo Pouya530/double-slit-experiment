@@ -1081,6 +1081,11 @@ body:is(.page-home, .page-marketing) .nav-mobile-overlay--open .nav-mobile-credi
   }
 }
 
+/* Homepage: FAQ → Who it's for should read as one dark band (no white gutter from .section margin) */
+#faq.faq-section:has(+ .home-who-section) {
+  margin-bottom: 0;
+}
+
 .section-light {
   background: white;
 }
