@@ -167,19 +167,19 @@ let waveOverlay, envParticles, qbismOverlay;
 let isDarkMode = false;
 let activeInterpretation = 'copenhagen';
 let singleParticleMode = false;
-let particleMassAmu = 0.00055;
+/** Default photon (0 amu) so effective λ matches the wavelength field — same baseline as classic demo. */
+let particleMassAmu = 0;
 let envCoupling = 0;
 let perspective = 'external';
 let gammaRecomputeTimer = null;
 
 /** Per-interpretation persisted knobs (slit λ / geometry stay global on the form). */
-const DEFAULT_ELECTRON_AMU = 0.00055;
 /** @type {Record<string, { particleMassAmu: number; envCoupling: number; perspective: string; measurementStrength: number; isObserving: boolean }>} */
 let interpParamSnapshots = {};
 
 function createDefaultInterpParams() {
   return {
-    particleMassAmu: DEFAULT_ELECTRON_AMU,
+    particleMassAmu: 0,
     envCoupling: 0,
     perspective: 'external',
     measurementStrength: 0,
@@ -240,6 +240,14 @@ function snapPhysicsStateImmediate() {
   gammaRecomputeTimer = null;
 }
 
+/** Match classic: preferred visibility model for the active interpretation (dropdown defaults to quadratic in HTML). */
+function syncVisibilitySelectToInterpretation() {
+  const vms = document.getElementById('vis-model-select');
+  if (!vms) return;
+  const pref = MEASUREMENT_CONFIGS[activeInterpretation]?.preferredVisModel ?? 'quadratic';
+  if (vms.querySelector(`option[value="${pref}"]`)) vms.value = pref;
+}
+
 /**
  * Save current globals into the tab we are leaving, load the tab we are entering, rebuild particles.
  */
@@ -256,11 +264,7 @@ function switchInterpretation(nextId) {
   isObserving = hydrated.measurementStrength >= 0.5;
   observerTarget = hydrated.measurementStrength;
   observerTransition = hydrated.measurementStrength;
-  const vms = document.getElementById('vis-model-select');
-  if (vms) {
-    const pref = MEASUREMENT_CONFIGS[activeInterpretation]?.preferredVisModel ?? 'quadratic';
-    vms.value = pref;
-  }
+  syncVisibilitySelectToInterpretation();
   syncAdvancedControlsFromGlobals();
   updateObserveAndAdvancedControls();
   snapPhysicsStateImmediate();
@@ -675,6 +679,7 @@ function init() {
   addParticles();
   addInterpretationOverlays();
 
+  syncVisibilitySelectToInterpretation();
   rebuildParticleBuffer(12345);
 
   applySceneTheme();
@@ -1537,7 +1542,7 @@ function setupUI() {
     document.getElementById('slit-width').value = '100';
     document.getElementById('slit-sep').value = '500';
     document.getElementById('wavelength').value = '550';
-    particleMassAmu = DEFAULT_ELECTRON_AMU;
+    particleMassAmu = 0;
     envCoupling = 0;
     syncAdvancedControlsFromGlobals();
     updateWavelengthSwatch();
