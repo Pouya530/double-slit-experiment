@@ -2858,17 +2858,18 @@ a.help-features-btn {
   display: none;
 }
 
-/* Desktop + wide canvas: wider interpretation control & popover; narrow canvas keeps @container rules below */
+/* Desktop: wide interpretation popover (mobile uses bottom sheet, not this panel) */
 @media (min-width: 1024px) {
+  .demo-layout-advanced .interpretation-popover {
+    width: min(520px, calc(100vw - 24px));
+    max-height: min(78vh, 680px);
+  }
   @container demo-canvas (min-width: 560px) {
     .demo-layout-advanced .interp-trigger {
       min-width: 200px;
       max-width: min(52cqw, 340px);
       font-size: 13px;
       height: 34px;
-    }
-    .demo-layout-advanced .interpretation-popover {
-      width: min(420px, calc(100vw - 24px));
     }
   }
 }
