@@ -3238,31 +3238,6 @@ a.help-features-btn {
   margin: 0;
 }
 
-.params-fab-mobile {
-  display: none;
-  position: fixed;
-  bottom: max(72px, calc(16px + env(safe-area-inset-bottom)));
-  left: 14px;
-  z-index: 48;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 14px;
-  border-radius: 999px;
-  border: 1px solid var(--panel-border);
-  background: var(--panel-bg);
-  color: var(--text);
-  font-size: 14px;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
-}
-@media (max-width: 1023px) {
-  .params-fab-mobile {
-    display: inline-flex;
-  }
-}
-
 .demo-layout-advanced .demo-header,
 .demo-layout-advanced .demo-toolbar-cluster {
   display: none !important;

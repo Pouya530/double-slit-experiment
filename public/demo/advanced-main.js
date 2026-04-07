@@ -1427,17 +1427,6 @@ function setupUI() {
     timelineEl.value = 0;
   });
 
-  const paramsToggleBtn = document.getElementById('params-toggle');
-  paramsToggleBtn?.addEventListener('click', () => {
-    if (window.matchMedia('(max-width: 1023px)').matches) {
-      const rp = document.getElementById('demo-right-panel');
-      rp?.classList.remove('sheet-peek', 'sheet-half', 'sheet-full');
-      rp?.classList.add('sheet-full');
-      document.getElementById('panel-section-params')?.setAttribute('open', '');
-      paramsToggleBtn.setAttribute('aria-expanded', 'true');
-    }
-  });
-
   syncPlayButton();
 
   setInterval(() => {

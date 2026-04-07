@@ -56,7 +56,7 @@
   <link rel="icon" href="/favicon.png" type="image/png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/demo/demo.css?v=51">
+  <link rel="stylesheet" href="/demo/demo.css?v=52">
   <script type="application/ld+json">
   {"@context":"https://schema.org","@graph":[{"@type":"WebPage","@id":"https://doubleslitexperiment.app/demo/#webpage","name":"Double Slit Experiment — Interactive Demo","description":"Run the Double Slit 3D demo: double-slit interference, measurement strength (continuous decoherence), quantum interpretations, and live parameters in your browser.","url":"https://doubleslitexperiment.app/demo/","isPartOf":{"@type":"WebSite","name":"Double Slit Experiment","url":"https://doubleslitexperiment.app/"},"breadcrumb":{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://doubleslitexperiment.app/"},{"@type":"ListItem","position":2,"name":"Demo","item":"https://doubleslitexperiment.app/demo/"}]}},{"@type":"SoftwareApplication","name":"Double Slit Experiment","applicationCategory":"EducationalApplication","operatingSystem":"Web","url":"https://doubleslitexperiment.app/demo/","description":"Interactive 3D double-slit experiment with timeline scrubber, measurement-strength control, interpretations, and adjustable experimental parameters.","author":{"@type":"Organization","name":"Nocturnal Cloud","url":"https://nocturnal.cloud"},"offers":{"@type":"Offer","price":"0","priceCurrency":"GBP","availability":"https://schema.org/InStock"}}]}
   </script>
@@ -152,11 +152,6 @@
       <button type="button" class="first-visit-nudge-close" id="first-visit-nudge-close" aria-label="Dismiss">×</button>
       <p class="first-visit-nudge-text">Drag the measurement slider to watch interference disappear — then switch interpretations to see why physicists disagree about what's happening.</p>
     </div>
-
-    <button type="button" class="params-fab-mobile" id="params-toggle" aria-expanded="false" aria-controls="params-panel">
-      <span aria-hidden="true">⚙</span>
-      <span class="params-fab-label">Params</span>
-    </button>
 
     <div class="demo-stage" id="demo-stage">
       <div class="canvas-stack" id="canvas-stack">
@@ -319,6 +314,6 @@
 
   <div id="ctx-tooltip" class="ctx-tooltip" hidden role="tooltip"></div>
 
-  <script type="module" src="/demo/advanced-main.js?v=37"></script>
+  <script type="module" src="/demo/advanced-main.js?v=38"></script>
 </body>
 </html>
