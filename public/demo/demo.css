@@ -993,7 +993,6 @@ details.explore-deeper[open] > .explore-deeper-summary::before {
   margin-top: 4px;
 }
 .measurement-narrative--compact {
-  max-height: 3.6em;
   margin-top: 8px;
   font-size: 12px;
 }
@@ -1092,6 +1091,11 @@ details.explore-deeper[open] > .explore-deeper-summary::before {
   color: var(--text-dim);
   max-height: 4.5em;
   overflow: auto;
+}
+/* Advanced right-panel: show full observation copy without inner scroll */
+.measurement-narrative.measurement-narrative--compact {
+  max-height: none;
+  overflow: visible;
 }
 .measurement-narrative[hidden] {
   display: none !important;
