@@ -39,8 +39,8 @@ function drawDetectionScreenWebKitFast(ctx, w, h, theme, _positionBlend, collaps
   const { birthTimes, interferencePositions, wavelengths } = particleBuffer;
   const isDark = isDarkMode;
   ctx.globalCompositeOperation = isDark ? 'lighter' : 'source-over';
-  const r0 = thinStripHits ? 3 : 5;
-  const r1 = thinStripHits ? 1.6 : 2.5;
+  const r0 = thinStripHits ? 2 : 3.5;
+  const r1 = thinStripHits ? 1.15 : 1.85;
 
   for (let i = 0; i < particleBuffer.count; i++) {
     if (singleParticleMode && i > 0) continue;
@@ -69,7 +69,7 @@ function drawDetectionScreenWebKitFast(ctx, w, h, theme, _positionBlend, collaps
 
     if (isNewHit) {
       const flashDecay = 1 - ageSinceHit / 0.2;
-      let flashExtra = (thinStripHits ? 6 : 10) * (1 - flashDecay);
+      let flashExtra = (thinStripHits ? 4 : 7) * (1 - flashDecay);
       if (!Number.isFinite(flashExtra)) flashExtra = 0;
       ctx.fillStyle = isDark
         ? `rgba(255,255,255,${0.42 * flashDecay})`
@@ -843,8 +843,8 @@ function drawDetectionScreen() {
 
     if (isNewHit) {
       const flashDecay = 1 - ageSinceHit / 0.2;
-      let flashRadius = thinStripHits ? 5 + 9 * (1 - flashDecay) : 8 + 16 * (1 - flashDecay);
-      if (!Number.isFinite(flashRadius) || flashRadius <= 0) flashRadius = thinStripHits ? 5 : 8;
+      let flashRadius = thinStripHits ? 3 + 5 * (1 - flashDecay) : 5 + 9 * (1 - flashDecay);
+      if (!Number.isFinite(flashRadius) || flashRadius <= 0) flashRadius = thinStripHits ? 3 : 5;
       const flashAlpha = 0.6 * flashDecay;
       const flashGrad = ctx.createRadialGradient(px, py, 0, px, py, flashRadius);
       flashGrad.addColorStop(0, `rgba(255,255,255,${flashAlpha})`);
@@ -856,8 +856,8 @@ function drawDetectionScreen() {
       ctx.fill();
     }
 
-    let glowR = thinStripHits ? 7 : 12;
-    if (!Number.isFinite(glowR) || glowR <= 0) glowR = 8;
+    let glowR = thinStripHits ? 4 : 7;
+    if (!Number.isFinite(glowR) || glowR <= 0) glowR = 5;
     const grad = ctx.createRadialGradient(px, py, 0, px, py, glowR);
     grad.addColorStop(0, `rgba(${R},${G},${B},${alpha})`);
     grad.addColorStop(0.4, `rgba(${R},${G},${B},${alphaOuter})`);
@@ -867,7 +867,7 @@ function drawDetectionScreen() {
     ctx.arc(px, py, glowR, 0, Math.PI * 2);
     ctx.fill();
 
-    const coreR = thinStripHits ? 2 : 3;
+    const coreR = thinStripHits ? 1.25 : 1.75;
     ctx.fillStyle = `rgba(${R},${G},${B},${isDarkMode ? 0.8 : 0.9})`;
     ctx.beginPath();
     ctx.arc(px, py, coreR, 0, Math.PI * 2);
