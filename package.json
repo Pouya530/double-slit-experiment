@@ -8,7 +8,8 @@
   },
   "scripts": {
     "start": "node index.js",
-    "preview": "node index.js"
+    "preview": "node index.js",
+    "test": "node --experimental-default-type=module tests/interference-peak-center.mjs"
   },
   "dependencies": {
     "@vercel/edge": "^1.2.2",
