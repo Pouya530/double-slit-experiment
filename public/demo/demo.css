@@ -806,8 +806,9 @@ body {
   font-size: 14px;
   color: var(--text-muted);
   font-variant-numeric: tabular-nums;
-  min-width: 21ch;
-  text-align: right;
+  min-width: 18.5ch;
+  max-width: 18.5ch;
+  text-align: left;
   flex-shrink: 0;
   box-sizing: border-box;
 }
@@ -2199,8 +2200,8 @@ a.help-features-btn {
   height: 48px;
   display: flex;
   align-items: center;
-  padding: 0 12px 8px;
-  gap: 10px;
+  padding: 0 10px 8px;
+  gap: 6px;
   background: rgba(0, 0, 0, 0.42);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
@@ -2217,6 +2218,13 @@ a.help-features-btn {
 }
 .transport-overlay .transport-play {
   flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  min-height: 40px;
+  max-width: 40px;
+  max-height: 40px;
+  font-size: 14px;
 }
 .transport-scrub-wrap {
   flex: 1 1 auto;
@@ -2235,27 +2243,27 @@ a.help-features-btn {
 }
 .transport-speed {
   flex-shrink: 0;
-  min-width: 44px;
-  min-height: 44px;
-  padding: 0 8px;
+  min-width: 36px;
+  min-height: 36px;
+  padding: 0 6px;
   border: 1px solid var(--panel-border);
   border-radius: 8px;
   background: var(--theme-btn-bg);
   color: var(--text);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   font-family: inherit;
 }
 .transport-reset {
   flex-shrink: 0;
-  width: 44px;
-  height: 44px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   border: 1px solid var(--panel-border);
   background: var(--theme-btn-bg);
   color: var(--text);
-  font-size: 18px;
+  font-size: 16px;
   cursor: pointer;
   font-family: inherit;
   display: inline-flex;
@@ -2266,10 +2274,10 @@ a.help-features-btn {
   flex-shrink: 0;
   font-size: 12px;
   font-variant-numeric: tabular-nums;
-  /* Reserve width for "3000 / 3000 particles" so the scrubber doesn’t shift when counts tick */
-  min-width: 21ch;
-  text-align: right;
-  max-width: 38vw;
+  /* Stable width for up to 3000 / 3000; left-align so space isn’t an empty gap after ↺ */
+  min-width: 18.5ch;
+  max-width: 18.5ch;
+  text-align: left;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
