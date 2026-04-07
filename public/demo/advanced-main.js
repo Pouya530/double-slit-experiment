@@ -30,6 +30,8 @@ const DESKTOP_INITIAL_CAM_Y = 1.5 * DESKTOP_INITIAL_ORBIT_SCALE;
 /** Mobile-only: world Y after orbit offset; offset also scaled ~15% toward target */
 const MOBILE_INITIAL_CAM_Y = 2.5;
 const MOBILE_INITIAL_DISTANCE_SCALE = 0.85;
+/** Mobile OrbitControls: max dolly-out (was 67; lower = less extreme zoom out) */
+const MOBILE_MAX_ORBIT_DISTANCE = 44;
 
 /** Map interpretation UI accent (#RRGGBB) to Three.js hex for overlays. */
 function hexFromInterpBrand(def) {
@@ -822,7 +824,7 @@ function applyInitialCameraAndControls() {
     camera.position.y = MOBILE_INITIAL_CAM_Y;
     controls.target.copy(tgt);
     controls.minDistance = 5.4;
-    controls.maxDistance = 67;
+    controls.maxDistance = MOBILE_MAX_ORBIT_DISTANCE;
   } else {
     const tgt = new THREE.Vector3(0.5, 0, 0);
     const yawLeft = -Math.PI / 6;
