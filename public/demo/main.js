@@ -373,9 +373,10 @@ function applyInitialCameraAndControls() {
     const rz = -offX * s + offZ * c;
     const tabletZoom = tablet ? 1.4 : 1;
     const startScale = tablet ? 1 : DESKTOP_INITIAL_ORBIT_SCALE;
+    const baseCamY = tablet ? 0.6 : 0.85;
     camera.position.set(
       tgt.x + rx * tabletZoom * startScale,
-      0.6 * tabletZoom * startScale,
+      baseCamY * tabletZoom * startScale,
       tgt.z + rz * tabletZoom * startScale
     );
     controls.target.copy(tgt);
